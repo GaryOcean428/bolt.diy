@@ -94,14 +94,12 @@ export class AgentManager extends EventEmitter {
 
       // Update success rate
       registration.successRate =
-        (registration.successRate * (registration.totalTasks - 1) + (result.success ? 1 : 0)) /
-        registration.totalTasks;
+        (registration.successRate * (registration.totalTasks - 1) + (result.success ? 1 : 0)) / registration.totalTasks;
 
       return result;
     } catch (error) {
       // Update success rate on error
-      registration.successRate =
-        (registration.successRate * (registration.totalTasks - 1)) / registration.totalTasks;
+      registration.successRate = (registration.successRate * (registration.totalTasks - 1)) / registration.totalTasks;
 
       throw error;
     }

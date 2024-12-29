@@ -197,6 +197,7 @@ export class ContainerManager extends EventEmitter {
         const domain = allowed.slice(2);
         return host === domain || host.endsWith('.' + domain);
       }
+
       return host === allowed;
     });
   }

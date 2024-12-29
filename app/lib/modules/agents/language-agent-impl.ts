@@ -35,6 +35,7 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
       // Use language model to translate
       const prompt = `Translate the following text from ${sourceLanguage} to ${this._language}:\n\n${content}`;
       const result = await this._languageModel.complete(prompt);
+
       return result.text;
     } catch (error) {
       throw new Error(`Translation failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -86,6 +87,7 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
       // Process task in agent's language
       const prompt = this._createPrompt(task, context);
       const result = await this._languageModel.complete(prompt);
+
       return {
         success: true,
         data: result as T,
@@ -141,7 +143,9 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
      */
     return {
       complete: async (prompt: string) => ({ text: prompt }),
-      dispose: async () => {},
+      dispose: async () => {
+        // Cleanup will be implemented when actual language model is used
+      },
     };
   }
 
