@@ -1,6 +1,6 @@
 import type { IProviderSetting } from '~/types/model';
-import { BaseProvider } from './base-provider';
 import type { ModelInfo, ProviderInfo } from './types';
+import { BaseProvider, type BaseProvider as BaseProviderType } from './base-provider';
 import * as providers from './registry';
 
 export class LLMManager {

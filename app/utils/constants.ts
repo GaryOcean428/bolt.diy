@@ -358,7 +358,7 @@ async function initializeModelList(options: {
   return list;
 }
 
-// initializeModelList({})
+initializeModelList({});
 export { initializeModelList, providerBaseUrlEnvKeys, MODEL_LIST };
 
 // starter Templates
