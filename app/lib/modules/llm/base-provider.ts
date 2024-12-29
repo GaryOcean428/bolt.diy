@@ -3,15 +3,20 @@ import type { ProviderInfo, ProviderConfig, ModelInfo } from './types';
 import type { IProviderSetting } from '~/types/model';
 import { createOpenAI } from '@ai-sdk/openai';
 import { LLMManager } from './manager';
+import { BasePlugin } from '../plugins/base-plugin';
+import type { PluginMetadata } from '../plugins/types';
 
-export abstract class BaseProvider implements ProviderInfo {
+export abstract class BaseProvider extends BasePlugin<ProviderConfig> implements ProviderInfo {
   abstract name: string;
   abstract staticModels: ModelInfo[];
-  abstract config: ProviderConfig;
 
   getApiKeyLink?: string;
   labelForGetApiKey?: string;
   icon?: string;
+
+  constructor(metadata: PluginMetadata, config: ProviderConfig) {
+    super(metadata, config);
+  }
 
   getProviderBaseUrlAndKey(options: {
     apiKeys?: Record<string, string>;
@@ -58,15 +63,4 @@ export abstract class BaseProvider implements ProviderInfo {
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
   }): LanguageModelV1;
-}
-
-type OptionalApiKey = string | undefined;
-
-export function getOpenAILikeModel(baseURL: string, apiKey: OptionalApiKey, model: string) {
-  const openai = createOpenAI({
-    baseURL,
-    apiKey,
-  });
-
-  return openai(model);
 }
