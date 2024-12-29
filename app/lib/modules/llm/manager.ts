@@ -35,7 +35,15 @@ export class LLMManager {
       // Look for exported classes that extend BaseProvider
       for (const exportedItem of Object.values(providers)) {
         if (typeof exportedItem === 'function' && exportedItem.prototype instanceof BaseProvider) {
-          const provider = new exportedItem();
+          const provider = new exportedItem(
+            {
+              name: 'provider',
+              version: '1.0.0',
+              description: 'LLM Provider',
+              enabled: true,
+            },
+            {},
+          );
 
           try {
             this.registerProvider(provider);

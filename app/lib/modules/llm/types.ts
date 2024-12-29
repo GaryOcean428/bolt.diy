@@ -29,4 +29,5 @@ export interface ProviderInfo {
 export interface ProviderConfig {
   baseUrlKey?: string;
   apiTokenKey?: string;
+  [key: string]: unknown; // Add index signature to satisfy PluginConfig
 }

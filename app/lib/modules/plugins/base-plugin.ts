@@ -7,12 +7,19 @@ export abstract class BasePlugin<T extends PluginConfig = PluginConfig> implemen
   constructor(metadata: PluginMetadata, config: T) {
     this.metadata = {
       ...metadata,
-      enabled: metadata.enabled ?? true
+      enabled: metadata.enabled ?? true,
     };
     this.config = config;
   }
 
   // Default implementations that can be overridden
-  async initialize(): Promise<void> {}
-  async cleanup(): Promise<void> {}
+  async initialize(): Promise<void> {
+    // Base initialization - can be overridden by plugins
+    return Promise.resolve();
+  }
+
+  async cleanup(): Promise<void> {
+    // Base cleanup - can be overridden by plugins
+    return Promise.resolve();
+  }
 }

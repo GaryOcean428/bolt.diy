@@ -8,12 +8,15 @@ export class PluginRegistryImpl implements PluginRegistry {
   private _plugins: Map<string, Plugin> = new Map();
   private static _instance: PluginRegistryImpl;
 
-  private constructor() {}
+  private constructor() {
+    // Private constructor for singleton pattern
+  }
 
   static getInstance(): PluginRegistryImpl {
     if (!PluginRegistryImpl._instance) {
       PluginRegistryImpl._instance = new PluginRegistryImpl();
     }
+
     return PluginRegistryImpl._instance;
   }
 
@@ -54,6 +57,7 @@ export class PluginRegistryImpl implements PluginRegistry {
    */
   async unregister(pluginName: string): Promise<void> {
     const plugin = this._plugins.get(pluginName);
+
     if (!plugin) {
       throw new Error(`Plugin ${pluginName} not found`);
     }

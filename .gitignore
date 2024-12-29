@@ -5,7 +5,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-/docs/docs/likeprojects
+/docs/docs/likeprojects/
+/docs/docs/likeprojects/**/*
 
 node_modules
 dist
