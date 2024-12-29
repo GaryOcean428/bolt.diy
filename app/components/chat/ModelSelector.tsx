@@ -56,7 +56,7 @@ export const ModelSelector = ({
   return (
     <div className="mb-2 flex gap-2 flex-col sm:flex-row">
       <select
-        value={provider?.name ?? ''}
+        value={provider?.name || providerList[0]?.name || ''}
         onChange={(e) => {
           const newProvider = providerList.find((p: ProviderInfo) => p.name === e.target.value);
 
@@ -70,6 +70,7 @@ export const ModelSelector = ({
             setModel(firstModel.name);
           }
         }}
+        title="Select a provider"
         className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all"
       >
         {providerList.map((provider: ProviderInfo) => (
@@ -82,6 +83,7 @@ export const ModelSelector = ({
         key={provider?.name}
         value={model}
         onChange={(e) => setModel?.(e.target.value)}
+        title="Select a model"
         className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all lg:max-w-[70%]"
       >
         {[...modelList]
