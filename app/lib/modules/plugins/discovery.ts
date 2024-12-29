@@ -86,15 +86,43 @@ export class PluginDiscovery {
     };
 
     try {
-      /**
-       * TODO: Implement file system scanning using node:fs/promises
-       * For now, we'll use dynamic imports which will be implemented later
-       */
-      const pluginModules = {
-        // Placeholder for dynamically loaded modules
+      const { readdir, stat } = await import('node:fs/promises');
+      const { join, relative, extname } = await import('node:path');
+
+      const pluginModules = new Map<string, any>();
+      const validExtensions = ['.js', '.ts'];
+      const isPluginFile = (filename: string) => {
+        const ext = extname(filename);
+        return validExtensions.includes(ext) && filename.endsWith('.plugin' + ext);
       };
 
-      for (const [path, module] of Object.entries(pluginModules)) {
+      // Recursive function to scan directory
+      const scanDir = async (dir: string) => {
+        const entries = await readdir(dir);
+
+        for (const entry of entries) {
+          const fullPath = join(dir, entry);
+          const stats = await stat(fullPath);
+
+          if (stats.isDirectory()) {
+            await scanDir(fullPath);
+          } else if (stats.isFile() && isPluginFile(entry)) {
+            try {
+              const relativePath = relative(this._config.pluginDir, fullPath);
+              const module = await import(fullPath);
+              pluginModules.set(relativePath, module);
+            } catch (error) {
+              console.warn(`Failed to import plugin at ${fullPath}:`, error);
+            }
+          }
+        }
+      };
+
+      // Start scanning from the configured plugin directory
+      await scanDir(this._config.pluginDir);
+
+      // Process discovered plugins
+      for (const [path, module] of pluginModules.entries()) {
         try {
           const plugin = await this._loadPlugin(path, module);
 
@@ -180,9 +208,49 @@ export class PluginDiscovery {
    * Start watching for plugin changes
    */
   private async _startWatching(): Promise<void> {
-    /**
-     * TODO: Implement file watching using node:fs/promises
-     */
-    console.log('Plugin watching not implemented yet');
+    const { watch } = await import('node:fs/promises');
+    const { join, relative, extname } = await import('node:path');
+
+    const validExtensions = ['.js', '.ts'];
+    const isPluginFile = (filename: string) => {
+      const ext = extname(filename);
+      return validExtensions.includes(ext) && filename.endsWith('.plugin' + ext);
+    };
+
+    try {
+      const watcher = watch(this._config.pluginDir, { recursive: true });
+      this._watcher = watcher;
+
+      for await (const event of watcher) {
+        if (!event.filename) {
+          continue;
+        }
+
+        // Only process .js and .ts plugin files
+        if (!isPluginFile(event.filename)) {
+          continue;
+        }
+
+        const fullPath = join(this._config.pluginDir, event.filename);
+        const relativePath = relative(this._config.pluginDir, fullPath);
+
+        try {
+          // Clear the module cache to ensure we get fresh imports
+          delete require.cache[require.resolve(fullPath)];
+
+          // Import the updated module
+          const module = await import(fullPath);
+          const plugin = await this._loadPlugin(relativePath, module);
+
+          if (plugin) {
+            console.log(`Plugin ${relativePath} updated successfully`);
+          }
+        } catch (error) {
+          console.error(`Error reloading plugin ${relativePath}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('Error setting up plugin watcher:', error);
+    }
   }
 }
