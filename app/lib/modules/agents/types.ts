@@ -60,9 +60,15 @@ export interface TaskComplexity {
 /**
  * Agent execution result
  */
+export interface CodeAction {
+  type: 'file' | 'shell';
+  content: string;
+  filePath?: string;
+}
+
 export interface AgentResult<T = unknown> {
   success: boolean;
-  data: T;
+  data: T | { actions: CodeAction[] };
   error?: Error;
   metrics: {
     tokensUsed: number;

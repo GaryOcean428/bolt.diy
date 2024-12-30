@@ -137,11 +137,19 @@ export const ChatImpl = memo(
 
     const { messages, isLoading, input, handleInputChange, setInput, stop, append } = useChat({
       api: '/api/chat',
-      body: {
+      body: ({ messages, data }: { messages: Message[]; data?: { input?: string } }) => ({
         apiKeys,
         files,
         promptId,
-      },
+        complexity: {
+          tokenCount: data?.input?.length || 0,
+          specializedKnowledge: (data?.input || '').includes('code') || (data?.input || '').includes('programming'),
+          securitySensitive: (data?.input || '').includes('security') || (data?.input || '').includes('auth'),
+          languageSpecific: true,
+          expectedDuration: 1,
+        },
+        messages,
+      }),
       sendExtraMessageFields: true,
       onError: (error) => {
         logger.error('Request failed\n\n', error);

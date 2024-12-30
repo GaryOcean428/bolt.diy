@@ -1,6 +1,6 @@
 import { BaseAgent } from './base-agent';
 import { SupportedLanguage } from './types';
-import type { AgentConfig, AgentResult, LanguageAgent, TaskComplexity } from './types';
+import type { AgentConfig, AgentResult, LanguageAgent, TaskComplexity, CodeAction } from './types';
 
 /**
  * Language-specific agent implementation
@@ -12,6 +12,33 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
   constructor(config: AgentConfig, language: SupportedLanguage) {
     super(config);
     this._language = language;
+    this._languageModel = null;
+  }
+
+  private _extractCodeActions(result: any): CodeAction[] {
+    const actions: CodeAction[] = [];
+
+    /*
+     * Extract code blocks and file paths from the result
+     * This is a basic implementation - enhance based on your LLM's output format
+     */
+    if (typeof result === 'string') {
+      const fileMatches = result.match(/```[\s\S]*?```/g) || [];
+
+      for (const match of fileMatches) {
+        const filePath = match.match(/```\w+\s+([^\n]+)/)?.[1];
+
+        if (filePath) {
+          actions.push({
+            type: 'file',
+            filePath,
+            content: match.replace(/```\w+\s+[^\n]+\n([\s\S]*?)```/, '$1').trim(),
+          });
+        }
+      }
+    }
+
+    return actions;
   }
 
   get language(): SupportedLanguage {
@@ -88,9 +115,12 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
       const prompt = this._createPrompt(task, context);
       const result = await this._languageModel.complete(prompt);
 
+      // Check if the result contains code actions
+      const actions = this._extractCodeActions(result);
+
       return {
         success: true,
-        data: result as T,
+        data: actions.length > 0 ? { actions } : (result as T),
         metrics: {
           tokensUsed: this._calculateTokens(prompt, result),
           executionTime: 0, // Will be set by base class

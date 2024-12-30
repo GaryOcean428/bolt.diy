@@ -22,10 +22,21 @@ export const PortDropdown = memo(
   }: PortDropdownProps) => {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // sort previews, preserving original index
+    /*
+     * sort previews, preserving original index
+     * Sort previews, preserving original index
+     */
     const sortedPreviews = previews
       .map((previewInfo, index) => ({ ...previewInfo, index }))
       .sort((a, b) => a.port - b.port);
+
+    // Ensure consistent initial state
+    useEffect(() => {
+      if (sortedPreviews.length > 0 && !isDropdownOpen) {
+        setActivePreviewIndex(sortedPreviews[0].index);
+        setHasSelectedPreview(true);
+      }
+    }, [sortedPreviews.length]);
 
     // close dropdown if user clicks outside
     useEffect(() => {

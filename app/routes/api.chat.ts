@@ -1,8 +1,9 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
-import { createDataStream } from 'ai';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS } from '~/lib/.server/llm/constants';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { streamText, type Messages, type StreamingOptions } from '~/lib/.server/llm/stream-text';
+import { AgentManager } from '~/lib/modules/agents/agent-manager';
+import type { TaskComplexity } from '~/lib/modules/agents/types';
 import SwitchableStream from '~/lib/.server/llm/switchable-stream';
 import type { IProviderSetting } from '~/types/model';
 
@@ -29,11 +30,15 @@ function parseCookies(cookieHeader: string): Record<string, string> {
 }
 
 async function chatAction({ context, request }: ActionFunctionArgs) {
-  const { messages, files, promptId } = await request.json<{
+  const { messages, files, promptId, complexity } = await request.json<{
     messages: Messages;
     files: any;
     promptId?: string;
+    complexity?: TaskComplexity;
   }>();
+
+  // Initialize agent manager
+  const agentManager = new AgentManager();
 
   const cookieHeader = request.headers.get('Cookie');
   const apiKeys = JSON.parse(parseCookies(cookieHeader || '').apiKeys || '{}');
@@ -50,9 +55,53 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
   };
 
   try {
+    // Determine task complexity if not provided
+    const taskComplexity = complexity || {
+      tokenCount: messages[messages.length - 1].content.length,
+      specializedKnowledge: false,
+      securitySensitive: false,
+      languageSpecific: true,
+      expectedDuration: 1, // minutes
+    };
+
     const options: StreamingOptions = {
       toolChoice: 'none',
       onFinish: async ({ text: content, finishReason, usage }) => {
+        // Execute task using appropriate agent
+        const agentResult = await agentManager.executeTask(content, taskComplexity, {
+          messages,
+          files,
+          env: context.cloudflare.env,
+        });
+
+        if (!agentResult.success) {
+          throw agentResult.error;
+        }
+
+        // If the agent result contains code actions, execute them
+        if (agentResult.data && typeof agentResult.data === 'object' && 'actions' in agentResult.data) {
+          const actions = agentResult.data.actions as any[];
+
+          for (const action of actions) {
+            if (action.type === 'file' || action.type === 'shell') {
+              await stream.switchSource(
+                new ReadableStream({
+                  async start(controller) {
+                    const data = new TextEncoder().encode(
+                      JSON.stringify({
+                        type: 'action',
+                        value: JSON.parse(JSON.stringify(action)),
+                      }),
+                    );
+                    controller.enqueue(data);
+                    controller.close();
+                  },
+                }),
+              );
+            }
+          }
+        }
+
         console.log('usage', usage);
 
         if (usage) {
@@ -64,18 +113,21 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         if (finishReason !== 'length') {
           return stream
             .switchSource(
-              createDataStream({
-                async execute(dataStream) {
-                  dataStream.writeMessageAnnotation({
-                    type: 'usage',
-                    value: {
-                      completionTokens: cumulativeUsage.completionTokens,
-                      promptTokens: cumulativeUsage.promptTokens,
-                      totalTokens: cumulativeUsage.totalTokens,
-                    },
-                  });
+              new ReadableStream({
+                async start(controller) {
+                  const data = new TextEncoder().encode(
+                    JSON.stringify({
+                      type: 'usage',
+                      value: {
+                        completionTokens: cumulativeUsage.completionTokens,
+                        promptTokens: cumulativeUsage.promptTokens,
+                        totalTokens: cumulativeUsage.totalTokens,
+                      },
+                    }),
+                  );
+                  controller.enqueue(data);
+                  controller.close();
                 },
-                onError: (error: any) => `Custom error: ${error.message}`,
               }),
             )
             .then(() => stream.close());
@@ -92,7 +144,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         messages.push({ role: 'assistant', content });
         messages.push({ role: 'user', content: CONTINUE_PROMPT });
 
-        const result = await streamText({
+        const streamResult = await streamText({
           messages,
           env: context.cloudflare.env,
           options,
@@ -102,7 +154,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           promptId,
         });
 
-        return stream.switchSource(result.toDataStream());
+        return stream.switchSource(streamResult.toDataStream());
       },
     };
 

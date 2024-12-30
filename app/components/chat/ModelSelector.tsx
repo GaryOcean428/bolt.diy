@@ -53,10 +53,14 @@ export const ModelSelector = ({
     );
   }
 
+  // Ensure we have a valid initial state
+  const currentProvider = provider || providerList[0];
+  const currentModel = model || modelList.find((m) => m.provider === currentProvider?.name)?.name;
+
   return (
     <div className="mb-2 flex gap-2 flex-col sm:flex-row">
       <select
-        value={provider?.name || providerList[0]?.name || ''}
+        value={currentProvider?.name || ''}
         onChange={(e) => {
           const newProvider = providerList.find((p: ProviderInfo) => p.name === e.target.value);
 
@@ -80,8 +84,8 @@ export const ModelSelector = ({
         ))}
       </select>
       <select
-        key={provider?.name}
-        value={model}
+        key={currentProvider?.name}
+        value={currentModel || ''}
         onChange={(e) => setModel?.(e.target.value)}
         title="Select a model"
         className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all lg:max-w-[70%]"
