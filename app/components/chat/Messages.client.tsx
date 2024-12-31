@@ -1,13 +1,13 @@
+import { useLocation } from '@remix-run/react';
 import type { Message } from 'ai';
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { toast } from 'react-toastify';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
-import { useLocation } from '@remix-run/react';
-import { db, chatId } from '~/lib/persistence/useChatHistory';
-import { forkChat } from '~/lib/persistence/db';
-import { toast } from 'react-toastify';
 import WithTooltip from '~/components/ui/Tooltip';
+import { forkChat } from '~/lib/persistence/db';
+import { db, chatId } from '~/lib/persistence/useChatHistory';
+import { classNames } from '~/utils/classNames';
 
 interface MessagesProps {
   id?: string;

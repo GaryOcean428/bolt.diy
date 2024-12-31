@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import type { Message } from 'ai';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { logStore } from '~/lib/stores/logs'; // Assuming logStore is imported from this location
 import { MAX_FILES, isBinaryFile, shouldIncludeFile } from '~/utils/fileUtils';
 import { createChatFromFolder } from '~/utils/folderImport';
-import { logStore } from '~/lib/stores/logs'; // Assuming logStore is imported from this location
 
 interface ImportFolderButtonProps {
   className?: string;

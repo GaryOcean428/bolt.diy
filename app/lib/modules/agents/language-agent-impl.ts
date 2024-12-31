@@ -109,26 +109,43 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
   /**
    * Implementation specific task execution
    */
-  protected async _executeImpl<T>(task: string, context?: unknown): Promise<AgentResult<T>> {
-    try {
-      // Process task in agent's language
-      const prompt = this._createPrompt(task, context);
-      const result = await this._languageModel.complete(prompt);
+  protected async _executeImpl<T>(_task: string, _context?: unknown): Promise<AgentResult<T>> {
+    if (!this._languageModel) {
+      throw new Error('Language model not initialized');
+    }
 
-      // Check if the result contains code actions
-      const actions = this._extractCodeActions(result);
+    try {
+      const prompt = await this._buildPrompt(_task);
+      const startTime = Date.now();
+
+      const result = await this._languageModel.complete(prompt);
+      const executionTime = Date.now() - startTime;
+
+      const actions = this._extractCodeActions(result.text);
+      const tokensUsed = this._calculateTokens(prompt, result.text);
+      const cost = tokensUsed * this.config.costPerToken;
 
       return {
         success: true,
-        data: actions.length > 0 ? { actions } : (result as T),
+        data: { actions } as T,
         metrics: {
-          tokensUsed: this._calculateTokens(prompt, result),
-          executionTime: 0, // Will be set by base class
-          cost: 0, // Will be calculated by base class
+          tokensUsed,
+          executionTime,
+          cost,
         },
       };
     } catch (error) {
-      throw new Error(`Task execution failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('Error executing task:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error : new Error(String(error)),
+        data: { actions: [] } as T,
+        metrics: {
+          tokensUsed: 0,
+          executionTime: 0,
+          cost: 0,
+        },
+      };
     }
   }
 
@@ -182,14 +199,16 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
   /**
    * Create prompt for language model
    */
-  private _createPrompt(task: string, context?: unknown): string {
-    let prompt = `[${this._language}] ${task}`;
-
-    if (context) {
-      prompt += `\n\nContext: ${JSON.stringify(context)}`;
-    }
-
+  protected async _createPrompt(_task: string, _context?: unknown): Promise<string> {
+    const prompt = await this._buildPrompt(_task);
     return prompt;
+  }
+
+  /**
+   * Build prompt for language model
+   */
+  protected async _buildPrompt(_task: string): Promise<string> {
+    return _task;
   }
 
   /**
@@ -197,5 +216,18 @@ export class LanguageAgentImpl extends BaseAgent implements LanguageAgent {
    */
   private _isValidLanguageCode(code: string): code is SupportedLanguage {
     return Object.values(SupportedLanguage).includes(code as SupportedLanguage);
+  }
+
+  protected async executeTask(_task: string, context?: unknown): Promise<AgentResult> {
+    try {
+      const result = await this._executeImpl(_task, context);
+      return result;
+    } catch (error) {
+      if (typeof error === 'string') {
+        throw new Error(error);
+      }
+
+      throw error;
+    }
   }
 }

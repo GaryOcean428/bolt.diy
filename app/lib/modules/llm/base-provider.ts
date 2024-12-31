@@ -1,10 +1,10 @@
-import type { LanguageModelV1 } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
-import type { ProviderInfo, ProviderConfig, ModelInfo } from './types';
-import type { IProviderSetting } from '~/types/model';
+import type { LanguageModelV1 } from 'ai';
 import { LLMManager } from './manager';
+import type { ProviderInfo, ProviderConfig, ModelInfo } from './types';
 import { BasePlugin } from '~/lib/modules/plugins/base-plugin';
 import type { PluginMetadata } from '~/lib/modules/plugins/types';
+import type { IProviderSetting } from '~/types/model';
 
 export abstract class BaseProvider extends BasePlugin<ProviderConfig> implements ProviderInfo {
   abstract name: string;

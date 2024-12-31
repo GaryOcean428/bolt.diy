@@ -1,4 +1,7 @@
 import { useStore } from '@nanostores/react';
+import Cookies from 'js-cookie';
+import { useCallback, useEffect, useState } from 'react';
+import { logStore } from '~/lib/stores/logs'; // assuming logStore is imported from this location
 import {
   isDebugMode,
   isEventLogsEnabled,
@@ -8,10 +11,7 @@ import {
   providersStore,
   latestBranchStore,
 } from '~/lib/stores/settings';
-import { useCallback, useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import type { IProviderSetting, ProviderInfo } from '~/types/model';
-import { logStore } from '~/lib/stores/logs'; // assuming logStore is imported from this location
 
 interface CommitData {
   commit: string;

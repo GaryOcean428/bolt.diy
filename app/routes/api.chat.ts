@@ -1,10 +1,10 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS } from '~/lib/.server/llm/constants';
-import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { streamText, type Messages, type StreamingOptions } from '~/lib/.server/llm/stream-text';
+import SwitchableStream from '~/lib/.server/llm/switchable-stream';
+import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { AgentManager } from '~/lib/modules/agents/agent-manager';
 import type { TaskComplexity } from '~/lib/modules/agents/types';
-import SwitchableStream from '~/lib/.server/llm/switchable-stream';
 import type { IProviderSetting } from '~/types/model';
 
 export async function action(args: ActionFunctionArgs) {

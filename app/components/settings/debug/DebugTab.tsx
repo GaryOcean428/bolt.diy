@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSettings } from '~/lib/hooks/useSettings';
 import { toast } from 'react-toastify';
+import { useSettings } from '~/lib/hooks/useSettings';
 import { providerBaseUrlEnvKeys } from '~/utils/constants';
 
 interface ProviderStatus {

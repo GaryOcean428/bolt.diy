@@ -147,4 +147,21 @@ export abstract class BaseAgent implements Agent {
     const outputText = typeof output === 'string' ? output : JSON.stringify(output);
     return this._estimateTokens(input) + this._estimateTokens(outputText);
   }
+
+  protected async _getSystemPrompt(): Promise<string> {
+    if (!this.config.specializations?.length) {
+      return '';
+    }
+
+    const { SYSTEM_PROMPTS } = await import('./prompts/system-prompts');
+
+    return SYSTEM_PROMPTS[this.config.specializations[0]] || '';
+  }
+
+  protected async _buildPrompt(task: string, context?: unknown): Promise<string> {
+    const systemPrompt = await this._getSystemPrompt();
+    const contextStr = context ? `\nContext:\n${JSON.stringify(context, null, 2)}` : '';
+
+    return `${systemPrompt}\n\nTask:\n${task}${contextStr}`;
+  }
 }

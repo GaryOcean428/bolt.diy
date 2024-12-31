@@ -1,9 +1,9 @@
-```markdown
 # Bolt Architecture Goals
 
 ## 1. Enhanced Agent System
 
 ### Team Structure
+
 - Implement specialized roles:
   - Architect Agent: High-level design decisions
   - Code Review Agent: Quality and standards
@@ -14,6 +14,7 @@
   - Memory Agent: Managing historical context
 
 ### Inter-Agent Communication
+
 - Enable direct agent-to-agent communication
 - Implement team deliberation protocols
 - Support consensus-building mechanisms
@@ -23,6 +24,7 @@
 ## 2. Memory Systems
 
 ### Vector Storage
+
 - Implement ChromaDB for semantic search
 - Store:
   - Code snippets and patterns
@@ -32,6 +34,7 @@
   - Architectural decisions
 
 ### Redis Cache
+
 - Short-term memory for:
   - Active conversations
   - Recent decisions
@@ -40,6 +43,7 @@
   - Agent state
 
 ### SQL Long-term Memory
+
 - Persistent storage for:
   - Project history
   - User preferences
@@ -50,6 +54,7 @@
 ## 3. Self-Improvement Capabilities
 
 ### Knowledge Acquisition
+
 - Autonomous research using:
   - GitHub API integration
   - Documentation scraping
@@ -58,6 +63,7 @@
   - Tech blog monitoring
 
 ### Learning System
+
 - Track successful/failed approaches
 - Adapt to user preferences over time
 - Build project-specific style guides
@@ -65,6 +71,7 @@
 - Update internal knowledge base
 
 ### Error Analysis
+
 - Track common mistakes
 - Build error pattern database
 - Implement automatic error prevention
@@ -74,6 +81,7 @@
 ## 4. Team Coordination
 
 ### Project Management
+
 - Task prioritization
 - Resource allocation
 - Progress monitoring
@@ -81,6 +89,7 @@
 - Risk assessment
 
 ### Communication Protocol
+
 - Structured message format
 - Clear role boundaries
 - Escalation paths
@@ -90,6 +99,7 @@
 ## 5. Security & Privacy
 
 ### Data Protection
+
 - Encryption at rest
 - Secure communication
 - Access control
@@ -97,6 +107,7 @@
 - Compliance checking
 
 ### Code Safety
+
 - Static analysis
 - Dependency scanning
 - Security best practices
@@ -128,6 +139,7 @@
 ## Technical Requirements
 
 ### Dependencies
+
 ```typescript
 {
   "dependencies": {
@@ -142,6 +154,7 @@
 ```
 
 ### Environment Variables
+
 ```bash
 # Vector DB
 CHROMA_API_KEY=
@@ -161,6 +174,7 @@ OPENAI_API_KEY=
 ```
 
 ### Database Schema
+
 ```sql
 -- Projects
 CREATE TABLE projects (
@@ -211,4 +225,3 @@ CREATE TABLE error_patterns (
 - PostgreSQL Performance Tuning
 - LangChain Agents Guide
 - Vector Search Optimization
-```

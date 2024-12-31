@@ -1,9 +1,9 @@
+import { useStore } from '@nanostores/react';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { useSettings } from '~/lib/hooks/useSettings';
 import { toast } from 'react-toastify';
 import { Switch } from '~/components/ui/Switch';
+import { useSettings } from '~/lib/hooks/useSettings';
 import { logStore, type LogEntry } from '~/lib/stores/logs';
-import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 
 export default function EventLogsTab() {

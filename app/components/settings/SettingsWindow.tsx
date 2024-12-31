@@ -1,17 +1,17 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { motion } from 'framer-motion';
 import { useState, type ReactElement } from 'react';
-import { classNames } from '~/utils/classNames';
-import { DialogTitle, dialogVariants, dialogBackdropVariants } from '~/components/ui/Dialog';
-import { IconButton } from '~/components/ui/IconButton';
 import styles from './Settings.module.scss';
-import ProvidersTab from './providers/ProvidersTab';
-import { useSettings } from '~/lib/hooks/useSettings';
-import FeaturesTab from './features/FeaturesTab';
-import DebugTab from './debug/DebugTab';
-import EventLogsTab from './event-logs/EventLogsTab';
 import ConnectionsTab from './connections/ConnectionsTab';
 import DataTab from './data/DataTab';
+import DebugTab from './debug/DebugTab';
+import EventLogsTab from './event-logs/EventLogsTab';
+import FeaturesTab from './features/FeaturesTab';
+import ProvidersTab from './providers/ProvidersTab';
+import { DialogTitle, dialogVariants, dialogBackdropVariants } from '~/components/ui/Dialog';
+import { IconButton } from '~/components/ui/IconButton';
+import { useSettings } from '~/lib/hooks/useSettings';
+import { classNames } from '~/utils/classNames';
 
 interface SettingsProps {
   open: boolean;

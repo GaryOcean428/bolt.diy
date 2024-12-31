@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Switch } from '~/components/ui/Switch';
 import { useSettings } from '~/lib/hooks/useSettings';
+import { logStore } from '~/lib/stores/logs';
 import { LOCAL_PROVIDERS, URL_CONFIGURABLE_PROVIDERS } from '~/lib/stores/settings';
 import type { IProviderConfig } from '~/types/model';
-import { logStore } from '~/lib/stores/logs';
 
 // Import a default fallback icon
 import DefaultIcon from '/icons/Default.svg'; // Adjust the path as necessary

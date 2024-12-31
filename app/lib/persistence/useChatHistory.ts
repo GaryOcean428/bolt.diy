@@ -1,10 +1,8 @@
 import { useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
-import { useState, useEffect } from 'react';
-import { atom } from 'nanostores';
 import type { Message } from 'ai';
+import { atom } from 'nanostores';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { workbenchStore } from '~/lib/stores/workbench';
-import { logStore } from '~/lib/stores/logs'; // Import logStore
 import {
   getMessages,
   getNextId,
@@ -14,6 +12,8 @@ import {
   duplicateChat,
   createChatFromMessages,
 } from './db';
+import { logStore } from '~/lib/stores/logs'; // Import logStore
+import { workbenchStore } from '~/lib/stores/workbench';
 
 export interface ChatHistoryItem {
   id: string;

@@ -1,6 +1,6 @@
+import type { JSONValue } from 'ai';
 import { memo } from 'react';
 import { Markdown } from './Markdown';
-import type { JSONValue } from 'ai';
 
 interface AssistantMessageProps {
   content: string;

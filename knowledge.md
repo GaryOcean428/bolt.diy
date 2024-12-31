@@ -1,4 +1,14 @@
-# TypeScript ESLint Rules
+# TypeScript Development
+
+## Type Checking
+
+- Use `pnpm run typecheck` to check types
+- If type checking times out without errors, it likely passed
+- For faster checks during development, can use `pnpm exec tsc --noEmit --incremental`
+- Type checking may time out on large codebases, especially after dependency updates
+- A timeout without errors usually indicates success
+
+## ESLint Rules
 
 ## no-unused-vars
 

@@ -1,406 +1,204 @@
-import { EventEmitter } from 'events';
-import { SupportedLanguage } from './types';
-import type { Agent, AgentResult, LanguageAgent, TaskAgent, TaskComplexity } from './types';
-import { AgentTier, AgentSpecialization } from './types';
+import { EventEmitter } from 'node:events';
+import { AgentCommunicationBus } from './communication/agent-protocol';
+import { ArchitectAgent, CodeReviewAgent, SecurityAgent } from './specialized-agents';
+import { TestingAgent, DocumentationAgent, ResearchAgent, MemoryAgent } from './specialized-agents-extended';
+import type { Agent, AgentConfig, AgentResult, TaskComplexity } from './types';
+import { AgentTier, AgentSpecialization, SupportedLanguage } from './types';
 
-interface AgentRegistration {
-  agent: Agent;
-  active: boolean;
-  lastUsed: Date;
-  totalTasks: number;
-  successRate: number;
+export type AgentType = 'specialized' | 'extended';
+export type SpecializedAgentType = 'architect' | 'code-review' | 'security';
+export type ExtendedAgentType = 'testing' | 'documentation' | 'research' | 'memory';
+
+export interface TaskContext {
+  messages?: any[];
+  files?: any;
+  env?: Record<string, any>;
 }
 
-/**
- * Manages agent lifecycle and task routing
- */
 export class AgentManager extends EventEmitter {
-  private readonly _agents = new Map<string, AgentRegistration>();
-  private readonly _languageAgents = new Map<SupportedLanguage, Set<string>>();
-  private readonly _specializationAgents = new Map<AgentSpecialization, Set<string>>();
+  private _agents: Map<string, Agent> = new Map();
+  private _deactivatedAgents: Map<string, Agent> = new Map();
+  private _communicationBus: AgentCommunicationBus;
 
-  /**
-   * Register a new agent
-   */
   constructor() {
-    super(); // Call EventEmitter's constructor
-    // Register default agents
-    this._registerDefaultAgents().catch(console.error);
+    super();
+    this._communicationBus = AgentCommunicationBus.getInstance();
+    this._setupProtocolHandlers();
+    this._initializeDefaultAgents();
   }
 
-  private async _registerDefaultAgents(): Promise<void> {
-    // Create language agent implementation
-    const languageAgent: LanguageAgent = {
-      config: {
+  private _setupProtocolHandlers(): void {
+    this._communicationBus.on('message', (message) => {
+      this.emit('message', message);
+    });
+
+    this._communicationBus.on('error', (error: Error) => {
+      this.emit('error', error);
+    });
+  }
+
+  private async _initializeDefaultAgents(): Promise<void> {
+    // Initialize language agent
+    const languageAgent = this.createAgent(
+      'specialized',
+      {
         name: 'english-language',
-        description: 'Handles English language tasks',
-        tier: AgentTier.Standard,
-        specializations: [],
-        supportedLanguages: [SupportedLanguage.English],
-        maxTokens: 8000,
-        costPerToken: 0.001,
-      },
-      language: SupportedLanguage.English,
-      initialize: async () => {
-        await this._initializeLanguageModel();
-      },
-      execute: async (task: string) => ({
-        success: true,
-        data: { actions: [] },
-        metrics: {
-          tokensUsed: Math.ceil(task.length / 4),
-          executionTime: 0,
-          cost: 0,
-        },
-      }),
-      canHandle: async (task: string, complexity: TaskComplexity) => {
-        return complexity.languageSpecific;
-      },
-      estimateCost: async () => 0,
-      dispose: async () => {
-        await this._cleanupLanguageModel();
-      },
-      translate: async (content: string) => content,
-      detectLanguage: async () => SupportedLanguage.English,
-    };
-
-    // Register language agent
-    await this.registerAgent(languageAgent);
-
-    // Register a code generation agent
-    await this.registerAgent({
-      config: {
-        name: 'code-generation',
-        description: 'Generates and modifies code',
+        description: 'Handles language-specific tasks',
         tier: AgentTier.Standard,
         specializations: [AgentSpecialization.CodeGeneration],
         supportedLanguages: [SupportedLanguage.English],
-        maxTokens: 8000,
+        maxTokens: 4096,
         costPerToken: 0.001,
       },
-      initialize: async () => {
-        await this._initializeCodeGeneration();
-      },
-      execute: this.executeTask.bind(this),
-      canHandle: async (task: string, complexity: TaskComplexity) => {
-        return complexity.specializedKnowledge && task.includes('code');
-      },
-      estimateCost: async () => 0,
-      dispose: async () => {
-        await this._cleanupCodeGeneration();
-      },
-    });
+      'architect',
+    );
 
-    // Register a testing agent
-    await this.registerAgent({
-      config: {
+    // Initialize code generation agent
+    const codeGenAgent = this.createAgent(
+      'specialized',
+      {
+        name: 'code-generation',
+        description: 'Handles code generation tasks',
+        tier: AgentTier.Expert,
+        specializations: [AgentSpecialization.CodeGeneration],
+        supportedLanguages: [SupportedLanguage.English],
+        maxTokens: 8192,
+        costPerToken: 0.002,
+      },
+      'architect',
+    );
+
+    // Initialize testing agent
+    const testingAgent = this.createAgent(
+      'extended',
+      {
         name: 'testing',
-        description: 'Generates and runs tests',
-        tier: AgentTier.Standard,
+        description: 'Handles test generation and execution',
+        tier: AgentTier.Expert,
         specializations: [AgentSpecialization.Testing],
         supportedLanguages: [SupportedLanguage.English],
-        maxTokens: 8000,
-        costPerToken: 0.001,
+        maxTokens: 8192,
+        costPerToken: 0.002,
       },
-      initialize: async () => {
-        await this._initializeTestingFramework();
-      },
-      execute: this.executeTask.bind(this),
-      canHandle: async (task: string, complexity: TaskComplexity) => {
-        return complexity.specializedKnowledge && task.includes('test');
-      },
-      estimateCost: async () => 0,
-      dispose: async () => {
-        await this._cleanupTestingFramework();
-      },
-    });
+      'testing',
+    );
+
+    await Promise.all([languageAgent.initialize(), codeGenAgent.initialize(), testingAgent.initialize()]);
   }
 
-  async registerAgent(agent: Agent): Promise<void> {
-    if (this._agents.has(agent.config.name)) {
-      throw new Error(`Agent ${agent.config.name} is already registered`);
+  createAgent(type: AgentType, config: AgentConfig, specializedType?: SpecializedAgentType | ExtendedAgentType): Agent {
+    let agent: Agent;
+
+    if (type === 'specialized') {
+      if (!specializedType) {
+        throw new Error('Specialized agent type must be specified');
+      }
+
+      switch (specializedType) {
+        case 'architect':
+          agent = new ArchitectAgent();
+          break;
+        case 'code-review':
+          agent = new CodeReviewAgent();
+          break;
+        case 'security':
+          agent = new SecurityAgent();
+          break;
+        default:
+          throw new Error(`Unknown specialized agent type: ${specializedType}`);
+      }
+    } else if (type === 'extended') {
+      if (!specializedType) {
+        throw new Error('Extended agent type must be specified');
+      }
+
+      switch (specializedType) {
+        case 'testing':
+          agent = new TestingAgent();
+          break;
+        case 'documentation':
+          agent = new DocumentationAgent();
+          break;
+        case 'research':
+          agent = new ResearchAgent();
+          break;
+        case 'memory':
+          agent = new MemoryAgent();
+          break;
+        default:
+          throw new Error(`Unknown extended agent type: ${specializedType}`);
+      }
+    } else {
+      throw new Error(`Unknown agent type: ${type}`);
     }
 
-    // Initialize the agent
-    await agent.initialize();
+    this._agents.set(config.name, agent);
 
-    // Create registration
-    const registration: AgentRegistration = {
-      agent,
-      active: true,
-      lastUsed: new Date(),
-      totalTasks: 0,
-      successRate: 1.0,
-    };
-
-    // Store in main registry
-    this._agents.set(agent.config.name, registration);
-
-    // Index by capabilities
-    if (this._isLanguageAgent(agent)) {
-      const agents = this._languageAgents.get((agent as LanguageAgent).language) || new Set();
-      agents.add(agent.config.name);
-      this._languageAgents.set((agent as LanguageAgent).language, agents);
-    }
-
-    if (this._isTaskAgent(agent)) {
-      const agents = this._specializationAgents.get((agent as TaskAgent).specialization) || new Set();
-      agents.add(agent.config.name);
-      this._specializationAgents.set((agent as TaskAgent).specialization, agents);
-    }
-
-    this.emit('agent:registered', agent.config);
+    return agent;
   }
 
-  /**
-   * Execute a task using the most appropriate agent
-   */
-  async executeTask<T>(task: string, complexity: TaskComplexity, context?: unknown): Promise<AgentResult<T>> {
-    // Detect task language if language-specific
-    let taskLanguage: SupportedLanguage | undefined;
-
-    if (complexity.languageSpecific) {
-      taskLanguage = await this._detectTaskLanguage(task);
-    }
-
-    // Find best agent for task
-    const agent = await this._selectAgent(task, complexity, taskLanguage);
-
-    if (!agent) {
-      throw new Error('No suitable agent found for task');
-    }
-
-    // Update agent stats
-    const registration = this._agents.get(agent.config.name)!;
-    registration.lastUsed = new Date();
-    registration.totalTasks++;
-
-    try {
-      // Execute task
-      const result = await agent.execute<T>(task, context);
-
-      // Update success rate
-      registration.successRate =
-        (registration.successRate * (registration.totalTasks - 1) + (result.success ? 1 : 0)) / registration.totalTasks;
-
-      return result;
-    } catch (error) {
-      // Update success rate on error
-      registration.successRate = (registration.successRate * (registration.totalTasks - 1)) / registration.totalTasks;
-
-      throw error;
-    }
-  }
-
-  /**
-   * Get all registered agents
-   */
   getAgents(): Agent[] {
-    return Array.from(this._agents.values()).map((reg) => reg.agent);
+    return Array.from(this._agents.values());
   }
 
-  /**
-   * Get agents by tier
-   */
-  getAgentsByTier(tier: AgentTier): Agent[] {
-    return this.getAgents().filter((agent) => agent.config.tier === tier);
+  getAgent(name: string): Agent | undefined {
+    return this._agents.get(name);
   }
 
-  /**
-   * Get language-specific agents
-   */
-  getLanguageAgents(language: SupportedLanguage): LanguageAgent[] {
-    return Array.from(this._languageAgents.get(language) || [])
-      .map((name) => this._agents.get(name)!.agent)
-      .filter(this._isLanguageAgent) as LanguageAgent[];
-  }
-
-  /**
-   * Get specialized agents
-   */
-  getSpecializedAgents(specialization: AgentSpecialization): TaskAgent[] {
-    return Array.from(this._specializationAgents.get(specialization) || [])
-      .map((name) => this._agents.get(name)!.agent)
-      .filter(this._isTaskAgent) as TaskAgent[];
-  }
-
-  /**
-   * Deactivate an agent
-   */
-  async deactivateAgent(name: string): Promise<void> {
-    const registration = this._agents.get(name);
-
-    if (registration) {
-      registration.active = false;
-      this.emit('agent:deactivated', registration.agent.config);
-    }
-  }
-
-  /**
-   * Reactivate an agent
-   */
-  async reactivateAgent(name: string): Promise<void> {
-    const registration = this._agents.get(name);
-
-    if (registration) {
-      registration.active = true;
-      this.emit('agent:reactivated', registration.agent.config);
-    }
-  }
-
-  /**
-   * Clean up all agents
-   */
-  async dispose(): Promise<void> {
-    // Clean up agent resources and connections
-    await Promise.all(Array.from(this._agents.values()).map((reg) => reg.agent.dispose()));
-    this.removeAllListeners();
-  }
-
-  async initialize(): Promise<void> {
-    // Initialize agent resources and connections
-    await Promise.all(Array.from(this._agents.values()).map((reg) => reg.agent.initialize()));
-  }
-
-  /**
-   * Select the most appropriate agent for a task
-   */
-  private async _selectAgent(
-    task: string,
-    complexity: TaskComplexity,
-    language?: SupportedLanguage,
-  ): Promise<Agent | null> {
-    // Get all active agents
-    const activeAgents = Array.from(this._agents.values())
-      .filter((reg) => reg.active)
-      .map((reg) => reg.agent);
-
-    // If no active agents, return null
-    if (activeAgents.length === 0) {
-      return null;
-    }
-
-    // Try to find capable agents
-    const agentResults = await Promise.all(
-      activeAgents.map(async (agent) => ({
+  async executeTask(task: string, complexity: TaskComplexity, context?: TaskContext): Promise<AgentResult> {
+    const agents = this.getAgents();
+    const suitableAgents = await Promise.all(
+      agents.map(async (agent) => ({
         agent,
         canHandle: await agent.canHandle(task, complexity),
         cost: await agent.estimateCost(task, complexity),
       })),
     );
 
-    // First try agents that explicitly say they can handle the task
-    const capableAgents = agentResults.filter((result) => result.canHandle);
+    const bestAgent = suitableAgents.filter((a) => a.canHandle).sort((a, b) => a.cost - b.cost)[0]?.agent;
 
-    // If no capable agents found, fall back to language agent or first available agent
-    if (capableAgents.length === 0) {
-      // Try to find a language agent first
-      const languageAgent = activeAgents.find(
-        (agent) => this._isLanguageAgent(agent) && (!language || (agent as LanguageAgent).language === language),
-      );
-
-      if (languageAgent) {
-        return languageAgent;
-      }
-
-      // Fall back to first available agent
-      return activeAgents[0];
+    if (!bestAgent) {
+      throw new Error('No suitable agent found for the task');
     }
 
-    // Score agents based on various factors
-    const scoredAgents = await Promise.all(
-      capableAgents.map(async (result) => {
-        const registration = this._agents.get(result.agent.config.name)!;
-        let score = 0;
-
-        // Base score from success rate
-        score += registration.successRate * 0.3;
-
-        // Language matching
-        if (language && this._isLanguageAgent(result.agent)) {
-          score += (result.agent as LanguageAgent).language === language ? 0.2 : 0;
-        }
-
-        // Specialization matching
-        if (complexity.specializedKnowledge && this._isTaskAgent(result.agent)) {
-          const expertise = await (result.agent as TaskAgent).getExpertiseLevel(task);
-          score += expertise * 0.3;
-        }
-
-        // Cost efficiency
-        const maxCost = Math.max(...capableAgents.map((a) => a.cost));
-        const normalizedCost = result.cost / maxCost;
-        score += (1 - normalizedCost) * 0.2;
-
-        return {
-          agent: result.agent,
-          score,
-        };
-      }),
-    );
-
-    // Select agent with highest score
-    scoredAgents.sort((a, b) => b.score - a.score);
-
-    return scoredAgents[0].agent;
+    return bestAgent.execute(task, context);
   }
 
-  /**
-   * Detect the language of a task
-   */
-  private async _detectTaskLanguage(task: string): Promise<SupportedLanguage> {
-    // Try each language agent until we get a confident detection
-    for (const agents of this._languageAgents.values()) {
-      for (const name of agents) {
-        const agent = this._agents.get(name)!.agent;
+  async deactivateAgent(name: string): Promise<void> {
+    const agent = this._agents.get(name);
 
-        try {
-          return await (agent as LanguageAgent).detectLanguage(task);
-        } catch {
-          continue;
-        }
-      }
+    if (agent) {
+      await agent.dispose();
+      this._agents.delete(name);
+      this._deactivatedAgents.set(name, agent);
     }
-
-    // Default to English if no detection successful
-    return SupportedLanguage.English;
   }
 
-  /**
-   * Type guard for LanguageAgent
-   */
-  private _isLanguageAgent(agent: Agent): agent is LanguageAgent {
-    return 'language' in agent && 'translate' in agent && 'detectLanguage' in agent;
+  async reactivateAgent(name: string): Promise<void> {
+    const agent = this._deactivatedAgents.get(name);
+
+    if (agent) {
+      await agent.initialize();
+      this._deactivatedAgents.delete(name);
+      this._agents.set(name, agent);
+    }
   }
 
-  /**
-   * Type guard for TaskAgent
-   */
-  private _isTaskAgent(agent: Agent): agent is TaskAgent {
-    return 'specialization' in agent && 'getExpertiseLevel' in agent && 'validateOutput' in agent;
+  removeAgent(name: string): void {
+    const agent = this._agents.get(name);
+
+    if (agent) {
+      agent.dispose();
+      this._agents.delete(name);
+    }
   }
 
-  private async _initializeLanguageModel(): Promise<void> {
-    // Implementation will be added later
-  }
-
-  private async _cleanupLanguageModel(): Promise<void> {
-    // Implementation will be added later
-  }
-
-  private async _initializeCodeGeneration(): Promise<void> {
-    // Implementation will be added later
-  }
-
-  private async _cleanupCodeGeneration(): Promise<void> {
-    // Implementation will be added later
-  }
-
-  private async _initializeTestingFramework(): Promise<void> {
-    // Implementation will be added later
-  }
-
-  private async _cleanupTestingFramework(): Promise<void> {
-    // Implementation will be added later
+  async cleanup(): Promise<void> {
+    for (const agent of this._agents.values()) {
+      await agent.dispose();
+    }
+    this._agents.clear();
+    this._deactivatedAgents.clear();
+    this.removeAllListeners();
   }
 }

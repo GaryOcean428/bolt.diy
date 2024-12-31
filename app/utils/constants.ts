@@ -1,7 +1,6 @@
-import type { IProviderSetting } from '~/types/model';
-
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
+import type { IProviderSetting } from '~/types/model';
 import type { Template } from '~/types/template';
 
 export const WORK_DIR_NAME = 'project';

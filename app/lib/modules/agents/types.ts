@@ -24,13 +24,16 @@ export enum SupportedLanguage {
  * Agent specialization areas
  */
 export enum AgentSpecialization {
-  CodeGeneration = 'code_generation',
-  CodeReview = 'code_review',
+  Architecture = 'architecture',
+  CodeGeneration = 'code-generation',
+  CodeReview = 'code-review',
   Testing = 'testing',
-  Documentation = 'documentation',
-  Debugging = 'debugging',
   Security = 'security',
   Performance = 'performance',
+  Documentation = 'documentation',
+  UIDesign = 'ui-design',
+  Research = 'research',
+  Memory = 'memory',
 }
 
 /**

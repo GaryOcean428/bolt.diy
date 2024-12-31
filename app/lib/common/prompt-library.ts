@@ -1,5 +1,5 @@
-import { getSystemPrompt } from './prompts/prompts';
 import optimized from './prompts/optimized';
+import { getSystemPrompt } from './prompts/prompts';
 
 export interface PromptOptions {
   cwd: string;

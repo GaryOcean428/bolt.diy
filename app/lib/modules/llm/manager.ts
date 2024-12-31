@@ -1,7 +1,7 @@
-import type { IProviderSetting } from '~/types/model';
-import type { ModelInfo, ProviderInfo } from './types';
 import { BaseProvider } from './base-provider';
 import * as providers from './registry';
+import type { ModelInfo, ProviderInfo } from './types';
+import type { IProviderSetting } from '~/types/model';
 
 export class LLMManager {
   private static _instance: LLMManager;
@@ -21,26 +21,32 @@ export class LLMManager {
 
     return LLMManager._instance;
   }
+
   get env() {
     return this._env;
   }
 
   private async _registerProvidersFromDirectory() {
     try {
-      /*
-       * Dynamically import all files from the providers directory
-       * const providerModules = import.meta.glob('./providers/*.ts', { eager: true });
-       */
+      // Register default provider first
+      const defaultProvider = new providers.DefaultProvider();
+      this.registerProvider(defaultProvider);
 
       // Look for exported classes that extend BaseProvider
-      for (const exportedItem of Object.values(providers)) {
-        if (typeof exportedItem === 'function' && exportedItem.prototype instanceof BaseProvider) {
-          const provider = new exportedItem(
+      for (const [name, providerClass] of Object.entries(providers)) {
+        if (name === 'DefaultProvider') {
+          continue;
+        } // Skip default provider as it's already registered
+
+        if (typeof providerClass === 'function' && providerClass.prototype instanceof BaseProvider) {
+          const provider = new providerClass(
             {
-              name: 'provider',
+              name: name.replace('Provider', '').toLowerCase(),
               version: '1.0.0',
-              description: 'LLM Provider',
+              description: `${name.replace('Provider', '')} LLM Provider`,
               enabled: true,
+              capabilities: [],
+              entrypoint: `${name.toLowerCase()}.ts`,
             },
             {},
           );

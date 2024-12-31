@@ -1,5 +1,5 @@
+import { EventEmitter } from 'node:events';
 import type { WebContainer } from '@webcontainer/api';
-import { EventEmitter } from 'events';
 
 interface ResourceLimits {
   maxMemoryMB: number;

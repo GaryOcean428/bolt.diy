@@ -1,6 +1,9 @@
 import { convertToCoreMessages, streamText as _streamText } from 'ai';
+import ignore from 'ignore';
 import { MAX_TOKENS } from './constants';
+import { PromptLibrary } from '~/lib/common/prompt-library';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
+import type { IProviderSetting } from '~/types/model';
 import {
   DEFAULT_MODEL,
   DEFAULT_PROVIDER,
@@ -11,9 +14,6 @@ import {
   PROVIDER_REGEX,
   WORK_DIR,
 } from '~/utils/constants';
-import ignore from 'ignore';
-import type { IProviderSetting } from '~/types/model';
-import { PromptLibrary } from '~/lib/common/prompt-library';
 import { allowedHTMLElements } from '~/utils/markdown';
 
 interface ToolResult<Name extends string, Args, Result> {

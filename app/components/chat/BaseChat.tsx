@@ -2,35 +2,33 @@
  * @ts-nocheck
  * Preventing TS checks with files presented in the video for a better presentation.
  */
+import * as Tooltip from '@radix-ui/react-tooltip';
 import type { Message } from 'ai';
+import Cookies from 'js-cookie';
 import React, { type RefCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { ClientOnly } from 'remix-utils/client-only';
+import { APIKeyManager } from './APIKeyManager';
+import styles from './BaseChat.module.scss';
+import ChatAlert from './ChatAlert';
+import FilePreview from './FilePreview';
+import GitCloneButton from './GitCloneButton';
+import { Messages } from './Messages.client';
+import { ScreenshotStateManager } from './ScreenshotStateManager';
+import { SendButton } from './SendButton.client';
+import StarterTemplates from './StarterTemplates';
+import { ExamplePrompts } from '~/components/chat/ExamplePrompts';
+import { ModelSelector } from '~/components/chat/ModelSelector';
+import { SpeechRecognitionButton } from '~/components/chat/SpeechRecognition';
+import { ExportChatButton } from '~/components/chat/chatExportAndImport/ExportChatButton';
+import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
 import { Menu } from '~/components/sidebar/Menu.client';
 import { IconButton } from '~/components/ui/IconButton';
 import { Workbench } from '~/components/workbench/Workbench.client';
+import type { ActionAlert } from '~/types/actions';
+import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { classNames } from '~/utils/classNames';
 import { MODEL_LIST, PROVIDER_LIST, initializeModelList } from '~/utils/constants';
-import { Messages } from './Messages.client';
-import { SendButton } from './SendButton.client';
-import { APIKeyManager } from './APIKeyManager';
-import Cookies from 'js-cookie';
-import * as Tooltip from '@radix-ui/react-tooltip';
-
-import styles from './BaseChat.module.scss';
-import { ExportChatButton } from '~/components/chat/chatExportAndImport/ExportChatButton';
-import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
-import { ExamplePrompts } from '~/components/chat/ExamplePrompts';
-import GitCloneButton from './GitCloneButton';
-
-import FilePreview from './FilePreview';
-import { ModelSelector } from '~/components/chat/ModelSelector';
-import { SpeechRecognitionButton } from '~/components/chat/SpeechRecognition';
-import type { IProviderSetting, ProviderInfo } from '~/types/model';
-import { ScreenshotStateManager } from './ScreenshotStateManager';
-import { toast } from 'react-toastify';
-import StarterTemplates from './StarterTemplates';
-import type { ActionAlert } from '~/types/actions';
-import ChatAlert from './ChatAlert';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 

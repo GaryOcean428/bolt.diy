@@ -1,10 +1,10 @@
-import { useParams } from '@remix-run/react';
-import { classNames } from '~/utils/classNames';
 import * as Dialog from '@radix-ui/react-dialog';
-import { type ChatHistoryItem } from '~/lib/persistence';
+import { useParams } from '@remix-run/react';
+import { forwardRef, type ForwardedRef } from 'react';
 import WithTooltip from '~/components/ui/Tooltip';
 import { useEditChatDescription } from '~/lib/hooks';
-import { forwardRef, type ForwardedRef } from 'react';
+import { type ChatHistoryItem } from '~/lib/persistence';
+import { classNames } from '~/utils/classNames';
 
 interface HistoryItemProps {
   item: ChatHistoryItem;

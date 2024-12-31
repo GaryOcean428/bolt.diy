@@ -1,11 +1,11 @@
+import * as nodePath from 'node:path';
 import { WebContainer } from '@webcontainer/api';
 import { atom, map, type MapStore } from 'nanostores';
-import * as nodePath from 'node:path';
+import type { ActionCallbackData } from './message-parser';
 import type { ActionAlert, BoltAction } from '~/types/actions';
 import { createScopedLogger } from '~/utils/logger';
-import { unreachable } from '~/utils/unreachable';
-import type { ActionCallbackData } from './message-parser';
 import type { BoltShell } from '~/utils/shell';
+import { unreachable } from '~/utils/unreachable';
 
 const logger = createScopedLogger('ActionRunner');
 
