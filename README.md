@@ -2,7 +2,12 @@
 
 [![bolt.diy: AI-Powered Full-Stack Web Development in the Browser](./public/social_preview_index.jpg)](https://bolt.diy)
 
-Welcome to bolt.diy, the official open source version of Bolt.new (previously known as oTToDev and bolt.new ANY LLM), which allows you to choose the LLM that you use for each prompt! Currently, you can use OpenAI, Anthropic, Ollama, OpenRouter, Gemini, LMStudio, Mistral, xAI, HuggingFace, DeepSeek, or Groq models - and it is easily extended to use any other model supported by the Vercel AI SDK! See the instructions below for running this locally and extending it to include more models.
+Welcome to bolt.diy, the official open source version of Bolt.new (previously known as oTToDev and bolt.new ANY LLM), which allows you to choose from a curated set of high-performance LLMs! Currently supported models include:
+
+- OpenAI's GPT4o and GPT4o-mini
+- xAI's models
+- Anthropic's Claude 3.5 models
+- o1 and o1-mini models
 
 -----
 Check the [bolt.diy Docs](https://stackblitz-labs.github.io/bolt.diy/) for more offical installation instructions and more informations.
@@ -40,45 +45,7 @@ project, please check the [project management guide](./PROJECT.md) to get starte
 
 ## Requested Additions
 
-- ✅ OpenRouter Integration (@coleam00)
-- ✅ Gemini Integration (@jonathands)
-- ✅ Autogenerate Ollama models from what is downloaded (@yunatamos)
-- ✅ Filter models by provider (@jasonm23)
-- ✅ Download project as ZIP (@fabwaseem)
-- ✅ Improvements to the main bolt.new prompt in `app\lib\.server\llm\prompts.ts` (@kofi-bhr)
-- ✅ DeepSeek API Integration (@zenith110)
-- ✅ Mistral API Integration (@ArulGandhi)
-- ✅ "Open AI Like" API Integration (@ZerxZ)
-- ✅ Ability to sync files (one way sync) to local folder (@muzafferkadir)
-- ✅ Containerize the application with Docker for easy installation (@aaronbolton)
-- ✅ Publish projects directly to GitHub (@goncaloalves)
-- ✅ Ability to enter API keys in the UI (@ali00209)
-- ✅ xAI Grok Beta Integration (@milutinke)
-- ✅ LM Studio Integration (@karrot0)
-- ✅ HuggingFace Integration (@ahsan3219)
-- ✅ Bolt terminal to see the output of LLM run commands (@thecodacus)
-- ✅ Streaming of code output (@thecodacus)
-- ✅ Ability to revert code to earlier version (@wonderwhy-er)
-- ✅ Chat history backup and restore functionality (@sidbetatester)
-- ✅ Cohere Integration (@hasanraiyan)
-- ✅ Dynamic model max token length (@hasanraiyan)
-- ✅ Better prompt enhancing (@SujalXplores)
-- ✅ Prompt caching (@SujalXplores)
-- ✅ Load local projects into the app (@wonderwhy-er)
-- ✅ Together Integration (@mouimet-infinisoft)
-- ✅ Mobile friendly (@qwikode)
-- ✅ Better prompt enhancing (@SujalXplores)
-- ✅ Attach images to prompts (@atrokhym)(@stijnus)
-- ✅ Added Git Clone button (@thecodacus)
-- ✅ Git Import from url (@thecodacus)
-- ✅ PromptLibrary to have different variations of prompts for different use cases (@thecodacus)
-- ✅ Detect package.json and commands to auto install & run preview for folder and git import (@wonderwhy-er)
-- ✅ Selection tool to target changes visually (@emcconnell)
-- ✅ Detect terminal Errors and ask bolt to fix it (@thecodacus)
-- ✅ Detect preview Errors and ask bolt to fix it (@wonderwhy-er)
-- ✅ Add Starter Template Options (@thecodacus)
-- ✅ Perplexity Integration (@meetpateltech)
-- ✅ AWS Bedrock Integration (@kunjabijukchhe)
+- ✅ xAI Integration (@milutinke)
 - ⬜ **HIGH PRIORITY** - Prevent bolt from rewriting files as often (file locking and diffs)
 - ⬜ **HIGH PRIORITY** - Better prompting for smaller LLMs (code window sometimes doesn't start)
 - ⬜ **HIGH PRIORITY** - Run agents in the backend as opposed to a single model call
@@ -87,9 +54,6 @@ project, please check the [project management guide](./PROJECT.md) to get starte
 - ⬜ VSCode Integration with git-like confirmations
 - ⬜ Upload documents for knowledge - UI design templates, a code base to reference coding style, etc.
 - ⬜ Voice prompting
-- ⬜ Azure Open AI API Integration
-- ⬜ Vertex AI Integration
-- ⬜ Granite Integration
 - ✅ Popout Window for Web Container(@stijnus)
 - ✅ Ability to change Popout window size (@stijnus)
 
@@ -97,6 +61,7 @@ project, please check the [project management guide](./PROJECT.md) to get starte
 
 - **AI-powered full-stack web development** for **NodeJS based applications** directly in your browser.
 - **Support for multiple LLMs** with an extensible architecture to integrate additional models.
+- **Web Search Integration** using Bing API for enhanced context and information gathering.
 - **Attach images to prompts** for better contextual understanding.
 - **Integrated terminal** to view output of LLM-run commands.
 - **Revert code to earlier versions** for easier debugging and quicker changes.
@@ -135,9 +100,11 @@ Node.js is required to run the application.
    - **For Mac/Linux Users**:
      1. Open Terminal
      2. Type this command:
+
         ```bash
         echo $PATH
         ```
+
      3. Look for `/usr/local/bin` in the output
 
 ## Running the Application
@@ -174,7 +141,7 @@ This option requires some familiarity with Docker but provides a more isolated e
 
 - Install Docker: [Download Docker](https://www.docker.com/)
 
-#### Steps:
+#### Steps
 
 1. **Build the Docker Image**:
 
@@ -187,6 +154,7 @@ This option requires some familiarity with Docker but provides a more isolated e
    ```
 
 2. **Run the Container**:
+
    ```bash
    docker compose --profile development up
    ```
@@ -204,6 +172,8 @@ Setting up your API keys in Bolt.DIY is straightforward:
 
 ![API Key Configuration Interface](./docs/images/api-key-ui-section.png)
 
+- For Bing Search: Get your API key from [Microsoft Azure Portal](https://portal.azure.com)
+
 ### Configuring Custom Base URLs
 
 For providers that support custom base URLs (such as Ollama or LM Studio), follow these steps:
@@ -220,9 +190,10 @@ For providers that support custom base URLs (such as Ollama or LM Studio), follo
 
 ### Supported Providers
 
-- Ollama
-- LM Studio
-- OpenAILike
+- OpenAI (GPT4o, GPT4o-mini)
+- xAI
+- Anthropic (Claude 3.5)
+- o1 (o1, o1-mini)
 
 ## Setup Using Git (For Developers only)
 
@@ -253,9 +224,11 @@ This method is recommended for developers who want to:
    ```
 
 3. **Switch to the Main Branch**:
+
    ```bash
    git checkout main
    ```
+
 4. **Install Dependencies**:
 
    ```bash
@@ -263,6 +236,7 @@ This method is recommended for developers who want to:
    ```
 
 5. **Start the Development Server**:
+
    ```bash
    pnpm run dev
    ```
@@ -290,6 +264,7 @@ To get the latest changes from the repository:
    ```
 
 4. **Restore Your Local Changes** (if any):
+
    ```bash
    git stash pop
    ```
@@ -312,6 +287,7 @@ If you encounter issues:
    ```
 
 2. **Reset Local Changes**:
+
    ```bash
    # Discard all local changes
    git reset --hard origin/main
@@ -350,3 +326,20 @@ Explore upcoming features and priorities on our [Roadmap](https://roadmap.sh/r/o
 ## FAQ
 
 For answers to common questions, issues, and to see a list of recommended models, visit our [FAQ Page](FAQ.md).
+
+### Known Issues
+
+#### React Server-Side Rendering (SSR) Streaming
+
+If you encounter errors related to `renderToReadableStream` not being recognized:
+
+1. For Node environments, use `renderToPipeableStream` instead as it's the officially supported API
+2. If you need `renderToReadableStream`, ensure you're using:
+   - An Edge runtime environment
+   - A compatible React version
+   - Proper ESM module imports
+
+For more details, see:
+
+- [React Server Components Guide](https://react.dev/reference/react-dom/server)
+- [React 18 Upgrade Guide](https://react.dev/blog/2022/03/08/react-18-upgrade-guide)
