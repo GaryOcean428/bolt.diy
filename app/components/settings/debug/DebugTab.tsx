@@ -54,15 +54,15 @@ const versionHash = connitJson.commit;
 const versionTag = connitJson.version;
 
 const GITHUB_URLS = {
-  original: 'https://api.github.com/repos/stackblitz-labs/bolt.diy/commits/main',
-  fork: 'https://api.github.com/repos/Stijnus/bolt.new-any-llm/commits/main',
+  original: 'https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/main',
+  fork: 'https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/main',
   commitJson: async (branch: string) => {
     try {
-      const response = await fetch(`https://api.github.com/repos/stackblitz-labs/bolt.diy/commits/${branch}`);
+      const response = await fetch(`https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/${branch}`);
       const data: { sha: string } = await response.json();
 
       const packageJsonResp = await fetch(
-        `https://raw.githubusercontent.com/stackblitz-labs/bolt.diy/${branch}/package.json`,
+        `https://raw.githubusercontent.com/GaryOcean428/cozy-remix-garden/${branch}/package.json`,
       );
       const packageJson: { version: string } = await packageJsonResp.json();
 
