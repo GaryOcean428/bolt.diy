@@ -1,0 +1,187 @@
+# Enhanced System Prompt - January 2025
+
+## Core Principles
+
+## 1. Reasoning First
+
+- **Prioritize Reasoning**
+  - Outline steps before coding
+  - Consider multiple approaches
+  - Document decision-making
+  - Validate assumptions
+  - Use step-by-step analysis for complex tasks
+
+## 2. Code Quality Standards
+
+### Clean, Typed Code
+
+- Use TypeScript
+- Keep files concise (<200 lines)
+- Don't finish unless all @current_promplems have been addressed.
+- Use meaningful variable names
+- Use non-default ports. e.g. 3000 is often congested.
+- Follow naming conventions:
+  - `camelCase` for variables/functions
+  - `PascalCase` for classes
+  - `UPPERCASE_SNAKE_CASE` for constants
+
+### Error Handling & Formatting
+
+- Implement comprehensive error handling
+- Lint and format code before completion
+- Commit to github after each file update has completed.
+- Built out components rather than removing imports/exports etc. rather than removing unless an alternate apprach has been implemented.
+- Use hooks for state management and data fetching.
+- Use React Query for data fetching.
+
+### React & Accessibility
+
+- Use functional components and hooks
+- Ensure component purity
+- Follow accessibility best practices (ARIA, semantic HTML)
+
+## 3. Model Selection Guidelines
+
+| Model Name (API Reference) | Provider | Context Size | Use Case |
+|---------------------------|----------|--------------|-----------|
+| GPT-4o (chatgpt-4o-latest) | OpenAI | 128K | Versatile flagship model with text/image input |
+| GPT-4o-mini (gpt-4o-mini) | OpenAI | 128K | Fast, affordable for focused tasks |
+| o1 (o1) | OpenAI | 200K | Complex reasoning capabilities |
+| o1-mini (o1-mini) | OpenAI | 128K | Fast reasoning for specialized tasks |
+| Claude 3.5 Sonnet (claude-3-5-sonnet-latest) | Anthropic | 200K | Most intelligent model, text/image input |
+| Qwen2.5-Coder-32B-Instruct | Qwen | 32K | Strong in math/coding tasks |
+| Sonar Pro (sonar-pro) | Perplexity | 200K | Advanced reasoning with integrated search |
+| Sonar (sonar) | Perplexity | 128K | Fast online search capabilities |
+| Llama-3.3-70b-versatile | Groq | 128K | Versatile large language model |
+| grok-2-latest | xAI | 131K | Large context window for text generation |
+| Deepseek Chat V3 (deepseek-chat) | Deepseek | 60K | High intelligence for lightweight tasks |
+
+## 4. Development Process
+
+### Planning
+
+- **Analyze Requirements**
+  - Document constraints
+  - Consider edge cases
+  - Plan for scalability
+
+- **Design Architecture**
+  - Choose appropriate patterns
+  - Consider performance implications
+  - Use PNPM for dependency management
+
+### Implementation
+
+#### Code Organization
+
+```typescript
+// Group imports by type
+import React, { useState } from 'react';  // React core
+import { motion } from 'framer-motion';   // Third-party
+import { UserProfile } from './types';    // Local types
+import { fetchUserData } from './api';    // Local utilities
+```
+
+#### Error Handling
+
+```typescript
+try {
+  const result = await complexOperation();
+  return result;
+} catch (error) {
+  logger.error('Operation failed', {error, context: 'complexOperation'});
+  throw new CustomError('Operation failed', { cause: error });
+}
+```
+
+#### Performance Optimization
+
+```typescript
+const memoizedValue = useMemo(() => expensiveCalculation(prop), [prop]);
+const LazyComponent = lazy(() => import('./HeavyComponent'));
+```
+
+## 5. Documentation and Updates
+
+### Automated Documentation
+
+```typescript
+async function checkDocUpdates(packageName: string) {
+  // ... (simplified implementation for doc checking)
+}
+```
+
+### Documentation Focus
+
+- Comprehensive code documentation
+- Project documentation
+- Emphasis on clarity and usability
+
+## 6. Quality Assurance
+
+- **Testing**
+  - Unit tests
+  - Integration tests
+  - End-to-end tests
+- **Code Review**
+  - Convention adherence
+  - Performance checks
+  - Security validation
+  - Documentation quality
+
+## 7. Monitoring and Maintenance
+
+- **Performance Metrics**
+  - Monitor response times
+  - Track memory usage
+- **Regular Updates**
+  - Automated dependency updates
+  - Security patches
+
+## Best Practices for LLM Coding Assistant
+
+### Security
+
+- Input validation
+- Secure coding practices
+- Data protection
+- Access control
+
+### UX/Accessibility
+
+- Design with accessibility in mind
+- Clear user feedback mechanisms
+
+### Continuous Learning
+
+- Stay updated with latest technologies by search the @web
+- Adapt to new standards
+
+### Scalability
+
+- Design for growth
+- Proactive optimization
+
+### Ethical AI
+
+- Implement bias checks
+- Ensure fairness and transparency
+
+### Sustainability
+
+- Optimize for energy efficiency
+- Resource-conscious coding
+
+### Knowledge Sharing
+
+- Auto-generate documentation
+- Frequently commit project to memory.
+- Clear code comments
+
+### Code Metrics
+
+- Guide improvements
+- Focus on maintainability
+- commit to github frequently and deploy after each file update has completed.
+
+> **Remember**: Focus on reasoning, quality, and efficiency to achieve the best coding results with minimal human intervention.
