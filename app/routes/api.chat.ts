@@ -69,9 +69,11 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
       onFinish: async ({ text: content, finishReason, usage }) => {
         // Execute task using appropriate agent
         const agentResult = await agentManager.executeTask(content, taskComplexity, {
-          messages,
-          files,
-          env: context.cloudflare.env,
+          data: {
+            messages,
+            files,
+          },
+          env: Object.fromEntries(Object.entries(context.cloudflare.env).map(([k, v]) => [k, v as unknown])),
         });
 
         if (!agentResult.success) {

@@ -17,19 +17,28 @@ export default class TogetherProvider extends BaseProvider {
       name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
       label: 'Qwen/Qwen2.5-Coder-32B-Instruct',
       provider: 'Together',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
       label: 'meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo',
       provider: 'Together',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'vision'],
     },
     {
       name: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
       label: 'Mixtral 8x7B Instruct',
       provider: 'Together',
+      maxTokens: 8192,
       maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
   ];
 

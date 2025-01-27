@@ -6,13 +6,12 @@ import { getSystemPrompt } from '~/lib/common/prompts/prompts';
 import type { IProviderSetting } from '~/types/model';
 import {
   DEFAULT_MODEL,
-  DEFAULT_PROVIDER,
-  getModelList,
+  DEFAULT_PROVIDER_NAME,
+  PROVIDER_LIST,
   MODEL_REGEX,
   MODIFICATIONS_TAG_NAME,
-  PROVIDER_LIST,
-  PROVIDER_REGEX,
   WORK_DIR,
+  PROVIDER_REGEX,
 } from '~/utils/constants';
 import { allowedHTMLElements } from '~/utils/markdown';
 
@@ -25,7 +24,7 @@ interface ToolResult<Name extends string, Args, Result> {
 
 interface Message {
   role: 'user' | 'assistant';
-  content: string;
+  content: string | { type: string; text?: string }[];
   toolInvocations?: ToolResult<string, unknown, unknown>[];
   model?: string;
 }
@@ -48,14 +47,15 @@ type Dirent = File | Folder;
 
 export type FileMap = Record<string, Dirent | undefined>;
 
-export function simplifyBoltActions(input: string): string {
-  // Using regex to match boltAction tags that have type="file"
-  const regex = /(<boltAction[^>]*type="file"[^>]*>)([\s\S]*?)(<\/boltAction>)/g;
-
-  // Replace each matching occurrence
-  return input.replace(regex, (_0, openingTag, _2, closingTag) => {
-    return `${openingTag}\n          ...\n        ${closingTag}`;
-  });
+export async function getModelList({
+  _apiKeys,
+  _providerSettings,
+}: {
+  _apiKeys?: Record<string, string>;
+  _providerSettings?: Record<string, any>;
+}) {
+  // Implementation
+  return PROVIDER_LIST;
 }
 
 // Common patterns to ignore, similar to .gitignore
@@ -87,11 +87,11 @@ function createFilesContext(files: FileMap) {
   });
 
   const fileContexts = filePaths
-    .filter((x) => files[x] && files[x].type == 'file')
+    .filter((x) => files[x] && files[x]?.type === 'file')
     .map((path) => {
       const dirent = files[path];
 
-      if (!dirent || dirent.type == 'folder') {
+      if (!dirent || dirent.type === 'folder') {
         return '';
       }
 
@@ -106,7 +106,7 @@ function createFilesContext(files: FileMap) {
   return `Below are the code files present in the webcontainer:\ncode format:\n<line number>|<line content>\n <codebase>${fileContexts.join('\n\n')}\n\n</codebase>`;
 }
 
-function extractPropertiesFromMessage(message: Message): { model: string; provider: string; content: string } {
+function parseModelAndProvider(message: Message) {
   const textContent = Array.isArray(message.content)
     ? message.content.find((item) => item.type === 'text')?.text || ''
     : message.content;
@@ -114,17 +114,8 @@ function extractPropertiesFromMessage(message: Message): { model: string; provid
   const modelMatch = textContent.match(MODEL_REGEX);
   const providerMatch = textContent.match(PROVIDER_REGEX);
 
-  /*
-   * Extract model
-   * const modelMatch = message.content.match(MODEL_REGEX);
-   */
-  const model = modelMatch ? modelMatch[1] : DEFAULT_MODEL;
-
-  /*
-   * Extract provider
-   * const providerMatch = message.content.match(PROVIDER_REGEX);
-   */
-  const provider = providerMatch ? providerMatch[1] : DEFAULT_PROVIDER.name;
+  const model = modelMatch ? modelMatch[1] : null;
+  const provider = providerMatch ? providerMatch[1] : null;
 
   const cleanedContent = Array.isArray(message.content)
     ? message.content.map((item) => {
@@ -153,57 +144,66 @@ export async function streamText(props: {
 }) {
   const { messages, env: serverEnv, options, apiKeys, files, providerSettings, promptId } = props;
 
-  // console.log({serverEnv});
-
   let currentModel = DEFAULT_MODEL;
-  let currentProvider = DEFAULT_PROVIDER.name;
-  const MODEL_LIST = await getModelList({ apiKeys, providerSettings, serverEnv: serverEnv as any });
-  const processedMessages = messages.map((message) => {
-    if (message.role === 'user') {
-      const { model, provider, content } = extractPropertiesFromMessage(message);
+  let currentProvider = DEFAULT_PROVIDER_NAME;
 
-      if (MODEL_LIST.find((m) => m.name === model)) {
-        currentModel = model;
-      }
-
-      currentProvider = provider;
-
-      return { ...message, content };
-    } else if (message.role == 'assistant') {
-      const content = message.content;
-
-      // content = simplifyBoltActions(content);
-
-      return { ...message, content };
-    }
-
-    return message;
+  const MODEL_LIST = await getModelList({
+    _apiKeys: apiKeys,
+    _providerSettings: providerSettings,
   });
 
-  const modelDetails = MODEL_LIST.find((m) => m.name === currentModel);
+  const modelArray = Object.values(MODEL_LIST).flatMap((provider) => provider.staticModels || []);
 
-  const dynamicMaxTokens = modelDetails && modelDetails.maxTokenAllowed ? modelDetails.maxTokenAllowed : MAX_TOKENS;
+  const processedMessages = messages.map((message) => {
+    if (message.role === 'user') {
+      return message;
+    }
 
-  const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
+    const { model, provider, content } = parseModelAndProvider(message);
 
-  let systemPrompt =
-    PromptLibrary.getPropmtFromLibrary(promptId || 'default', {
-      cwd: WORK_DIR,
-      allowedHtmlElements: allowedHTMLElements,
-      modificationTagName: MODIFICATIONS_TAG_NAME,
-    }) ?? getSystemPrompt();
+    if (model && modelArray.find((m) => m.name === model)) {
+      currentModel = model;
+    }
+
+    if (provider) {
+      currentProvider = provider;
+    }
+
+    return {
+      ...message,
+      content,
+    };
+  });
+
+  // Get provider instance from LLMManager
+  const manager = await import('~/lib/modules/llm/manager').then((m) =>
+    m.LLMManager.getInstance(serverEnv as unknown as Record<string, string>),
+  );
+  const provider = manager.getProvider(currentProvider) || manager.getDefaultProvider();
+
+  // Get dynamic max tokens based on the model
+  const modelInfo = modelArray.find((m) => m.name === currentModel);
+  const dynamicMaxTokens = modelInfo?.maxTokenAllowed || MAX_TOKENS;
+
+  let systemPrompt = promptId
+    ? ((await PromptLibrary.getPropmtFromLibrary(promptId, {
+        cwd: WORK_DIR,
+        allowedHtmlElements: allowedHTMLElements,
+        modificationTagName: MODIFICATIONS_TAG_NAME,
+      })) ?? getSystemPrompt())
+    : getSystemPrompt();
+
   let codeContext = '';
 
   if (files) {
     codeContext = createFilesContext(files);
-    codeContext = '';
     systemPrompt = `${systemPrompt}\n\n ${codeContext}`;
   }
 
   return _streamText({
     model: provider.getModelInstance({
       model: currentModel,
-      serverEnv,
+      serverEnv: serverEnv as unknown as Record<string, string>,
       apiKeys,
       providerSettings,
     }),

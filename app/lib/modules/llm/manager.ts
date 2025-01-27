@@ -1,13 +1,13 @@
 import { BaseProvider } from './base-provider';
 import * as providers from './registry';
-import type { ModelInfo, ProviderInfo } from './types';
+import type { ModelInfo } from './types';
 import type { IProviderSetting } from '~/types/model';
 
 export class LLMManager {
   private static _instance: LLMManager;
   private _providers: Map<string, BaseProvider> = new Map();
   private _modelList: ModelInfo[] = [];
-  private readonly _env: any = {};
+  private readonly _env: Record<string, string> = {};
 
   private constructor(_env: Record<string, string>) {
     this._registerProvidersFromDirectory();
@@ -29,7 +29,17 @@ export class LLMManager {
   private async _registerProvidersFromDirectory() {
     try {
       // Register default provider first
-      const defaultProvider = new providers.DefaultProvider();
+      const defaultProvider = new providers.DefaultProvider(
+        {
+          name: 'default',
+          version: '1.0.0',
+          description: 'Default LLM Provider',
+          enabled: true,
+          capabilities: [],
+          entrypoint: 'default.ts',
+        },
+        {},
+      );
       this.registerProvider(defaultProvider);
 
       // Look for exported classes that extend BaseProvider
@@ -52,9 +62,14 @@ export class LLMManager {
           );
 
           try {
-            this.registerProvider(provider);
-          } catch (error: any) {
-            console.log('Failed To Register Provider: ', provider.name, 'error:', error.message);
+            this.registerProvider(provider as BaseProvider);
+          } catch (error: unknown) {
+            console.log(
+              'Failed To Register Provider: ',
+              provider.name,
+              'error:',
+              error instanceof Error ? error.message : String(error),
+            );
           }
         }
       }
@@ -83,7 +98,14 @@ export class LLMManager {
   }
 
   getModelList(): ModelInfo[] {
-    return this._modelList;
+    // Filter model list to only include unique models
+    return this._modelList.filter((model, index, self) => self.findIndex((m) => m.name === model.name) === index);
+  }
+
+  private _validateModel(modelName: string) {
+    if (!this._modelList.some((m) => m.name === modelName)) {
+      throw new Error(`Model ${modelName} is not allowed. Please select an allowed model.`);
+    }
   }
 
   async updateModelList(options: {
@@ -97,8 +119,15 @@ export class LLMManager {
     const dynamicModels = await Promise.all(
       Array.from(this._providers.values())
         .filter(
-          (provider): provider is BaseProvider & Required<Pick<ProviderInfo, 'getDynamicModels'>> =>
-            !!provider.getDynamicModels,
+          (
+            provider,
+          ): provider is BaseProvider & {
+            getDynamicModels: (
+              apiKeys?: Record<string, string>,
+              providerSettings?: IProviderSetting,
+              serverEnv?: Record<string, string>,
+            ) => Promise<ModelInfo[]>;
+          } => typeof provider.getDynamicModels === 'function',
         )
         .map((provider) =>
           provider.getDynamicModels(apiKeys, providerSettings?.[provider.name], serverEnv).catch((err) => {
@@ -115,7 +144,14 @@ export class LLMManager {
     ];
     this._modelList = modelList;
 
-    return modelList;
+    // Filter to only unique models
+    const uniqueModelList: ModelInfo[] = modelList.filter(
+      (model, index, self) => self.findIndex((m) => m.name === model.name) === index,
+    );
+
+    this._modelList = uniqueModelList;
+
+    return uniqueModelList;
   }
 
   getDefaultProvider(): BaseProvider {

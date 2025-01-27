@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { ALLOWED_MODELS, getModelByName } from '~/lib/constants/allowedModels';
+import { DEFAULT_MODEL, DEFAULT_PROVIDER } from '~/lib/constants/models';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { ProviderInfo } from '~/types/model';
 
@@ -17,87 +19,104 @@ export const ModelSelector = ({
   setModel,
   provider,
   setProvider,
-  modelList,
   providerList,
+  apiKeys,
 }: ModelSelectorProps) => {
-  // Load enabled providers from cookies
-
-  // Update enabled providers when cookies change
+  // Validate and set default model if needed
   useEffect(() => {
-    // If current provider is disabled, switch to first enabled provider
-    if (providerList.length == 0) {
-      return;
-    }
+    if (!model || !getModelByName(model)) {
+      setModel?.(DEFAULT_MODEL);
 
-    if (provider && !providerList.map((p) => p.name).includes(provider.name)) {
-      const firstEnabledProvider = providerList[0];
-      setProvider?.(firstEnabledProvider);
+      const defaultProvider = providerList.find((p) => p.name === DEFAULT_PROVIDER);
 
-      // Also update the model to the first available one for the new provider
-      const firstModel = modelList.find((m) => m.provider === firstEnabledProvider.name);
-
-      if (firstModel) {
-        setModel?.(firstModel.name);
+      if (defaultProvider) {
+        setProvider?.(defaultProvider);
       }
     }
-  }, [providerList, provider, setProvider, modelList, setModel]);
+  }, [model, setModel, setProvider, providerList]);
 
-  if (providerList.length === 0) {
+  const filteredModels = useMemo(() => {
+    return ALLOWED_MODELS.filter((m) => m.provider === provider?.name);
+  }, [provider]);
+
+  if (!provider || filteredModels.length === 0) {
     return (
       <div className="mb-2 p-4 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary">
-        <p className="text-center">
-          No providers are currently enabled. Please enable at least one provider in the settings to start using the
-          chat.
-        </p>
+        <p className="text-center">Please select a valid provider to continue.</p>
       </div>
     );
   }
 
-  // Ensure we have a valid initial state
-  const currentProvider = provider || providerList[0];
-  const currentModel = model || modelList.find((m) => m.provider === currentProvider?.name)?.name;
-
   return (
-    <div className="mb-2 flex gap-2 flex-col sm:flex-row">
-      <select
-        value={currentProvider?.name || ''}
-        onChange={(e) => {
-          const newProvider = providerList.find((p: ProviderInfo) => p.name === e.target.value);
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
+        <label htmlFor="provider-select" className="text-sm font-medium text-bolt-elements-textSecondary">
+          Provider
+        </label>
+        <select
+          id="provider-select"
+          value={provider?.name || DEFAULT_PROVIDER}
+          onChange={(e) => {
+            const newProvider = providerList.find((p) => p.name === e.target.value);
 
-          if (newProvider && setProvider) {
-            setProvider(newProvider);
-          }
+            if (newProvider) {
+              setProvider?.(newProvider);
 
-          const firstModel = [...modelList].find((m) => m.provider === e.target.value);
-
-          if (firstModel && setModel) {
-            setModel(firstModel.name);
-          }
-        }}
-        title="Select a provider"
-        className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all"
-      >
-        {providerList.map((provider: ProviderInfo) => (
-          <option key={provider.name} value={provider.name}>
-            {provider.name}
-          </option>
-        ))}
-      </select>
-      <select
-        key={currentProvider?.name}
-        value={currentModel || ''}
-        onChange={(e) => setModel?.(e.target.value)}
-        title="Select a model"
-        className="flex-1 p-2 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-prompt-background text-bolt-elements-textPrimary focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus transition-all lg:max-w-[70%]"
-      >
-        {[...modelList]
-          .filter((e) => e.provider == provider?.name && e.name)
-          .map((modelOption, index) => (
-            <option key={index} value={modelOption.name}>
-              {modelOption.label}
+              // Reset model when provider changes
+              const firstModel = filteredModels[0]?.apiModelName || DEFAULT_MODEL;
+              setModel?.(firstModel);
+            }
+          }}
+          className="w-full px-3 py-2 text-bolt-elements-select-text bg-bolt-elements-select-background border border-bolt-elements-select-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+          aria-label="Select provider"
+          title="Select AI provider"
+        >
+          {providerList.map((p) => (
+            <option
+              key={p.name}
+              value={p.name}
+              className="text-bolt-elements-select-text bg-bolt-elements-select-background"
+            >
+              {p.name}
             </option>
           ))}
-      </select>
+        </select>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label htmlFor="model-select" className="text-sm font-medium text-bolt-elements-textSecondary">
+          Model
+        </label>
+        <select
+          id="model-select"
+          value={model || DEFAULT_MODEL}
+          onChange={(e) => setModel?.(e.target.value)}
+          className="w-full px-3 py-2 text-bolt-elements-select-text bg-bolt-elements-select-background border border-bolt-elements-select-border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
+          aria-label="Select model"
+          title="Select AI model"
+        >
+          {filteredModels.map((m) => (
+            <option
+              key={m.apiModelName}
+              value={m.apiModelName}
+              className="text-bolt-elements-select-text bg-bolt-elements-select-background"
+            >
+              {m.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {provider?.getApiKeyLink && !apiKeys?.[provider.name] && (
+        <a
+          href={provider.getApiKeyLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-accent-500 hover:text-accent-600 mt-1"
+        >
+          {provider.labelForGetApiKey || 'Get API Key'}
+        </a>
+      )}
     </div>
   );
 };

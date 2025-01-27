@@ -18,108 +18,60 @@ interface SettingsProps {
   onClose: () => void;
 }
 
-type TabType = 'data' | 'providers' | 'features' | 'debug' | 'event-logs' | 'connection';
+type TabType = 'features' | 'providers' | 'connections' | 'data' | 'debug' | 'event-logs' | 'connection';
 
 export const SettingsWindow = ({ open, onClose }: SettingsProps) => {
   const { debug, eventLogs } = useSettings();
   const [activeTab, setActiveTab] = useState<TabType>('data');
 
+  const getTabClassName = (isActive: boolean) => classNames(styles.tab, { [styles.active]: isActive });
+
   const tabs: { id: TabType; label: string; icon: string; component?: ReactElement }[] = [
+    { id: 'features', label: 'Features', icon: 'i-ph:flag', component: <FeaturesTab /> },
+    { id: 'providers', label: 'Providers', icon: 'i-ph:plug', component: <ProvidersTab /> },
+    { id: 'connections', label: 'Connections', icon: 'i-ph:link', component: <ConnectionsTab /> },
     { id: 'data', label: 'Data', icon: 'i-ph:database', component: <DataTab /> },
-    { id: 'providers', label: 'Providers', icon: 'i-ph:key', component: <ProvidersTab /> },
-    { id: 'connection', label: 'Connection', icon: 'i-ph:link', component: <ConnectionsTab /> },
-    { id: 'features', label: 'Features', icon: 'i-ph:star', component: <FeaturesTab /> },
-    ...(debug
-      ? [
-          {
-            id: 'debug' as TabType,
-            label: 'Debug Tab',
-            icon: 'i-ph:bug',
-            component: <DebugTab />,
-          },
-        ]
-      : []),
+    ...(debug ? [{ id: 'debug' as const, label: 'Debug', icon: 'i-ph:bug', component: <DebugTab /> }] : []),
     ...(eventLogs
-      ? [
-          {
-            id: 'event-logs' as TabType,
-            label: 'Event Logs',
-            icon: 'i-ph:list-bullets',
-            component: <EventLogsTab />,
-          },
-        ]
+      ? [{ id: 'event-logs' as const, label: 'Event Logs', icon: 'i-ph:list', component: <EventLogsTab /> }]
       : []),
   ];
 
   return (
-    <RadixDialog.Root open={open}>
+    <RadixDialog.Root open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <RadixDialog.Portal>
-        <RadixDialog.Overlay asChild onClick={onClose}>
+        <RadixDialog.Overlay asChild>
           <motion.div
-            className="bg-black/50 fixed inset-0 z-max backdrop-blur-sm"
-            initial="closed"
-            animate="open"
-            exit="closed"
+            className={styles.overlay}
             variants={dialogBackdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
           />
         </RadixDialog.Overlay>
-        <RadixDialog.Content aria-describedby={undefined} asChild>
+        <RadixDialog.Content asChild>
           <motion.div
-            className="fixed top-[50%] left-[50%] z-max h-[85vh] w-[90vw] max-w-[900px] translate-x-[-50%] translate-y-[-50%] border border-bolt-elements-borderColor rounded-lg shadow-lg focus:outline-none overflow-hidden"
-            initial="closed"
-            animate="open"
-            exit="closed"
+            className={styles.content}
             variants={dialogVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
           >
-            <div className="flex h-full">
-              <div
-                className={classNames(
-                  'w-48 border-r border-bolt-elements-borderColor bg-bolt-elements-background-depth-1 p-4 flex flex-col justify-between',
-                  styles['settings-tabs'],
-                )}
-              >
-                <DialogTitle className="flex-shrink-0 text-lg font-semibold text-bolt-elements-textPrimary mb-2">
-                  Settings
-                </DialogTitle>
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={classNames(activeTab === tab.id ? styles.active : '')}
-                  >
-                    <div className={tab.icon} />
-                    {tab.label}
+            <div className={styles.header}>
+              <DialogTitle>Settings</DialogTitle>
+              <IconButton icon="i-ph:x" onClick={onClose} className={styles.closeButton} aria-label="Close settings" />
+            </div>
+            <div className={styles.body}>
+              <div className={styles.tabs}>
+                {tabs.map(({ id, label, icon }) => (
+                  <button key={id} onClick={() => setActiveTab(id)} className={getTabClassName(activeTab === id)}>
+                    <i className={icon} />
+                    <span>{label}</span>
                   </button>
                 ))}
-                <div className="mt-auto flex flex-col gap-2">
-                  <a
-                    href="https://github.com/stackblitz-labs/bolt.diy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={classNames(styles['settings-button'], 'flex items-center gap-2')}
-                  >
-                    <div className="i-ph:github-logo" />
-                    GitHub
-                  </a>
-                  <a
-                    href="https://stackblitz-labs.github.io/bolt.diy/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={classNames(styles['settings-button'], 'flex items-center gap-2')}
-                  >
-                    <div className="i-ph:book" />
-                    Docs
-                  </a>
-                </div>
               </div>
-
-              <div className="flex-1 flex flex-col p-8 pt-10 bg-bolt-elements-background-depth-2">
-                <div className="flex-1 overflow-y-auto">{tabs.find((tab) => tab.id === activeTab)?.component}</div>
-              </div>
+              <div className={styles.tabContent}>{tabs.find((tab) => tab.id === activeTab)?.component}</div>
             </div>
-            <RadixDialog.Close asChild onClick={onClose}>
-              <IconButton icon="i-ph:x" className="absolute top-[10px] right-[10px]" />
-            </RadixDialog.Close>
           </motion.div>
         </RadixDialog.Content>
       </RadixDialog.Portal>

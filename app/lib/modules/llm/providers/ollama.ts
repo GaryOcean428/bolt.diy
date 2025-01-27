@@ -46,9 +46,14 @@ export default class OllamaProvider extends BaseProvider {
     serverEnv: Record<string, string> = {},
   ): Promise<ModelInfo[]> {
     try {
+      const providerSetting = settings?.Ollama || {
+        name: 'Ollama',
+        baseUrl: undefined,
+        apiKey: undefined,
+      };
       const { baseUrl } = this.getProviderBaseUrlAndKey({
         apiKeys,
-        providerSettings: settings,
+        providerSettings: providerSetting,
         serverEnv,
         defaultBaseUrlKey: 'OLLAMA_API_BASE_URL',
         defaultApiTokenKey: '',
@@ -61,13 +66,14 @@ export default class OllamaProvider extends BaseProvider {
       const response = await fetch(`${baseUrl}/api/tags`);
       const data = (await response.json()) as OllamaApiResponse;
 
-      // console.log({ ollamamodels: data.models });
-
       return data.models.map((model: OllamaModel) => ({
         name: model.name,
         label: `${model.name} (${model.details.parameter_size})`,
         provider: this.name,
+        maxTokens: 8000,
         maxTokenAllowed: 8000,
+        type: 'text-generation',
+        capabilities: ['text-generation'],
       }));
     } catch (e) {
       console.error('Failed to get Ollama models:', e);
@@ -81,9 +87,14 @@ export default class OllamaProvider extends BaseProvider {
     providerSettings?: Record<string, IProviderSetting>;
   }) => LanguageModelV1 = (options) => {
     const { apiKeys, providerSettings, serverEnv, model } = options;
+    const providerSetting = providerSettings?.Ollama || {
+      name: 'Ollama',
+      baseUrl: undefined,
+      apiKey: undefined,
+    };
     let { baseUrl } = this.getProviderBaseUrlAndKey({
       apiKeys,
-      providerSettings,
+      providerSettings: providerSetting,
       serverEnv: serverEnv as any,
       defaultBaseUrlKey: 'OLLAMA_API_BASE_URL',
       defaultApiTokenKey: '',

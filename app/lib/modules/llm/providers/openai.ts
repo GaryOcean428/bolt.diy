@@ -13,10 +13,42 @@ export default class OpenAIProvider extends BaseProvider {
   };
 
   staticModels: ModelInfo[] = [
-    { name: 'gpt-4o-mini', label: 'GPT-4o Mini', provider: 'OpenAI', maxTokenAllowed: 8000 },
-    { name: 'gpt-4-turbo', label: 'GPT-4 Turbo', provider: 'OpenAI', maxTokenAllowed: 8000 },
-    { name: 'gpt-4', label: 'GPT-4', provider: 'OpenAI', maxTokenAllowed: 8000 },
-    { name: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo', provider: 'OpenAI', maxTokenAllowed: 8000 },
+    {
+      name: 'gpt-4-turbo-preview',
+      label: 'GPT-4 Turbo',
+      provider: 'OpenAI',
+      maxTokens: 128000,
+      maxTokenAllowed: 128000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
+      name: 'gpt-4-vision-preview',
+      label: 'GPT-4 Vision',
+      provider: 'OpenAI',
+      maxTokens: 128000,
+      maxTokenAllowed: 128000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation', 'vision'],
+    },
+    {
+      name: 'gpt-4',
+      label: 'GPT-4',
+      provider: 'OpenAI',
+      maxTokens: 8192,
+      maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
+      name: 'gpt-3.5-turbo',
+      label: 'GPT-3.5 Turbo',
+      provider: 'OpenAI',
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
   ];
 
   getModelInstance(options: {

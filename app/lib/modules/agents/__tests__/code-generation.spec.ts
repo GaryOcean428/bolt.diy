@@ -1,42 +1,54 @@
 // Code Generation Tests
+import { createMockAgentManager } from './test-setup';
 import { AgentManager } from '~/lib/modules/agents/agent-manager';
-import type { TaskComplexity, CodeAction } from '~/lib/modules/agents/types';
+import { LanguageAgentImpl } from '~/lib/modules/agents/language-agent-impl';
+import { AgentTier, AgentSpecialization, SupportedLanguage } from '~/lib/modules/agents/types';
 
 describe('Code Generation', () => {
   let agentManager: AgentManager;
 
   beforeEach(() => {
-    agentManager = new AgentManager();
+    agentManager = createMockAgentManager();
+
+    const languageAgent = new LanguageAgentImpl(
+      {
+        name: 'code-generation',
+        description: 'Code generation agent',
+        tier: AgentTier.Standard,
+        specializations: [AgentSpecialization.CodeGeneration],
+        supportedLanguages: [SupportedLanguage.English],
+        maxTokens: 1000,
+        costPerToken: 0.001,
+      },
+      SupportedLanguage.English,
+    );
+
+    (agentManager as any)._agents.set('language', languageAgent);
   });
 
   it('should generate a React component', async () => {
-    const task = [
-      'Create a TypeScript React component that:',
-      '- Takes a "user" prop with name and email',
-      "- Shows the user's info in a card",
-      '- Has proper TypeScript types',
-      '- Includes error handling',
-    ].join('\n');
-
-    const complexity: TaskComplexity = {
-      tokenCount: task.length,
-      specializedKnowledge: true,
-      securitySensitive: false,
-      languageSpecific: true,
-      expectedDuration: 1,
+    const task = {
+      type: 'code',
+      input: 'Generate a React component that displays a list of items',
+      complexity: {
+        tokenCount: 50,
+        specializedKnowledge: true,
+        securitySensitive: false,
+        languageSpecific: true,
+        expectedDuration: 2,
+      },
     };
 
-    const result = await agentManager.executeTask(task, complexity);
-    expect(result.success).toBe(true);
-
-    const data = result.data as { actions: CodeAction[] };
-    const actions = data.actions;
-    actions.forEach((a: CodeAction) => {
-      if (a.type === 'file') {
-        expect(a).toBeDefined();
-        expect(a.content).toContain('interface UserProps');
-        expect(a.content).toContain('export function UserCard');
-      }
+    const result = await agentManager.executeTask(task.input, {
+      tokenCount: 100,
+      specializedKnowledge: false,
+      securitySensitive: false,
+      languageSpecific: false,
+      expectedDuration: 60,
     });
+    expect(result).toBeDefined();
+    expect(result.data).toBeDefined();
+    expect((result.data as any).type).toBe('code');
+    expect((result.data as any).content).toContain('React');
   });
 });

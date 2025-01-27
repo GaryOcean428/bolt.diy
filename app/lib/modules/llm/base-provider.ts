@@ -18,6 +18,13 @@ export abstract class BaseProvider extends BasePlugin<ProviderConfig> implements
     super(metadata, config);
   }
 
+  abstract getModelInstance(options: {
+    model: string;
+    serverEnv: Record<string, string> | Env;
+    apiKeys?: Record<string, string>;
+    providerSettings?: Record<string, IProviderSetting>;
+  }): LanguageModelV1;
+
   getProviderBaseUrlAndKey(options: {
     apiKeys?: Record<string, string>;
     providerSettings?: IProviderSetting;
@@ -56,13 +63,6 @@ export abstract class BaseProvider extends BasePlugin<ProviderConfig> implements
     settings?: IProviderSetting,
     serverEnv?: Record<string, string>,
   ): Promise<ModelInfo[]>;
-
-  abstract getModelInstance(options: {
-    model: string;
-    serverEnv: Env;
-    apiKeys?: Record<string, string>;
-    providerSettings?: Record<string, IProviderSetting>;
-  }): LanguageModelV1;
 }
 
 type OptionalApiKey = string | undefined;

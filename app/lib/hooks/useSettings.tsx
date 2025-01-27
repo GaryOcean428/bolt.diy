@@ -125,21 +125,37 @@ export function useSettings() {
     const providers = providersStore.get();
     const providerSetting: Record<string, IProviderSetting> = {};
     Object.keys(providers).forEach((provider) => {
-      providerSetting[provider] = providers[provider].settings;
+      const settings = providers[provider].settings;
+
+      if (settings) {
+        providerSetting[provider] = {
+          ...settings,
+          name: provider,
+        };
+      }
     });
     Cookies.set('providers', JSON.stringify(providerSetting));
   }, [providers]);
 
   useEffect(() => {
     let active = Object.entries(providers)
-      .filter(([_key, provider]) => provider.settings.enabled)
+      .filter(([_key, provider]) => provider.settings?.enabled ?? false)
       .map(([_k, p]) => p);
 
     if (!isLocalModel) {
       active = active.filter((p) => !LOCAL_PROVIDERS.includes(p.name));
     }
 
-    setActiveProviders(active);
+    setActiveProviders(
+      active.map((config) => {
+        const providerInfo: ProviderInfo = {
+          name: config.name,
+          displayName: config.name,
+          staticModels: (config as any).staticModels ?? [],
+        };
+        return providerInfo;
+      }),
+    );
   }, [providers, isLocalModel]);
 
   // helper function to update settings
@@ -150,6 +166,15 @@ export function useSettings() {
     },
     [providers],
   );
+
+  const updateProviders = useCallback((providers: ProviderInfo[]) => {
+    setActiveProviders(
+      providers.map((provider) => ({
+        ...provider,
+        displayName: provider.displayName || provider.name,
+      })),
+    );
+  }, []);
 
   const enableDebugMode = useCallback((enabled: boolean) => {
     isDebugMode.set(enabled);
@@ -173,6 +198,7 @@ export function useSettings() {
     promptStore.set(promptId);
     Cookies.set('promptId', promptId);
   }, []);
+
   const enableLatestBranch = useCallback((enabled: boolean) => {
     latestBranchStore.set(enabled);
     logStore.logSystem(`Main branch updates ${enabled ? 'enabled' : 'disabled'}`);
@@ -183,6 +209,7 @@ export function useSettings() {
     providers,
     activeProviders,
     updateProviderSettings,
+    updateProviders,
     debug,
     enableDebugMode,
     eventLogs,

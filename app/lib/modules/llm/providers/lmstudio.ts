@@ -16,38 +16,18 @@ export default class LMStudioProvider extends BaseProvider {
 
   staticModels: ModelInfo[] = [];
 
-  async getDynamicModels(
-    apiKeys?: Record<string, string>,
-    settings?: IProviderSetting,
-    serverEnv: Record<string, string> = {},
-  ): Promise<ModelInfo[]> {
-    try {
-      const { baseUrl } = this.getProviderBaseUrlAndKey({
-        apiKeys,
-        providerSettings: settings,
-        serverEnv,
-        defaultBaseUrlKey: 'LMSTUDIO_API_BASE_URL',
-        defaultApiTokenKey: '',
-      });
-
-      if (!baseUrl) {
-        return [];
-      }
-
-      const response = await fetch(`${baseUrl}/v1/models`);
-      const data = (await response.json()) as { data: Array<{ id: string }> };
-
-      return data.data.map((model) => ({
-        name: model.id,
-        label: model.id,
-        provider: this.name,
-        maxTokenAllowed: 8000,
-      }));
-    } catch (error: any) {
-      console.log('Error getting LMStudio models:', error.message);
-
-      return [];
-    }
+  async getDynamicModels(): Promise<ModelInfo[]> {
+    return [
+      {
+        name: 'local-model',
+        label: 'Local Model',
+        provider: 'LMStudio',
+        maxTokens: 4096,
+        maxTokenAllowed: 4096,
+        type: 'text-generation',
+        capabilities: ['text-generation'],
+      },
+    ];
   }
   getModelInstance: (options: {
     model: string;
@@ -56,9 +36,14 @@ export default class LMStudioProvider extends BaseProvider {
     providerSettings?: Record<string, IProviderSetting>;
   }) => LanguageModelV1 = (options) => {
     const { apiKeys, providerSettings, serverEnv, model } = options;
+    const providerSetting = providerSettings?.LMStudio || {
+      name: 'LMStudio',
+      baseUrl: undefined,
+      apiKey: undefined,
+    };
     const { baseUrl } = this.getProviderBaseUrlAndKey({
       apiKeys,
-      providerSettings,
+      providerSettings: providerSetting,
       serverEnv: serverEnv as any,
       defaultBaseUrlKey: 'OLLAMA_API_BASE_URL',
       defaultApiTokenKey: '',

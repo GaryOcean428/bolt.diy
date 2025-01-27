@@ -1,34 +1,50 @@
 {
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["@remix-run/cloudflare", "vite/client", "@cloudflare/workers-types/2023-07-01", "@types/dom-speech-recognition", "jest"],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": [
+      "@remix-run/cloudflare",
+      "vite/client",
+      "@cloudflare/workers-types/2023-07-01",
+      "@types/dom-speech-recognition",
+      "jest"
+    ],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "target": "ESNext",
+    "target": "ES2022",
     "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
     "allowJs": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]
     },
-
-    // vite takes care of building everything, not tsc
-    "noEmit": true
+    "allowSyntheticDefaultImports": true,
+    "module": "ESNext",
+    "noEmit": true,
+    "incremental": true,
+    "verbatimModuleSyntax": true
   },
   "include": [
+    "remix.env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/.server/**/*.ts",
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx"
-  ]
+  ],
+  "exclude": ["node_modules"]
 }

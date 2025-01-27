@@ -1,16 +1,10 @@
-/**
- * Agent capability level for cost-efficient routing
- */
 export enum AgentTier {
-  Basic = 'basic', // Simple tasks, lower cost
-  Standard = 'standard', // Most common tasks
-  Advanced = 'advanced', // Complex tasks requiring expertise
-  Expert = 'expert', // Highly specialized tasks
+  Basic = 'basic',
+  Standard = 'standard',
+  Advanced = 'advanced',
+  Expert = 'expert',
 }
 
-/**
- * Supported languages for multi-lingual support
- */
 export enum SupportedLanguage {
   English = 'en',
   Spanish = 'es',
@@ -20,25 +14,21 @@ export enum SupportedLanguage {
   Japanese = 'ja',
 }
 
-/**
- * Agent specialization areas
- */
 export enum AgentSpecialization {
   Architecture = 'architecture',
   CodeGeneration = 'code-generation',
   CodeReview = 'code-review',
   Testing = 'testing',
+  Documentation = 'documentation',
   Security = 'security',
   Performance = 'performance',
-  Documentation = 'documentation',
   UIDesign = 'ui-design',
   Research = 'research',
   Memory = 'memory',
+  Language = 'language',
+  Review = 'review',
 }
 
-/**
- * Base configuration for all agents
- */
 export interface AgentConfig {
   name: string;
   description: string;
@@ -49,9 +39,6 @@ export interface AgentConfig {
   costPerToken: number;
 }
 
-/**
- * Task complexity metrics for routing
- */
 export interface TaskComplexity {
   tokenCount: number;
   specializedKnowledge: boolean;
@@ -60,9 +47,16 @@ export interface TaskComplexity {
   expectedDuration: number;
 }
 
-/**
- * Agent execution result
- */
+export interface TaskContext {
+  previousTasks?: string[];
+  requirements?: {
+    specialization?: string[];
+  };
+  metadata?: Record<string, unknown>;
+  data?: Record<string, unknown>;
+  env?: Record<string, unknown>;
+}
+
 export interface CodeAction {
   type: 'file' | 'shell';
   content: string;
@@ -80,68 +74,17 @@ export interface AgentResult<T = unknown> {
   };
 }
 
-/**
- * Base interface for all agents
- */
 export interface Agent {
   readonly config: AgentConfig;
-
-  /**
-   * Initialize the agent
-   */
   initialize(): Promise<void>;
-
-  /**
-   * Execute a task
-   */
   execute<T>(task: string, context?: unknown): Promise<AgentResult<T>>;
-
-  /**
-   * Check if agent can handle a task
-   */
   canHandle(task: string, complexity: TaskComplexity): Promise<boolean>;
-
-  /**
-   * Estimate task cost
-   */
   estimateCost(task: string, complexity: TaskComplexity): Promise<number>;
-
-  /**
-   * Clean up agent resources
-   */
   dispose(): Promise<void>;
 }
 
-/**
- * Language-specific agent interface
- */
 export interface LanguageAgent extends Agent {
   readonly language: SupportedLanguage;
-
-  /**
-   * Translate content to agent's language
-   */
   translate(content: string, sourceLanguage: SupportedLanguage): Promise<string>;
-
-  /**
-   * Detect content language
-   */
   detectLanguage(content: string): Promise<SupportedLanguage>;
-}
-
-/**
- * Specialized task agent interface
- */
-export interface TaskAgent extends Agent {
-  readonly specialization: AgentSpecialization;
-
-  /**
-   * Get agent expertise level for a task
-   */
-  getExpertiseLevel(task: string): Promise<number>;
-
-  /**
-   * Validate task output
-   */
-  validateOutput<T>(result: T): Promise<boolean>;
 }

@@ -31,12 +31,14 @@
 .PromptEffectLine {
   width: calc(100% - var(--prompt-container-offset) + var(--prompt-line-stroke-width));
   height: calc(100% - var(--prompt-container-offset) + var(--prompt-line-stroke-width));
-  x: calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2);
-  y: calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2);
-  rx: calc(8px - var(--prompt-line-stroke-width));
+  transform: translate(
+    calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2),
+    calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2)
+  );
+  border-radius: 8px;
   fill: transparent;
   stroke-width: var(--prompt-line-stroke-width);
-  stroke: url(#line-gradient);
+  stroke: var(--prompt-line-color, currentColor);
   stroke-dasharray: 35px 65px;
   stroke-dashoffset: 10;
 }
@@ -44,4 +46,9 @@
 .PromptShine {
   fill: url(#shine-gradient);
   mix-blend-mode: overlay;
+}
+
+.textarea {
+  min-height: var(--textarea-min-height, 76px);
+  max-height: var(--textarea-max-height, 400px);
 }

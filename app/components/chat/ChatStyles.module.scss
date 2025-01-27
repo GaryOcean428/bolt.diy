@@ -1,0 +1,157 @@
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background-color: var(--bolt-background-color);
+  color: var(--bolt-text-color);
+}
+
+.chat {
+  --textarea-min-height: 76px;
+  --textarea-max-height: 400px;
+  --prompt-container-offset: 6px;
+  --prompt-line-stroke-width: 2px;
+  --prompt-line-color: var(--bolt-elements-focus);
+
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: var(--chat-min-width);
+  height: 100%;
+
+  &[data-chat-visible='false'] {
+    --workbench-inner-width: 100%;
+    --workbench-left: 0;
+  }
+}
+
+.messageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-top: 1px solid var(--bolt-border-color);
+}
+
+.promptContainer {
+  position: relative;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--bolt-elements-borderColor);
+  background-color: var(--bolt-elements-background-depth-2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--bolt-shadow-xs);
+  z-index: var(--prompt-z-index);
+  width: 100%;
+  max-width: var(--chat-max-width);
+  margin: 0 auto;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem 4rem 1rem 1rem;
+  outline: none;
+  resize: none;
+  color: var(--bolt-elements-textPrimary);
+  background-color: transparent;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  min-height: var(--textarea-min-height);
+  max-height: var(--textarea-max-height);
+
+  &::placeholder {
+    color: var(--bolt-elements-textTertiary);
+  }
+
+  &:hover {
+    border-color: var(--bolt-elements-focus);
+  }
+
+  &:focus {
+    border-color: var(--bolt-elements-focus);
+  }
+}
+
+.promptEffectContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.promptEffectLine {
+  width: calc(100% - var(--prompt-container-offset) + var(--prompt-line-stroke-width));
+  height: calc(100% - var(--prompt-container-offset) + var(--prompt-line-stroke-width));
+  transform: translate(
+    calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2),
+    calc(var(--prompt-container-offset) / 2 - var(--prompt-line-stroke-width) / 2)
+  );
+  border-radius: 8px;
+  fill: transparent;
+  stroke-width: var(--prompt-line-stroke-width);
+  stroke: var(--prompt-line-color);
+  stroke-dasharray: 35px 65px;
+  stroke-dashoffset: 10;
+}
+
+.textareaContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--textarea-min-height);
+  max-height: var(--textarea-max-height);
+  background-color: var(--bolt-elements-background-depth-1);
+  border-radius: 0.5rem;
+  border: 1px solid var(--bolt-elements-borderColor);
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--bolt-elements-focus);
+  }
+
+  &:focus-within {
+    border-color: var(--bolt-elements-focus);
+    box-shadow: var(--bolt-shadow-sm);
+  }
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inlineStyles {
+  &__textArea {
+    min-height: var(--textarea-min-height);
+    max-height: var(--textarea-max-height);
+    width: 100%;
+    resize: none;
+    outline: none;
+    border: none;
+    background: transparent;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--bolt-elements-textPrimary);
+    padding: 1rem;
+  }
+}

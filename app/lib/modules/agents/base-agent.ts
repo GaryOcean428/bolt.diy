@@ -155,7 +155,10 @@ export abstract class BaseAgent implements Agent {
 
     const { SYSTEM_PROMPTS } = await import('./prompts/system-prompts');
 
-    return SYSTEM_PROMPTS[this.config.specializations[0]] || '';
+    const specialization = this.config.specializations[0];
+    const prompt = SYSTEM_PROMPTS[specialization.replace('-', '_') as keyof typeof SYSTEM_PROMPTS];
+
+    return prompt || '';
   }
 
   protected async _buildPrompt(task: string, context?: unknown): Promise<string> {
