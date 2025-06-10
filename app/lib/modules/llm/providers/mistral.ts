@@ -1,8 +1,8 @@
+import { createMistral } from '@ai-sdk/mistral';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createMistral } from '@ai-sdk/mistral';
 
 export default class MistralProvider extends BaseProvider {
   name = 'Mistral';
@@ -13,15 +13,87 @@ export default class MistralProvider extends BaseProvider {
   };
 
   staticModels: ModelInfo[] = [
-    { name: 'open-mistral-7b', label: 'Mistral 7B', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'open-mixtral-8x7b', label: 'Mistral 8x7B', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'open-mixtral-8x22b', label: 'Mistral 8x22B', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'open-codestral-mamba', label: 'Codestral Mamba', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'open-mistral-nemo', label: 'Mistral Nemo', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'ministral-8b-latest', label: 'Mistral 8B', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'mistral-small-latest', label: 'Mistral Small', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'codestral-latest', label: 'Codestral', provider: 'Mistral', maxTokenAllowed: 8000 },
-    { name: 'mistral-large-latest', label: 'Mistral Large Latest', provider: 'Mistral', maxTokenAllowed: 8000 },
+    {
+      name: 'open-mistral-7b',
+      label: 'Mistral 7B',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'open-mixtral-8x7b',
+      label: 'Mistral 8x7B',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'open-mixtral-8x22b',
+      label: 'Mistral 8x22B',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'open-codestral-mamba',
+      label: 'Codestral Mamba',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
+      name: 'open-mistral-nemo',
+      label: 'Mistral Nemo',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'ministral-8b-latest',
+      label: 'Mistral 8B',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'mistral-small-latest',
+      label: 'Mistral Small',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'codestral-latest',
+      label: 'Codestral',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
+      name: 'mistral-large-latest',
+      label: 'Mistral Large Latest',
+      provider: 'Mistral',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
   ];
 
   getModelInstance(options: {

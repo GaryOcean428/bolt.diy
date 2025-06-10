@@ -1,8 +1,8 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 
 export default class HuggingFaceProvider extends BaseProvider {
   name = 'HuggingFace';
@@ -14,70 +14,40 @@ export default class HuggingFaceProvider extends BaseProvider {
 
   staticModels: ModelInfo[] = [
     {
-      name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-      label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
+      name: 'meta-llama/Llama-2-70b-chat-hf',
+      label: 'Llama 2 70B',
       provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
-      name: '01-ai/Yi-1.5-34B-Chat',
-      label: 'Yi-1.5-34B-Chat (HuggingFace)',
+      name: 'tiiuae/falcon-180B-chat',
+      label: 'Falcon 180B',
       provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
     {
-      name: 'codellama/CodeLlama-34b-Instruct-hf',
-      label: 'CodeLlama-34b-Instruct (HuggingFace)',
+      name: 'codellama/CodeLlama-70b-Instruct-hf',
+      label: 'CodeLlama 70B',
       provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
-      name: 'NousResearch/Hermes-3-Llama-3.1-8B',
-      label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
+      name: 'google/gemma-7b-it',
+      label: 'Gemma 7B',
       provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'Qwen/Qwen2.5-Coder-32B-Instruct',
-      label: 'Qwen2.5-Coder-32B-Instruct (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'Qwen/Qwen2.5-72B-Instruct',
-      label: 'Qwen2.5-72B-Instruct (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'meta-llama/Llama-3.1-70B-Instruct',
-      label: 'Llama-3.1-70B-Instruct (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'meta-llama/Llama-3.1-405B',
-      label: 'Llama-3.1-405B (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: '01-ai/Yi-1.5-34B-Chat',
-      label: 'Yi-1.5-34B-Chat (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'codellama/CodeLlama-34b-Instruct-hf',
-      label: 'CodeLlama-34b-Instruct (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'NousResearch/Hermes-3-Llama-3.1-8B',
-      label: 'Hermes-3-Llama-3.1-8B (HuggingFace)',
-      provider: 'HuggingFace',
-      maxTokenAllowed: 8000,
+      maxTokens: 8192,
+      maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
   ];
 

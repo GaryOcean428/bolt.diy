@@ -61,3 +61,104 @@
     }
   }
 }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-dialog);
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 900px;
+  height: 85vh;
+  background-color: var(--bolt-elements-bg-depth-1);
+  border: 1px solid var(--bolt-elements-borderColor);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  z-index: calc(var(--z-dialog) + 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--bolt-elements-borderColor);
+  background-color: var(--bolt-elements-bg-depth-2);
+
+  h2 {
+    color: var(--bolt-elements-textPrimary);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.closeButton {
+  color: var(--bolt-elements-textSecondary);
+  &:hover {
+    color: var(--bolt-elements-textPrimary);
+    background-color: var(--bolt-elements-bg-depth-3);
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tabs {
+  width: 200px;
+  padding: 1rem;
+  border-right: 1px solid var(--bolt-elements-borderColor);
+  background-color: var(--bolt-elements-bg-depth-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  color: var(--bolt-elements-textSecondary);
+  transition: all 150ms;
+
+  &:hover {
+    background-color: var(--bolt-elements-bg-depth-3);
+    color: var(--bolt-elements-textPrimary);
+  }
+
+  &.active {
+    background-color: var(--bolt-elements-bg-depth-3);
+    color: var(--bolt-elements-textPrimary);
+    font-weight: 500;
+  }
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.tabContent {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: var(--bolt-elements-bg-depth-1);
+  color: var(--bolt-elements-textPrimary);
+}

@@ -1,7 +1,7 @@
 import { atom, map } from 'nanostores';
 import { workbenchStore } from './workbench';
-import { PROVIDER_LIST } from '~/utils/constants';
 import type { IProviderConfig } from '~/types/model';
+import { PROVIDER_LIST } from '~/utils/constants';
 
 export interface Shortcut {
   key: string;

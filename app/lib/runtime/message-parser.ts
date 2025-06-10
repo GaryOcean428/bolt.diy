@@ -226,15 +226,15 @@ export class StreamingMessageParser {
 
               state.insideArtifact = true;
 
-              const currentArtifact = {
+              const artifactData = {
                 id: artifactId,
                 title: artifactTitle,
                 type,
               } satisfies BoltArtifactData;
 
-              state.currentArtifact = currentArtifact;
+              state.currentArtifact = artifactData;
 
-              this._options.callbacks?.onArtifactOpen?.({ messageId, ...currentArtifact });
+              this._options.callbacks?.onArtifactOpen?.({ messageId, ...artifactData });
 
               const artifactFactory = this._options.artifactElement ?? createArtifactElement;
 

@@ -1,8 +1,8 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 
 export default class XAIProvider extends BaseProvider {
   name = 'xAI';
@@ -13,8 +13,24 @@ export default class XAIProvider extends BaseProvider {
   };
 
   staticModels: ModelInfo[] = [
-    { name: 'grok-beta', label: 'xAI Grok Beta', provider: 'xAI', maxTokenAllowed: 8000 },
-    { name: 'grok-2-1212', label: 'xAI Grok2 1212', provider: 'xAI', maxTokenAllowed: 8000 },
+    {
+      name: 'grok-1',
+      label: 'Grok-1',
+      provider: 'xAI',
+      maxTokens: 8192,
+      maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
+      name: 'grok-0',
+      label: 'Grok-0',
+      provider: 'xAI',
+      maxTokens: 8192,
+      maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
   ];
 
   getModelInstance(options: {

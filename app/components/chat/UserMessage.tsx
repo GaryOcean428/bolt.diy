@@ -2,8 +2,8 @@
  * @ts-nocheck
  * Preventing TS checks with files presented in the video for a better presentation.
  */
-import { MODEL_REGEX, PROVIDER_REGEX } from '~/utils/constants';
 import { Markdown } from './Markdown';
+import { MODEL_REGEX, PROVIDER_REGEX } from '~/utils/constants';
 
 interface UserMessageProps {
   content: string | Array<{ type: string; text?: string; image?: string }>;

@@ -1,8 +1,8 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 
 export default class PerplexityProvider extends BaseProvider {
   name = 'Perplexity';
@@ -14,22 +14,31 @@ export default class PerplexityProvider extends BaseProvider {
 
   staticModels: ModelInfo[] = [
     {
-      name: 'llama-3.1-sonar-small-128k-online',
-      label: 'Sonar Small Online',
+      name: 'pplx-70b-online',
+      label: 'PPLX 70B Online',
       provider: 'Perplexity',
-      maxTokenAllowed: 8192,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
     {
-      name: 'llama-3.1-sonar-large-128k-online',
-      label: 'Sonar Large Online',
+      name: 'pplx-7b-online',
+      label: 'PPLX 7B Online',
       provider: 'Perplexity',
-      maxTokenAllowed: 8192,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
     {
-      name: 'llama-3.1-sonar-huge-128k-online',
-      label: 'Sonar Huge Online',
+      name: 'pplx-70b-chat',
+      label: 'PPLX 70B Chat',
       provider: 'Perplexity',
-      maxTokenAllowed: 8192,
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
   ];
 

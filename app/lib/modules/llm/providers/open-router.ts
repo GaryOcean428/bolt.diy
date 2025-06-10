@@ -1,8 +1,8 @@
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 
 interface OpenRouterModel {
   name: string;
@@ -28,49 +28,95 @@ export default class OpenRouterProvider extends BaseProvider {
 
   staticModels: ModelInfo[] = [
     {
+      name: 'gpt-4o',
+      label: 'GPT-4o',
+      provider: 'OpenAI',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
+    },
+    {
       name: 'anthropic/claude-3.5-sonnet',
       label: 'Anthropic: Claude 3.5 Sonnet (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'anthropic/claude-3-haiku',
       label: 'Anthropic: Claude 3 Haiku (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'deepseek/deepseek-coder',
       label: 'Deepseek-Coder V2 236B (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'google/gemini-flash-1.5',
       label: 'Google Gemini Flash 1.5 (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
     {
       name: 'google/gemini-pro-1.5',
       label: 'Google Gemini Pro 1.5 (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
-    { name: 'x-ai/grok-beta', label: 'xAI Grok Beta (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 8000 },
+    {
+      name: 'x-ai/grok-beta',
+      label: 'xAI Grok Beta (OpenRouter)',
+      provider: 'OpenRouter',
+      maxTokens: 8000,
+      maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
     {
       name: 'mistralai/mistral-nemo',
       label: 'OpenRouter Mistral Nemo (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
     {
       name: 'qwen/qwen-110b-chat',
       label: 'OpenRouter Qwen 110b Chat (OpenRouter)',
       provider: 'OpenRouter',
+      maxTokens: 8000,
       maxTokenAllowed: 8000,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
     },
-    { name: 'cohere/command', label: 'Cohere Command (OpenRouter)', provider: 'OpenRouter', maxTokenAllowed: 4096 },
+    {
+      name: 'cohere/command',
+      label: 'Cohere Command (OpenRouter)',
+      provider: 'OpenRouter',
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
   ];
 
   async getDynamicModels(
@@ -93,7 +139,10 @@ export default class OpenRouterProvider extends BaseProvider {
           name: m.id,
           label: `${m.name} - in:$${(m.pricing.prompt * 1_000_000).toFixed(2)} out:$${(m.pricing.completion * 1_000_000).toFixed(2)} - context ${Math.floor(m.context_length / 1000)}k`,
           provider: this.name,
+          maxTokens: 8000,
           maxTokenAllowed: 8000,
+          type: 'text-generation' as const,
+          capabilities: ['text-generation'] as readonly string[],
         }));
     } catch (error) {
       console.error('Error getting OpenRouter models:', error);

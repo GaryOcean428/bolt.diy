@@ -1,7 +1,7 @@
 import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
-import type { ITerminal } from '~/types/terminal';
-import { withResolvers } from './promises';
 import { atom } from 'nanostores';
+import { withResolvers } from './promises';
+import type { ITerminal } from '~/types/terminal';
 
 export async function newShellProcess(webcontainer: WebContainer, terminal: ITerminal) {
   const args: string[] = [];

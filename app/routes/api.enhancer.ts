@@ -1,11 +1,32 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
+
+//import { StreamingTextResponse, parseStreamPart } from 'ai';
 import { streamText } from '~/lib/.server/llm/stream-text';
+import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { stripIndents } from '~/utils/stripIndent';
-import type { ProviderInfo } from '~/types/model';
-import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 
 export async function action(args: ActionFunctionArgs) {
   return enhancerAction(args);
+}
+
+function parseCookies(cookieHeader: string) {
+  const cookies: any = {};
+
+  // Split the cookie string by semicolons and spaces
+  const items = cookieHeader.split(';').map((cookie) => cookie.trim());
+
+  items.forEach((item) => {
+    const [name, ...rest] = item.split('=');
+
+    if (name && rest) {
+      // Decode the name and value, and join value parts in case it contains '='
+      const decodedName = decodeURIComponent(name.trim());
+      const decodedValue = decodeURIComponent(rest.join('=').trim());
+      cookies[decodedName] = decodedValue;
+    }
+  });
+
+  return cookies;
 }
 
 async function enhancerAction({ context, request }: ActionFunctionArgs) {
@@ -34,8 +55,12 @@ async function enhancerAction({ context, request }: ActionFunctionArgs) {
   }
 
   const cookieHeader = request.headers.get('Cookie');
-  const apiKeys = getApiKeysFromCookie(cookieHeader);
-  const providerSettings = getProviderSettingsFromCookie(cookieHeader);
+
+  // Parse the cookie's value (returns an object or null if no cookie exists)
+  const apiKeys = JSON.parse(parseCookies(cookieHeader || '').apiKeys || '{}');
+  const providerSettings: Record<string, IProviderSetting> = JSON.parse(
+    parseCookies(cookieHeader || '').providers || '{}',
+  );
 
   try {
     const result = await streamText({
@@ -74,7 +99,7 @@ async function enhancerAction({ context, request }: ActionFunctionArgs) {
           `,
         },
       ],
-      env: context.cloudflare?.env as any,
+      env: context.cloudflare.env,
       apiKeys,
       providerSettings,
     });
@@ -82,10 +107,7 @@ async function enhancerAction({ context, request }: ActionFunctionArgs) {
     return new Response(result.textStream, {
       status: 200,
       headers: {
-        'Content-Type': 'text/event-stream',
-        Connection: 'keep-alive',
-        'Cache-Control': 'no-cache',
-        'Text-Encoding': 'chunked',
+        'Content-Type': 'text/plain; charset=utf-8',
       },
     });
   } catch (error: unknown) {

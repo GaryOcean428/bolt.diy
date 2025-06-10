@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSettings } from '~/lib/hooks/useSettings';
 import { toast } from 'react-toastify';
-import { providerBaseUrlEnvKeys } from '~/utils/constants';
+import { useSettings } from '~/lib/hooks/useSettings';
 
 interface ProviderStatus {
   name: string;
@@ -16,18 +15,15 @@ interface ProviderStatus {
 
 interface SystemInfo {
   os: string;
-  browser: string;
-  screen: string;
-  language: string;
-  timezone: string;
-  memory: string;
-  cores: number;
-  deviceType: string;
-  colorDepth: string;
-  pixelRatio: number;
-  online: boolean;
-  cookiesEnabled: boolean;
-  doNotTrack: boolean;
+  arch: string;
+  memory: {
+    total: string;
+    free: string;
+    used: string;
+  };
+  uptime: string;
+  node: string;
+  v8: string;
 }
 
 interface IProviderConfig {
@@ -53,16 +49,19 @@ const LOCAL_PROVIDERS = ['Ollama', 'LMStudio', 'OpenAILike'];
 const versionHash = connitJson.commit;
 const versionTag = connitJson.version;
 
+const providerBaseUrlEnvKeys: Record<string, { baseUrlKey: string }> = {
+  Anthropic: { baseUrlKey: 'ANTHROPIC_API_URL' },
+  OpenAI: { baseUrlKey: 'OPENAI_API_URL' },
+};
+
 const GITHUB_URLS = {
-  original: 'https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/main',
-  fork: 'https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/main',
   commitJson: async (branch: string) => {
     try {
-      const response = await fetch(`https://api.github.com/repos/GaryOcean428/cozy-remix-garden/commits/${branch}`);
+      const response = await fetch(`https://api.github.com/repos/stackblitz-labs/bolt.diy/commits/${branch}`);
       const data: { sha: string } = await response.json();
 
       const packageJsonResp = await fetch(
-        `https://raw.githubusercontent.com/GaryOcean428/cozy-remix-garden/${branch}/package.json`,
+        `https://raw.githubusercontent.com/stackblitz-labs/bolt.diy/${branch}/package.json`,
       );
       const packageJson: { version: string } = await packageJsonResp.json();
 
@@ -77,119 +76,8 @@ const GITHUB_URLS = {
   },
 };
 
-function getSystemInfo(): SystemInfo {
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) {
-      return '0 Bytes';
-    }
-
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const getBrowserInfo = (): string => {
-    const ua = navigator.userAgent;
-    let browser = 'Unknown';
-
-    if (ua.includes('Firefox/')) {
-      browser = 'Firefox';
-    } else if (ua.includes('Chrome/')) {
-      if (ua.includes('Edg/')) {
-        browser = 'Edge';
-      } else if (ua.includes('OPR/')) {
-        browser = 'Opera';
-      } else {
-        browser = 'Chrome';
-      }
-    } else if (ua.includes('Safari/')) {
-      if (!ua.includes('Chrome')) {
-        browser = 'Safari';
-      }
-    }
-
-    // Extract version number
-    const match = ua.match(new RegExp(`${browser}\\/([\\d.]+)`));
-    const version = match ? ` ${match[1]}` : '';
-
-    return `${browser}${version}`;
-  };
-
-  const getOperatingSystem = (): string => {
-    const ua = navigator.userAgent;
-    const platform = navigator.platform;
-
-    if (ua.includes('Win')) {
-      return 'Windows';
-    }
-
-    if (ua.includes('Mac')) {
-      if (ua.includes('iPhone') || ua.includes('iPad')) {
-        return 'iOS';
-      }
-
-      return 'macOS';
-    }
-
-    if (ua.includes('Linux')) {
-      return 'Linux';
-    }
-
-    if (ua.includes('Android')) {
-      return 'Android';
-    }
-
-    return platform || 'Unknown';
-  };
-
-  const getDeviceType = (): string => {
-    const ua = navigator.userAgent;
-
-    if (ua.includes('Mobile')) {
-      return 'Mobile';
-    }
-
-    if (ua.includes('Tablet')) {
-      return 'Tablet';
-    }
-
-    return 'Desktop';
-  };
-
-  // Get more detailed memory info if available
-  const getMemoryInfo = (): string => {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
-      return `${formatBytes(memory.jsHeapSizeLimit)} (Used: ${formatBytes(memory.usedJSHeapSize)})`;
-    }
-
-    return 'Not available';
-  };
-
-  return {
-    os: getOperatingSystem(),
-    browser: getBrowserInfo(),
-    screen: `${window.screen.width}x${window.screen.height}`,
-    language: navigator.language,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    memory: getMemoryInfo(),
-    cores: navigator.hardwareConcurrency || 0,
-    deviceType: getDeviceType(),
-
-    // Add new fields
-    colorDepth: `${window.screen.colorDepth}-bit`,
-    pixelRatio: window.devicePixelRatio,
-    online: navigator.onLine,
-    cookiesEnabled: navigator.cookieEnabled,
-    doNotTrack: navigator.doNotTrack === '1',
-  };
-}
-
 const checkProviderStatus = async (url: string | null, providerName: string): Promise<ProviderStatus> => {
   if (!url) {
-    console.log(`[Debug] No URL provided for ${providerName}`);
     return {
       name: providerName,
       enabled: false,
@@ -201,71 +89,14 @@ const checkProviderStatus = async (url: string | null, providerName: string): Pr
     };
   }
 
-  console.log(`[Debug] Checking status for ${providerName} at ${url}`);
-
   const startTime = performance.now();
 
   try {
-    if (providerName.toLowerCase() === 'ollama') {
-      // Special check for Ollama root endpoint
-      try {
-        console.log(`[Debug] Checking Ollama root endpoint: ${url}`);
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            Accept: 'text/plain,application/json',
-          },
-        });
-        clearTimeout(timeoutId);
-
-        const text = await response.text();
-        console.log(`[Debug] Ollama root response:`, text);
-
-        if (text.includes('Ollama is running')) {
-          console.log(`[Debug] Ollama running confirmed via root endpoint`);
-          return {
-            name: providerName,
-            enabled: false,
-            isLocal: true,
-            isRunning: true,
-            lastChecked: new Date(),
-            responseTime: performance.now() - startTime,
-            url,
-          };
-        }
-      } catch (error) {
-        console.log(`[Debug] Ollama root check failed:`, error);
-
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-        if (errorMessage.includes('aborted')) {
-          return {
-            name: providerName,
-            enabled: false,
-            isLocal: true,
-            isRunning: false,
-            error: 'Connection timeout',
-            lastChecked: new Date(),
-            responseTime: performance.now() - startTime,
-            url,
-          };
-        }
-      }
-    }
-
-    // Try different endpoints based on provider
     const checkUrls = [`${url}/api/health`, url.endsWith('v1') ? `${url}/models` : `${url}/v1/models`];
-    console.log(`[Debug] Checking additional endpoints:`, checkUrls);
 
     const results = await Promise.all(
       checkUrls.map(async (checkUrl) => {
         try {
-          console.log(`[Debug] Trying endpoint: ${checkUrl}`);
-
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
 
@@ -278,11 +109,11 @@ const checkProviderStatus = async (url: string | null, providerName: string): Pr
           clearTimeout(timeoutId);
 
           const ok = response.ok;
-          console.log(`[Debug] Endpoint ${checkUrl} response:`, ok);
 
           if (ok) {
             try {
               const data = await response.json();
+
               console.log(`[Debug] Endpoint ${checkUrl} data:`, data);
             } catch {
               console.log(`[Debug] Could not parse JSON from ${checkUrl}`);
@@ -291,14 +122,20 @@ const checkProviderStatus = async (url: string | null, providerName: string): Pr
 
           return ok;
         } catch (error) {
-          console.log(`[Debug] Endpoint ${checkUrl} failed:`, error);
+          if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+              return false;
+            }
+
+            console.log(`[Debug] Endpoint ${checkUrl} failed:`, error);
+          }
+
           return false;
         }
       }),
     );
 
     const isRunning = results.some((result) => result);
-    console.log(`[Debug] Final status for ${providerName}:`, isRunning);
 
     return {
       name: providerName,
@@ -310,7 +147,6 @@ const checkProviderStatus = async (url: string | null, providerName: string): Pr
       url,
     };
   } catch (error) {
-    console.log(`[Debug] Provider check failed for ${providerName}:`, error);
     return {
       name: providerName,
       enabled: false,
@@ -328,10 +164,35 @@ export default function DebugTab() {
   const { providers, isLatestBranch } = useSettings();
   const [activeProviders, setActiveProviders] = useState<ProviderStatus[]>([]);
   const [updateMessage, setUpdateMessage] = useState<string>('');
-  const [systemInfo] = useState<SystemInfo>(getSystemInfo());
+  const [systemInfo] = useState<SystemInfo>(() => {
+    const formatBytes = (bytes: number): string => {
+      if (bytes === 0) {
+        return '0 B';
+      }
+
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+      return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+    };
+
+    return {
+      os: navigator.platform,
+      arch: navigator.userAgent,
+      memory: {
+        total: formatBytes(8 * 1024 * 1024 * 1024),
+        free: 'Not available',
+        used: 'Not available',
+      },
+      uptime: 'Not available',
+      node: 'Not available',
+      v8: 'Not available',
+    };
+  });
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
 
-  const updateProviderStatuses = async () => {
+  const updateProviderStatuses = useCallback(async () => {
     if (!providers) {
       return;
     }
@@ -342,18 +203,19 @@ export default function DebugTab() {
         entries
           .filter(([, provider]) => LOCAL_PROVIDERS.includes(provider.name))
           .map(async ([, provider]) => {
-            const envVarName =
-              providerBaseUrlEnvKeys[provider.name].baseUrlKey || `REACT_APP_${provider.name.toUpperCase()}_URL`;
+            const baseUrlKey =
+              provider.name in providerBaseUrlEnvKeys
+                ? providerBaseUrlEnvKeys[provider.name].baseUrlKey
+                : `REACT_APP_${provider.name.toUpperCase()}_URL`;
 
-            // Access environment variables through import.meta.env
             let settingsUrl = provider.settings.baseUrl;
 
             if (settingsUrl && settingsUrl.trim().length === 0) {
               settingsUrl = undefined;
             }
 
-            const url = settingsUrl || import.meta.env[envVarName] || null; // Ensure baseUrl is used
-            console.log(`[Debug] Using URL for ${provider.name}:`, url, `(from ${envVarName})`);
+            const url = settingsUrl || import.meta.env[baseUrlKey] || null;
+            console.log(`[Debug] Using URL for ${provider.name}:`, url, `(from ${baseUrlKey})`);
 
             const status = await checkProviderStatus(url, provider.name);
 
@@ -368,7 +230,7 @@ export default function DebugTab() {
     } catch (error) {
       console.error('[Debug] Failed to update provider statuses:', error);
     }
-  };
+  }, [providers]);
 
   useEffect(() => {
     updateProviderStatuses();
@@ -376,7 +238,7 @@ export default function DebugTab() {
     const interval = setInterval(updateProviderStatuses, 30000);
 
     return () => clearInterval(interval);
-  }, [providers]);
+  }, [updateProviderStatuses]);
 
   const handleCheckForUpdate = useCallback(async () => {
     if (isCheckingUpdate) {
@@ -388,8 +250,6 @@ export default function DebugTab() {
       setUpdateMessage('Checking for updates...');
 
       const branchToCheck = isLatestBranch ? 'main' : 'stable';
-      console.log(`[Debug] Checking for updates against ${branchToCheck} branch`);
-
       const latestCommitResp = await GITHUB_URLS.commitJson(branchToCheck);
 
       const remoteCommitHash = latestCommitResp.commit;
@@ -496,45 +356,32 @@ export default function DebugTab() {
                 <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.os}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Device Type</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.deviceType}</p>
+                <p className="text-xs text-bolt-elements-textSecondary">Architecture</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.arch}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Browser</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.browser}</p>
+                <p className="text-xs text-bolt-elements-textSecondary">Total Memory</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.memory.total}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Display</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">
-                  {systemInfo.screen} ({systemInfo.colorDepth}) @{systemInfo.pixelRatio}x
-                </p>
+                <p className="text-xs text-bolt-elements-textSecondary">Free Memory</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.memory.free}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Connection</p>
-                <p className="text-sm font-medium flex items-center gap-2">
-                  <span
-                    className={`inline-block w-2 h-2 rounded-full ${systemInfo.online ? 'bg-green-500' : 'bg-red-500'}`}
-                  />
-                  <span className={`${systemInfo.online ? 'text-green-600' : 'text-red-600'}`}>
-                    {systemInfo.online ? 'Online' : 'Offline'}
-                  </span>
-                </p>
+                <p className="text-xs text-bolt-elements-textSecondary">Used Memory</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.memory.used}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Screen Resolution</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.screen}</p>
+                <p className="text-xs text-bolt-elements-textSecondary">Uptime</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.uptime}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Language</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.language}</p>
+                <p className="text-xs text-bolt-elements-textSecondary">Node.js Version</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.node}</p>
               </div>
               <div>
-                <p className="text-xs text-bolt-elements-textSecondary">Timezone</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.timezone}</p>
-              </div>
-              <div>
-                <p className="text-xs text-bolt-elements-textSecondary">CPU Cores</p>
-                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.cores}</p>
+                <p className="text-xs text-bolt-elements-textSecondary">V8 Version</p>
+                <p className="text-sm font-medium text-bolt-elements-textPrimary">{systemInfo.v8}</p>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-bolt-elements-surface-hover">
@@ -594,7 +441,6 @@ export default function DebugTab() {
                   </div>
 
                   <div className="pl-5 flex flex-col space-y-1 text-xs">
-                    {/* Status Details */}
                     <div className="flex flex-wrap gap-2">
                       <span className="text-bolt-elements-textSecondary">
                         Last checked: {new Date(provider.lastChecked).toLocaleTimeString()}
@@ -606,14 +452,12 @@ export default function DebugTab() {
                       )}
                     </div>
 
-                    {/* Error Message */}
                     {provider.error && (
                       <div className="mt-1 text-red-600 bg-red-50 rounded-md p-2">
                         <span className="font-medium">Error:</span> {provider.error}
                       </div>
                     )}
 
-                    {/* Connection Info */}
                     {provider.url && (
                       <div className="text-bolt-elements-textSecondary">
                         <span className="font-medium">Endpoints checked:</span>

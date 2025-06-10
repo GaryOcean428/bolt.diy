@@ -1,16 +1,16 @@
 import { motion, type Variants } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
-import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
+import { HistoryItem } from './HistoryItem';
+import { binDates } from './date-binning';
 import { SettingsWindow } from '~/components/settings/SettingsWindow';
+import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
 import { SettingsButton } from '~/components/ui/SettingsButton';
+import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
+import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 import { db, deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
 import { cubicEasingFn } from '~/utils/easings';
 import { logger } from '~/utils/logger';
-import { HistoryItem } from './HistoryItem';
-import { binDates } from './date-binning';
-import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
 
 const menuVariants = {
   closed: {

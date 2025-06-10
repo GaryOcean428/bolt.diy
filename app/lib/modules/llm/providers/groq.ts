@@ -1,8 +1,8 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 
 export default class GroqProvider extends BaseProvider {
   name = 'Groq';
@@ -13,12 +13,51 @@ export default class GroqProvider extends BaseProvider {
   };
 
   staticModels: ModelInfo[] = [
-    { name: 'llama-3.1-8b-instant', label: 'Llama 3.1 8b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
-    { name: 'llama-3.2-11b-vision-preview', label: 'Llama 3.2 11b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
-    { name: 'llama-3.2-90b-vision-preview', label: 'Llama 3.2 90b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
-    { name: 'llama-3.2-3b-preview', label: 'Llama 3.2 3b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
-    { name: 'llama-3.2-1b-preview', label: 'Llama 3.2 1b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
-    { name: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70b (Groq)', provider: 'Groq', maxTokenAllowed: 8000 },
+    {
+      name: 'mixtral-8x7b-32768',
+      label: 'Mixtral 8x7B-32K',
+      provider: 'Groq',
+      maxTokens: 32768,
+      maxTokenAllowed: 32768,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'llama2-70b-4096',
+      label: 'Llama2 70B',
+      provider: 'Groq',
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'gemma-7b-it',
+      label: 'Gemma 7B-IT',
+      provider: 'Groq',
+      maxTokens: 8192,
+      maxTokenAllowed: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'mixtral-8x7b',
+      label: 'Mixtral 8x7B',
+      provider: 'Groq',
+      maxTokens: 32768,
+      maxTokenAllowed: 32768,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
+    {
+      name: 'llama2-70b',
+      label: 'Llama2 70B',
+      provider: 'Groq',
+      maxTokens: 4096,
+      maxTokenAllowed: 4096,
+      type: 'text-generation',
+      capabilities: ['text-generation'],
+    },
   ];
 
   getModelInstance(options: {

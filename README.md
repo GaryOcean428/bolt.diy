@@ -2,18 +2,9 @@
 
 [![bolt.diy: AI-Powered Full-Stack Web Development in the Browser](./public/social_preview_index.jpg)](https://bolt.diy)
 
-Welcome to bolt.diy, the official open source version of Bolt.new (previously known as oTToDev and bolt.new ANY LLM), which allows you to choose from a curated set of high-performance LLMs! Currently supported models include:
+Welcome to bolt.diy, the official open source version of Bolt.new (previously known as oTToDev and bolt.new ANY LLM), which allows you to choose the LLM that you use for each prompt! Currently, you can use OpenAI, Anthropic, Ollama, OpenRouter, Gemini, LMStudio, Mistral, xAI, HuggingFace, DeepSeek, or Groq models - and it is easily extended to use any other model supported by the Vercel AI SDK! See the instructions below for running this locally and extending it to include more models.
 
-- OpenAI's GPT4o and GPT4o-mini
-- xAI's models
-- Anthropic's Claude 3.5 models
-- o1 and o1-mini models
-
------
-Check the [bolt.diy Docs](https://stackblitz-labs.github.io/bolt.diy/) for more offical installation instructions and more informations.
-
------
-Also [this pinned post in our community](https://thinktank.ottomator.ai/t/videos-tutorial-helpful-content/3243) has a bunch of incredible resources for running and deploying bolt.diy yourself!
+Check the [bolt.diy Docs](https://stackblitz-labs.github.io/bolt.diy/) for more information.
 
 We have also launched an experimental agent called the "bolt.diy Expert" that can answer common questions about bolt.diy. Find it here on the [oTTomator Live Agent Studio](https://studio.ottomator.ai/).
 
@@ -25,27 +16,54 @@ bolt.diy was originally started by [Cole Medin](https://www.youtube.com/@ColeMed
 - [Requested Additions](#requested-additions)
 - [Features](#features)
 - [Setup](#setup)
-- [Run the Application](#run-the-application)
+- [Running the Application](#running-the-application)
 - [Available Scripts](#available-scripts)
 - [Contributing](#contributing)
 - [Roadmap](#roadmap)
 - [FAQ](#faq)
 
-## Join the community
+## Join the Community
 
-[Join the bolt.diy community here, in the oTTomator Think Tank!](https://thinktank.ottomator.ai)
-
-## Project management
-
-Bolt.diy is a community effort! Still, the core team of contributors aims at organizing the project in way that allows
-you to understand where the current areas of focus are.
-
-If you want to know what we are working on, what we are planning to work on, or if you want to contribute to the
-project, please check the [project management guide](./PROJECT.md) to get started easily.
+[Join the bolt.diy community here, in the thinktank on ottomator.ai!](https://thinktank.ottomator.ai)
 
 ## Requested Additions
 
-- ✅ xAI Integration (@milutinke)
+- ✅ OpenRouter Integration (@coleam00)
+- ✅ Gemini Integration (@jonathands)
+- ✅ Autogenerate Ollama models from what is downloaded (@yunatamos)
+- ✅ Filter models by provider (@jasonm23)
+- ✅ Download project as ZIP (@fabwaseem)
+- ✅ Improvements to the main bolt.new prompt in `app\lib\.server\llm\prompts.ts` (@kofi-bhr)
+- ✅ DeepSeek API Integration (@zenith110)
+- ✅ Mistral API Integration (@ArulGandhi)
+- ✅ "Open AI Like" API Integration (@ZerxZ)
+- ✅ Ability to sync files (one way sync) to local folder (@muzafferkadir)
+- ✅ Containerize the application with Docker for easy installation (@aaronbolton)
+- ✅ Publish projects directly to GitHub (@goncaloalves)
+- ✅ Ability to enter API keys in the UI (@ali00209)
+- ✅ xAI Grok Beta Integration (@milutinke)
+- ✅ LM Studio Integration (@karrot0)
+- ✅ HuggingFace Integration (@ahsan3219)
+- ✅ Bolt terminal to see the output of LLM run commands (@thecodacus)
+- ✅ Streaming of code output (@thecodacus)
+- ✅ Ability to revert code to earlier version (@wonderwhy-er)
+- ✅ Cohere Integration (@hasanraiyan)
+- ✅ Dynamic model max token length (@hasanraiyan)
+- ✅ Better prompt enhancing (@SujalXplores)
+- ✅ Prompt caching (@SujalXplores)
+- ✅ Load local projects into the app (@wonderwhy-er)
+- ✅ Together Integration (@mouimet-infinisoft)
+- ✅ Mobile friendly (@qwikode)
+- ✅ Better prompt enhancing (@SujalXplores)
+- ✅ Attach images to prompts (@atrokhym)
+- ✅ Added Git Clone button (@thecodacus)
+- ✅ Git Import from url (@thecodacus)
+- ✅ PromptLibrary to have different variations of prompts for different use cases (@thecodacus)
+- ✅ Detect package.json and commands to auto install & run preview for folder and git import (@wonderwhy-er)
+- ✅ Selection tool to target changes visually (@emcconnell)
+- ✅ Detect terminal Errors and ask bolt to fix it (@thecodacus)
+- ✅ Detect preview Errors and ask bolt to fix it (@wonderwhy-er)
+- ✅ Add Starter Template Options (@thecodacus)
 - ⬜ **HIGH PRIORITY** - Prevent bolt from rewriting files as often (file locking and diffs)
 - ⬜ **HIGH PRIORITY** - Better prompting for smaller LLMs (code window sometimes doesn't start)
 - ⬜ **HIGH PRIORITY** - Run agents in the backend as opposed to a single model call
@@ -54,14 +72,14 @@ project, please check the [project management guide](./PROJECT.md) to get starte
 - ⬜ VSCode Integration with git-like confirmations
 - ⬜ Upload documents for knowledge - UI design templates, a code base to reference coding style, etc.
 - ⬜ Voice prompting
-- ✅ Popout Window for Web Container(@stijnus)
-- ✅ Ability to change Popout window size (@stijnus)
+- ⬜ Azure Open AI API Integration
+- ✅ Perplexity Integration (@meetpateltech)
+- ⬜ Vertex AI Integration
 
 ## Features
 
-- **AI-powered full-stack web development** for **NodeJS based applications** directly in your browser.
+- **AI-powered full-stack web development** directly in your browser.
 - **Support for multiple LLMs** with an extensible architecture to integrate additional models.
-- **Web Search Integration** using Bing API for enhanced context and information gathering.
 - **Attach images to prompts** for better contextual understanding.
 - **Integrated terminal** to view output of LLM-run commands.
 - **Revert code to earlier versions** for easier debugging and quicker changes.
@@ -101,11 +119,11 @@ Node.js is required to run the application.
      1. Open Terminal
      2. Type this command:
 
-        ```bash
-        echo $PATH
-        ```
+```bash
+echo $PATH
+```
 
-     3. Look for `/usr/local/bin` in the output
+1. Look for `/usr/local/bin` in the output
 
 ## Running the Application
 
@@ -115,49 +133,49 @@ You have two options for running Bolt.DIY: directly on your machine or using Doc
 
 1. **Install Package Manager (pnpm)**:
 
-   ```bash
-   npm install -g pnpm
-   ```
+```bash
+npm install -g pnpm
+```
 
-2. **Install Project Dependencies**:
+1. **Install Project Dependencies**:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
-3. **Start the Application**:
+1. **Start the Application**:
 
-   ```bash
-   pnpm run dev
-   ```
+```bash
+pnpm run dev
+```
 
-   **Important Note**: If you're using Google Chrome, you'll need Chrome Canary for local development. [Download it here](https://www.google.com/chrome/canary/)
+**Important Note**: If you're using Google Chrome, you'll need Chrome Canary for local development. [Download it here](https://www.google.com/chrome/canary/)
 
 ### Option 2: Using Docker
 
 This option requires some familiarity with Docker but provides a more isolated environment.
 
-#### Additional Prerequisite
+### Additional Prerequisites
 
 - Install Docker: [Download Docker](https://www.docker.com/)
 
-#### Steps
+### Docker Steps
 
 1. **Build the Docker Image**:
 
-   ```bash
-   # Using npm script:
-   npm run dockerbuild
+```bash
+# Using npm script:
+npm run dockerbuild
 
-   # OR using direct Docker command:
-   docker build . --target bolt-ai-development
-   ```
+# OR using direct Docker command:
+docker build . --target bolt-ai-development
+```
 
-2. **Run the Container**:
+1. **Run the Container**:
 
-   ```bash
-   docker compose --profile development up
-   ```
+```bash
+docker-compose --profile development up
+```
 
 ## Configuring API Keys and Providers
 
@@ -171,8 +189,6 @@ Setting up your API keys in Bolt.DIY is straightforward:
 4. Enter your API key in the secure input field
 
 ![API Key Configuration Interface](./docs/images/api-key-ui-section.png)
-
-- For Bing Search: Get your API key from [Microsoft Azure Portal](https://portal.azure.com)
 
 ### Configuring Custom Base URLs
 
@@ -190,12 +206,11 @@ For providers that support custom base URLs (such as Ollama or LM Studio), follo
 
 ### Supported Providers
 
-- OpenAI (GPT4o, GPT4o-mini)
-- xAI
-- Anthropic (Claude 3.5)
-- o1 (o1, o1-mini)
+- Ollama
+- LM Studio
+- OpenAILike
 
-## Setup Using Git (For Developers only)
+## Setup Using Git (For Developers)
 
 This method is recommended for developers who want to:
 
@@ -204,98 +219,96 @@ This method is recommended for developers who want to:
 - Switch between different versions
 - Create custom modifications
 
-#### Prerequisites
+### Git Prerequisites
 
 1. Install Git: [Download Git](https://git-scm.com/downloads)
 
-#### Initial Setup
+### Initial Setup
 
 1. **Clone the Repository**:
 
-   ```bash
-   # Using HTTPS
-   git clone https://github.com/stackblitz-labs/bolt.diy.git
-   ```
+```bash
+# Using HTTPS
+git clone https://github.com/stackblitz-labs/bolt.diy.git
+```
 
-2. **Navigate to Project Directory**:
+1. **Navigate to Project Directory**:
 
-   ```bash
-   cd bolt.diy
-   ```
+```bash
+cd bolt.diy
+```
 
-3. **Switch to the Main Branch**:
+1. **Switch to the Main Branch**:
 
-   ```bash
-   git checkout main
-   ```
+```bash
+git checkout main
+```
 
-4. **Install Dependencies**:
+1. **Install Dependencies**:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
-5. **Start the Development Server**:
+1. **Start the Development Server**:
 
-   ```bash
-   pnpm run dev
-   ```
+```bash
+pnpm run dev
+```
 
-#### Staying Updated
+### Staying Updated
 
 To get the latest changes from the repository:
 
 1. **Save Your Local Changes** (if any):
 
-   ```bash
-   git stash
-   ```
+```bash
+git stash
+```
 
-2. **Pull Latest Updates**:
+1. **Pull Latest Updates**:
 
-   ```bash
-   git pull origin main
-   ```
+```bash
+git pull origin main
+```
 
-3. **Update Dependencies**:
+1. **Update Dependencies**:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm install
+```
 
-4. **Restore Your Local Changes** (if any):
+1. **Restore Your Local Changes** (if any):
 
-   ```bash
-   git stash pop
-   ```
+```bash
+git stash pop
+```
 
-#### Troubleshooting Git Setup
+### Troubleshooting Git Setup
 
 If you encounter issues:
 
 1. **Clean Installation**:
 
-   ```bash
-   # Remove node modules and lock files
-   rm -rf node_modules pnpm-lock.yaml
+```bash
+# Remove node modules and lock files
+rm -rf node_modules pnpm-lock.yaml
 
-   # Clear pnpm cache
-   pnpm store prune
+# Clear pnpm cache
+pnpm store prune
 
-   # Reinstall dependencies
-   pnpm install
-   ```
+# Reinstall dependencies
+pnpm install
+```
 
-2. **Reset Local Changes**:
+1. **Reset Local Changes**:
 
-   ```bash
-   # Discard all local changes
-   git reset --hard origin/main
-   ```
+```bash
+# Discard all local changes
+git reset --hard origin/main
+```
 
 Remember to always commit your local changes or stash them before pulling updates to avoid conflicts.
-
----
 
 ## Available Scripts
 
@@ -309,37 +322,14 @@ Remember to always commit your local changes or stash them before pulling update
 - **`pnpm run deploy`**: Deploys the project to Cloudflare Pages.
 - **`pnpm run lint:fix`**: Automatically fixes linting issues.
 
----
-
 ## Contributing
 
 We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
-
----
 
 ## Roadmap
 
 Explore upcoming features and priorities on our [Roadmap](https://roadmap.sh/r/ottodev-roadmap-2ovzo).
 
----
-
 ## FAQ
 
 For answers to common questions, issues, and to see a list of recommended models, visit our [FAQ Page](FAQ.md).
-
-### Known Issues
-
-#### React Server-Side Rendering (SSR) Streaming
-
-If you encounter errors related to `renderToReadableStream` not being recognized:
-
-1. For Node environments, use `renderToPipeableStream` instead as it's the officially supported API
-2. If you need `renderToReadableStream`, ensure you're using:
-   - An Edge runtime environment
-   - A compatible React version
-   - Proper ESM module imports
-
-For more details, see:
-
-- [React Server Components Guide](https://react.dev/reference/react-dom/server)
-- [React 18 Upgrade Guide](https://react.dev/blog/2022/03/08/react-18-upgrade-guide)

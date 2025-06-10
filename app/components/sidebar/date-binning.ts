@@ -4,7 +4,9 @@ import type { ChatHistoryItem } from '~/lib/persistence';
 type Bin = { category: string; items: ChatHistoryItem[] };
 
 export function binDates(_list: ChatHistoryItem[]) {
-  const list = _list.toSorted((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
+  const list = [..._list].sort(
+    (a: { timestamp: string }, b: { timestamp: string }) => Date.parse(b.timestamp) - Date.parse(a.timestamp),
+  );
 
   const binLookup: Record<string, Bin> = {};
   const bins: Array<Bin> = [];

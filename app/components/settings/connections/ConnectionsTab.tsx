@@ -1,6 +1,6 @@
+import Cookies from 'js-cookie';
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import Cookies from 'js-cookie';
 import { logStore } from '~/lib/stores/logs';
 
 interface GitHubUserResponse {

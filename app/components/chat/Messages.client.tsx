@@ -1,13 +1,13 @@
+import { useLocation } from '@remix-run/react';
 import type { Message } from 'ai';
-import React, { Fragment } from 'react';
-import { classNames } from '~/utils/classNames';
+import React from 'react';
+import { toast } from 'react-toastify';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
-import { useLocation } from '@remix-run/react';
-import { db, chatId } from '~/lib/persistence/useChatHistory';
-import { forkChat } from '~/lib/persistence/db';
-import { toast } from 'react-toastify';
 import WithTooltip from '~/components/ui/Tooltip';
+import { forkChat } from '~/lib/persistence/db';
+import { db, chatId } from '~/lib/persistence/useChatHistory';
+import { classNames } from '~/utils/classNames';
 
 interface MessagesProps {
   id?: string;
@@ -44,15 +44,10 @@ export const Messages = React.forwardRef<HTMLDivElement, MessagesProps>((props: 
     <div id={id} ref={ref} className={props.className}>
       {messages.length > 0
         ? messages.map((message, index) => {
-            const { role, content, id: messageId, annotations } = message;
+            const { role, content, id: messageId } = message;
             const isUserMessage = role === 'user';
             const isFirst = index === 0;
             const isLast = index === messages.length - 1;
-            const isHidden = annotations?.includes('hidden');
-
-            if (isHidden) {
-              return <Fragment key={index} />;
-            }
 
             return (
               <div
