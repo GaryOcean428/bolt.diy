@@ -53,9 +53,12 @@ ENV WRANGLER_SEND_METRICS=false \
 RUN mkdir -p /root/.config/.wrangler && \
     echo '{"enabled":false}' > /root/.config/.wrangler/metrics.json
 
+# Create empty .env.local to prevent bindings.sh from failing
+RUN touch .env.local
+
 RUN pnpm run build
 
-CMD [ "pnpm", "run", "dockerstart"]
+CMD [ "pnpm", "run", "start"]
 
 # Development image
 FROM base AS bolt-ai-development

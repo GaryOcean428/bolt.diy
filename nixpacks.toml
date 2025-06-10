@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.build]
+cmds = ["echo 'Using Dockerfile instead'"]
+
+[start]
+cmd = "echo 'Using Dockerfile instead'"
