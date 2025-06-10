@@ -1,7 +1,4 @@
 export type DebugLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
-import { Chalk } from 'chalk';
-
-const chalk = new Chalk({ level: 3 });
 
 type LoggerFunction = (...messages: any[]) => void;
 
@@ -89,7 +86,9 @@ function log(level: DebugLevel, scope: string | undefined, messages: any[]) {
 }
 
 function formatText(text: string, color: string, bg: string) {
-  return chalk.bgHex(bg)(chalk.hex(color)(text));
+  // In browser environments or when chalk is not available, just return the text
+  // The browser console styling is handled separately via console.log styles
+  return text;
 }
 
 function getLabelStyles(color: string, textColor: string) {
