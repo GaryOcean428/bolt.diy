@@ -1,8 +1,8 @@
+import { createOpenAI } from '@ai-sdk/openai';
+import type { LanguageModelV1 } from 'ai';
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV1 } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 
 export default class GithubProvider extends BaseProvider {
   name = 'Github';
@@ -18,7 +18,7 @@ export default class GithubProvider extends BaseProvider {
     { name: 'gpt-4o-mini', label: 'GPT-4o Mini', provider: 'Github', maxTokenAllowed: 128000 },
     { name: 'o1', label: 'o1', provider: 'Github', maxTokenAllowed: 200000 },
     { name: 'o1-mini', label: 'o1-mini', provider: 'Github', maxTokenAllowed: 128000 },
-    { name: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet', provider: 'Anthropic', maxTokenAllowed: 200000 }
+    { name: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet', provider: 'Anthropic', maxTokenAllowed: 200000 },
   ];
 
   getModelInstance(options: {

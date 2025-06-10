@@ -1,8 +1,8 @@
 import { type Message } from 'ai';
-import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODEL_REGEX, PROVIDER_REGEX } from '~/utils/constants';
-import { IGNORE_PATTERNS, type FileMap } from './constants';
 import ignore from 'ignore';
+import { IGNORE_PATTERNS, type FileMap } from './constants';
 import type { ContextAnnotation } from '~/types/context';
+import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODEL_REGEX, PROVIDER_REGEX } from '~/utils/constants';
 
 export function extractPropertiesFromMessage(message: Omit<Message, 'id'>): {
   model: string;

@@ -85,9 +85,11 @@ function log(level: DebugLevel, scope: string | undefined, messages: any[]) {
   }
 }
 
-function formatText(text: string, color: string, bg: string) {
-  // In browser environments or when chalk is not available, just return the text
-  // The browser console styling is handled separately via console.log styles
+function formatText(text: string, _color: string, _bg: string) {
+  /*
+   * In browser environments or when chalk is not available, just return the text
+   * The browser console styling is handled separately via console.log styles
+   */
   return text;
 }
 

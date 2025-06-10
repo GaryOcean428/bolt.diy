@@ -1,11 +1,11 @@
 import { useNavigate } from '@remix-run/react';
+import type { Message } from 'ai';
 import Cookies from 'js-cookie';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { db, deleteById, getAll, setMessages } from '~/lib/persistence';
 import { logStore } from '~/lib/stores/logs';
 import { classNames } from '~/utils/classNames';
-import type { Message } from 'ai';
 
 // List of supported providers that can have API keys
 const API_KEY_PROVIDERS = [

@@ -1,8 +1,8 @@
 import ignore from 'ignore';
+import Cookies from 'js-cookie';
+import { STARTER_TEMPLATES } from './constants';
 import type { ProviderInfo } from '~/types/model';
 import type { Template } from '~/types/template';
-import { STARTER_TEMPLATES } from './constants';
-import Cookies from 'js-cookie';
 
 const starterTemplateSelectionPrompt = (templates: Template[]) => `
 You are an experienced developer who helps people choose the best starter template for their projects.
