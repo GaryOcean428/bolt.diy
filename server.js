@@ -1,8 +1,14 @@
-const express = require('express');
-const compression = require('compression');
-const morgan = require('morgan');
-const { createRequestHandler } = require('@remix-run/express');
-const path = require('path');
+import express from 'express';
+import compression from 'compression';
+import morgan from 'morgan';
+import { createRequestHandler } from '@remix-run/express';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -28,97 +34,106 @@ app.get('/health', (req, res) => {
   });
 });
 
-const BUILD_DIR = path.join(process.cwd(), 'build');
+async function startServer() {
+  const BUILD_DIR = path.join(process.cwd(), 'build');
 
-// Check if build directory exists
-const fs = require('fs');
-if (!fs.existsSync(BUILD_DIR)) {
-  console.error('Build directory not found:', BUILD_DIR);
-  process.exit(1);
-}
-
-console.log('Looking for Remix server build...');
-console.log('Build directory contents:', fs.readdirSync(BUILD_DIR));
-
-const serverBuildPath = path.join(BUILD_DIR, 'server', 'index.js');
-console.log('Expected server build path:', serverBuildPath);
-
-if (!fs.existsSync(serverBuildPath)) {
-  console.error('Server build not found:', serverBuildPath);
-  
-  // Check if server directory exists
-  const serverDir = path.join(BUILD_DIR, 'server');
-  if (fs.existsSync(serverDir)) {
-    console.log('Server directory contents:', fs.readdirSync(serverDir));
-  } else {
-    console.log('Server directory does not exist');
+  // Check if build directory exists
+  if (!fs.existsSync(BUILD_DIR)) {
+    console.error('Build directory not found:', BUILD_DIR);
+    process.exit(1);
   }
-  
-  // Try alternative build locations
-  const alternatives = [
-    path.join(BUILD_DIR, 'index.js'),
-    path.join(BUILD_DIR, 'server.js'),
-    path.join(BUILD_DIR, 'server/server.js')
-  ];
-  
-  console.log('Checking alternative build locations...');
-  for (const altPath of alternatives) {
-    if (fs.existsSync(altPath)) {
-      console.log('Found alternative build at:', altPath);
-      break;
+
+  console.log('Looking for Remix server build...');
+  console.log('Build directory contents:', fs.readdirSync(BUILD_DIR));
+
+  const serverBuildPath = path.join(BUILD_DIR, 'server', 'index.js');
+  console.log('Expected server build path:', serverBuildPath);
+
+  if (!fs.existsSync(serverBuildPath)) {
+    console.error('Server build not found:', serverBuildPath);
+    
+    // Check if server directory exists
+    const serverDir = path.join(BUILD_DIR, 'server');
+    if (fs.existsSync(serverDir)) {
+      console.log('Server directory contents:', fs.readdirSync(serverDir));
+    } else {
+      console.log('Server directory does not exist');
     }
+    
+    // Try alternative build locations
+    const alternatives = [
+      path.join(BUILD_DIR, 'index.js'),
+      path.join(BUILD_DIR, 'server.js'),
+      path.join(BUILD_DIR, 'server/server.js')
+    ];
+    
+    console.log('Checking alternative build locations...');
+    for (const altPath of alternatives) {
+      if (fs.existsSync(altPath)) {
+        console.log('Found alternative build at:', altPath);
+        break;
+      }
+    }
+    
+    process.exit(1);
   }
-  
-  process.exit(1);
-}
 
-let remixBuild;
-try {
-  console.log('Loading Remix build from:', serverBuildPath);
-  remixBuild = require(serverBuildPath);
-  console.log('Remix build loaded successfully');
-  console.log('Build exports:', Object.keys(remixBuild));
-} catch (error) {
-  console.error('Failed to load Remix build:', error);
-  console.error('Error details:', error.stack);
-  process.exit(1);
-}
+  let remixBuild;
+  try {
+    console.log('Loading Remix build from:', serverBuildPath);
+    // Convert to file:// URL for ES module import
+    const buildUrl = new URL(`file://${serverBuildPath}`).href;
+    remixBuild = await import(buildUrl);
+    console.log('Remix build loaded successfully');
+    console.log('Build exports:', Object.keys(remixBuild));
+  } catch (error) {
+    console.error('Failed to load Remix build:', error);
+    console.error('Error details:', error.stack);
+    process.exit(1);
+  }
 
-app.all(
-  '*',
-  createRequestHandler({
-    build: remixBuild,
-    mode: process.env.NODE_ENV || 'production',
-    getLoadContext() {
-      // Return what you need to access in your route loaders
-      return {};
-    },
-  })
-);
+  app.all(
+    '*',
+    createRequestHandler({
+      build: remixBuild,
+      mode: process.env.NODE_ENV || 'production',
+      getLoadContext() {
+        // Return what you need to access in your route loaders
+        return {};
+      },
+    })
+  );
 
-const port = process.env.PORT || 3001;
-const host = '0.0.0.0';
+  const port = process.env.PORT || 3001;
+  const host = '0.0.0.0';
 
-console.log(`Starting server on ${host}:${port}...`);
-console.log('Environment:', {
-  NODE_ENV: process.env.NODE_ENV,
-  PORT: process.env.PORT,
-  PWD: process.cwd()
-});
-
-const server = app.listen(port, host, () => {
-  console.log(`✅ Express server listening on http://${host}:${port}`);
-  console.log(`🏥 Health check available at: http://${host}:${port}/health`);
-}).on('error', (err) => {
-  console.error('❌ Server failed to start:', err);
-  process.exit(1);
-});
-
-// Handle graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+  console.log(`Starting server on ${host}:${port}...`);
+  console.log('Environment:', {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    PWD: process.cwd()
   });
+
+  const server = app.listen(port, host, () => {
+    console.log(`✅ Express server listening on http://${host}:${port}`);
+    console.log(`🏥 Health check available at: http://${host}:${port}/health`);
+  }).on('error', (err) => {
+    console.error('❌ Server failed to start:', err);
+    process.exit(1);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+}
+
+// Start the server
+startServer().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
