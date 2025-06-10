@@ -12,8 +12,8 @@ RUN npm install -g pnpm@9.4.0 && pnpm install
 # Copy the rest of your app's source code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5173
+# Railway will set the PORT environment variable
+# EXPOSE directive is informational only and doesn't affect Railway deployments
 
 # Production image
 FROM base AS bolt-ai-production
