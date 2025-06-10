@@ -22,7 +22,8 @@ FROM base AS bolt-ai-production
 # Railway will inject all other environment variables at runtime
 ENV WRANGLER_SEND_METRICS=false \
     RUNNING_IN_DOCKER=true \
-    VITE_LOG_LEVEL=debug
+    VITE_LOG_LEVEL=debug \
+    CI=false
 
 # Pre-configure wrangler to disable metrics
 RUN mkdir -p /root/.config/.wrangler && \

@@ -5,6 +5,7 @@ dockerfilePath = "./Dockerfile"
 [build.args]
 BASE = "node:20.18.0"
 DOCKERFILE_TARGET = "bolt-ai-production"
+CI = "false"
 
 [deploy]
 startCommand = "pnpm run dockerstart"

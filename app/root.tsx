@@ -62,6 +62,7 @@ export const Head = createHead(() => (
   </>
 ));
 
+// Export Layout as a named export as well for better compatibility
 export function Layout({ children }: { children: React.ReactNode }) {
   const theme = useStore(themeStore);
 
