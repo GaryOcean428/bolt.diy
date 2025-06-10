@@ -67,7 +67,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    document.querySelector('html')?.setAttribute('data-theme', theme);
+    if (!import.meta.env.SSR) {
+      document.querySelector('html')?.setAttribute('data-theme', theme);
+    }
   }, [theme]);
 
   return (
@@ -84,7 +86,9 @@ export function ErrorBoundary() {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    document.querySelector('html')?.setAttribute('data-theme', theme);
+    if (!import.meta.env.SSR) {
+      document.querySelector('html')?.setAttribute('data-theme', theme);
+    }
   }, [theme]);
 
   let errorMessage = 'Something went wrong';
@@ -131,12 +135,14 @@ export default function App() {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    logStore.logSystem('Application initialized', {
-      theme,
-      platform: navigator.platform,
-      userAgent: navigator.userAgent,
-      timestamp: new Date().toISOString(),
-    });
+    if (!import.meta.env.SSR) {
+      logStore.logSystem('Application initialized', {
+        theme,
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }, []);
 
   return <Outlet />;
