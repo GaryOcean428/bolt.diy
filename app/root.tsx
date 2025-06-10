@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError, isRouteErrorResponse } from '@remix-run/react';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
 import { useEffect } from 'react';
@@ -76,6 +76,54 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <ScrollRestoration />
       <Scripts />
     </>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  const theme = useStore(themeStore);
+
+  useEffect(() => {
+    document.querySelector('html')?.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  let errorMessage = 'Something went wrong';
+  let errorDetails = 'An unexpected error occurred';
+
+  if (isRouteErrorResponse(error)) {
+    errorMessage = `${error.status} ${error.statusText}`;
+    errorDetails = error.data?.message || `Error ${error.status}`;
+  } else if (error instanceof Error) {
+    errorMessage = 'Application Error';
+    errorDetails = error.message;
+  }
+
+  console.error('Root Error Boundary:', error);
+
+  return (
+    <html data-theme={theme}>
+      <head>
+        <title>Oops! - Bolt.diy</title>
+        <Meta />
+        <Links />
+      </head>
+      <body className="bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+          <div className="text-center max-w-md">
+            <div className="text-6xl mb-4">⚡</div>
+            <h1 className="text-2xl font-bold mb-2">{errorMessage}</h1>
+            <p className="text-bolt-elements-textSecondary mb-6">{errorDetails}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text px-4 py-2 rounded"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+        <Scripts />
+      </body>
+    </html>
   );
 }
 
