@@ -6,7 +6,8 @@ WORKDIR /app
 # Install dependencies (this step is cached as long as the dependencies don't change)
 COPY package.json pnpm-lock.yaml ./
 
-RUN corepack enable pnpm && pnpm install
+# Install pnpm using npm instead of corepack to avoid signature verification issues
+RUN npm install -g pnpm@9.4.0 && pnpm install
 
 # Copy the rest of your app's source code
 COPY . .
