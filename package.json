@@ -31,6 +31,7 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^1.0.0",
     "@ai-sdk/anthropic": "^1.0.6",
     "@ai-sdk/cohere": "^1.0.6",
     "@ai-sdk/google": "^1.0.12",
