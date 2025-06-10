@@ -34,7 +34,7 @@ RUN touch .env.local
 
 RUN pnpm run build
 
-CMD [ "pnpm", "run", "dockerstart"]
+CMD [ "pnpm", "run", "server"]
 
 # Development image
 FROM base AS bolt-ai-development
