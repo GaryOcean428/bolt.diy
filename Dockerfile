@@ -12,8 +12,8 @@ RUN npm install -g pnpm@9.4.0 && pnpm install
 # Copy the rest of your app's source code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 5173
+# Expose the port - Railway will override this with PORT env var
+EXPOSE 3001
 
 # Production image
 FROM base AS bolt-ai-production
