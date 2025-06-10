@@ -31,6 +31,15 @@ export default defineConfig((config) => {
     build: {
       target: 'esnext',
     },
+    server: {
+      host: true,
+      allowedHosts: [
+        'localhost',
+        '127.0.0.1',
+        'boltdiy-production-c4fa.up.railway.app',
+        '.railway.app' // Allow all Railway subdomains
+      ]
+    },
     plugins: [
       nodePolyfills({
         include: ['path', 'buffer', 'process'],
