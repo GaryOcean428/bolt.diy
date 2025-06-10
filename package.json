@@ -81,6 +81,7 @@
     "chromadb": "^1.9.4",
     "date-fns": "^4.1.0",
     "diff": "^7.0.0",
+    "dotenv": "^16.4.7",
     "file-saver": "^2.0.5",
     "framer-motion": "^11.15.0",
     "ignore": "^7.0.0",
