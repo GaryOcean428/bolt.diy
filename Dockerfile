@@ -90,7 +90,14 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
     AWS_BEDROCK_CONFIG=${AWS_BEDROCK_CONFIG} \
     VITE_LOG_LEVEL=${VITE_LOG_LEVEL} \
     DEFAULT_NUM_CTX=${DEFAULT_NUM_CTX}\
-    RUNNING_IN_DOCKER=true
+    RUNNING_IN_DOCKER=true \
+    PORT=5173
 
-RUN mkdir -p ${WORKDIR}/run
-CMD pnpm run dev --host
+# Create empty .env.local to prevent bindings.sh from failing
+RUN touch .env.local
+
+# Build the application
+RUN pnpm run build
+
+# Use the start command instead of dev for Railway
+CMD ["pnpm", "run", "start"]
