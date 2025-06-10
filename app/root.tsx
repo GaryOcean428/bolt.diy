@@ -62,7 +62,7 @@ export const Head = createHead(() => (
   </>
 ));
 
-// Export Layout as a named export as well for better compatibility
+// Export Layout as required by Remix v2
 export function Layout({ children }: { children: React.ReactNode }) {
   const theme = useStore(themeStore);
 
@@ -91,9 +91,5 @@ export default function App() {
     });
   }, []);
 
-  return (
-    <Layout>
-      <Outlet />
-    </Layout>
-  );
+  return <Outlet />;
 }

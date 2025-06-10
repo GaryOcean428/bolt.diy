@@ -18,30 +18,45 @@ export default class HyperbolicProvider extends BaseProvider {
       label: 'Qwen 2.5 Coder 32B Instruct',
       provider: 'Hyperbolic',
       maxTokenAllowed: 8192,
+      maxTokens: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'Qwen/Qwen2.5-72B-Instruct',
       label: 'Qwen2.5-72B-Instruct',
       provider: 'Hyperbolic',
       maxTokenAllowed: 8192,
+      maxTokens: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'deepseek-ai/DeepSeek-V2.5',
       label: 'DeepSeek-V2.5',
       provider: 'Hyperbolic',
       maxTokenAllowed: 8192,
+      maxTokens: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'Qwen/QwQ-32B-Preview',
       label: 'QwQ-32B-Preview',
       provider: 'Hyperbolic',
       maxTokenAllowed: 8192,
+      maxTokens: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
     {
       name: 'Qwen/Qwen2-VL-72B-Instruct',
       label: 'Qwen2-VL-72B-Instruct',
       provider: 'Hyperbolic',
       maxTokenAllowed: 8192,
+      maxTokens: 8192,
+      type: 'text-generation',
+      capabilities: ['text-generation', 'code-generation'],
     },
   ];
 
@@ -60,7 +75,8 @@ export default class HyperbolicProvider extends BaseProvider {
     const baseUrl = fetchBaseUrl || 'https://api.hyperbolic.xyz/v1';
 
     if (!apiKey) {
-      throw `Missing Api Key configuration for ${this.name} provider`;
+      // Return empty array instead of throwing error when API key is missing
+      return [];
     }
 
     const response = await fetch(`${baseUrl}/models`, {
@@ -78,6 +94,9 @@ export default class HyperbolicProvider extends BaseProvider {
       label: `${m.id} - context ${m.context_length ? Math.floor(m.context_length / 1000) + 'k' : 'N/A'}`,
       provider: this.name,
       maxTokenAllowed: m.context_length || 8000,
+      maxTokens: m.context_length || 8000,
+      type: 'text-generation' as const,
+      capabilities: ['text-generation', 'code-generation'] as const,
     }));
   }
 
@@ -98,7 +117,7 @@ export default class HyperbolicProvider extends BaseProvider {
     });
 
     if (!apiKey) {
-      throw `Missing Api Key configuration for ${this.name} provider`;
+      throw new Error(`Missing API key for ${this.name} provider. Please add HYPERBOLIC_API_KEY to use this provider.`);
     }
 
     const openai = createOpenAI({

@@ -17,6 +17,7 @@ function getProviderInfo(llmManager: LLMManager) {
   if (!cachedProviders) {
     cachedProviders = llmManager.getAllProviders().map((provider) => ({
       name: provider.name,
+      displayName: provider.name, // Add displayName
       staticModels: provider.staticModels,
       getApiKeyLink: provider.getApiKeyLink,
       labelForGetApiKey: provider.labelForGetApiKey,
@@ -28,6 +29,7 @@ function getProviderInfo(llmManager: LLMManager) {
     const defaultProvider = llmManager.getDefaultProvider();
     cachedDefaultProvider = {
       name: defaultProvider.name,
+      displayName: defaultProvider.name, // Add displayName
       staticModels: defaultProvider.staticModels,
       getApiKeyLink: defaultProvider.getApiKeyLink,
       labelForGetApiKey: defaultProvider.labelForGetApiKey,

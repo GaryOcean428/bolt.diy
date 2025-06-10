@@ -14,11 +14,11 @@ export default class GithubProvider extends BaseProvider {
 
   // find more in https://github.com/marketplace?type=models
   staticModels: ModelInfo[] = [
-    { name: 'gpt-4o', label: 'GPT-4o', provider: 'Github', maxTokenAllowed: 128000 },
-    { name: 'gpt-4o-mini', label: 'GPT-4o Mini', provider: 'Github', maxTokenAllowed: 128000 },
-    { name: 'o1', label: 'o1', provider: 'Github', maxTokenAllowed: 200000 },
-    { name: 'o1-mini', label: 'o1-mini', provider: 'Github', maxTokenAllowed: 128000 },
-    { name: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet', provider: 'Anthropic', maxTokenAllowed: 200000 },
+    { name: 'gpt-4o', label: 'GPT-4o', provider: 'Github', maxTokenAllowed: 128000, maxTokens: 128000, type: 'text-generation', capabilities: ['text-generation', 'code-generation'] },
+    { name: 'gpt-4o-mini', label: 'GPT-4o Mini', provider: 'Github', maxTokenAllowed: 128000, maxTokens: 128000, type: 'text-generation', capabilities: ['text-generation', 'code-generation'] },
+    { name: 'o1', label: 'o1', provider: 'Github', maxTokenAllowed: 200000, maxTokens: 200000, type: 'text-generation', capabilities: ['text-generation', 'code-generation'] },
+    { name: 'o1-mini', label: 'o1-mini', provider: 'Github', maxTokenAllowed: 128000, maxTokens: 128000, type: 'text-generation', capabilities: ['text-generation', 'code-generation'] },
+    { name: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet', provider: 'Anthropic', maxTokenAllowed: 200000, maxTokens: 200000, type: 'text-generation', capabilities: ['text-generation', 'code-generation'] },
   ];
 
   getModelInstance(options: {
