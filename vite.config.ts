@@ -146,6 +146,9 @@ export default defineConfig((config) => {
         },
       },
     },
+    server: {
+      allowedHosts: ['boltdiy-production-c4fa.up.railway.app'],
+    },
   };
 });
 

@@ -240,3 +240,25 @@ Example for the `DEFAULT_NUM_CTX` variable:
 ```bash
 DEFAULT_NUM_CTX=24576 # Uses 32GB VRAM
 ```
+
+---
+
+## 🎯 Arcane-Fly Engineering Guidelines
+
+### Development Principles
+
+- **Break complex tasks into logical steps** - Decompose large features into manageable, testable units
+- **Use modern React patterns** - Prefer hooks and functional components over class components
+- **Follow project conventions for state management** - Maintain consistency with existing patterns
+- **Implement proper error handling and performance optimization** - Consider edge cases and user experience
+- **Keep components modular and testable** - Design for reusability and maintainability
+- **Prioritize security in all implementations** - Follow security best practices throughout the codebase
+- **Document non-obvious design decisions** - Explain complex logic and architectural choices
+- **Prioritize clarity when asking about AI models** - Be specific about model requirements and constraints
+- **Respond with bullet points and minimal preamble** - Keep communication concise and actionable
+- **Use yarn for TypeScript and related dependencies** - Maintain consistency in package management
+- **Always provide the best long term solution, no quick fixes** - Focus on sustainable, maintainable code
+
+### Additional Resources
+
+For GitHub Copilot custom instructions and organization-specific guidance, refer to: [GitHub Copilot Custom Instructions Documentation](https://docs.github.com/en/copilot/customizing-copilot/adding-organization-custom-instructions-for-github-copilot)
