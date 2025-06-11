@@ -19,7 +19,12 @@ console.log('Current directory:', process.cwd());
 console.log('Environment:', process.env.NODE_ENV || 'production');
 console.log('Port:', process.env.PORT || 5173);
 console.log('Railway environment:', process.env.RAILWAY_ENVIRONMENT);
-console.log('Available env vars:', Object.keys(process.env).filter(key => !key.includes('SECRET') && !key.includes('KEY')).join(', '));
+console.log(
+  'Available env vars:',
+  Object.keys(process.env)
+    .filter((key) => !key.includes('SECRET') && !key.includes('KEY'))
+    .join(', '),
+);
 
 app.use(compression());
 
@@ -134,11 +139,12 @@ async function startServer() {
 
     app.all('*', (req, res, next) => {
       console.log(`Request: ${req.method} ${req.path}`);
+
       try {
         return requestHandler(req, res, next);
       } catch (error) {
         console.error(`Error handling request ${req.path}:`, error);
-        next(error);
+        return next(error);
       }
     });
   } catch (error) {

@@ -5,21 +5,15 @@ import * as ReactDOMServerModule from 'react-dom/server';
 const ReactDOMServer = ReactDOMServerModule.default || ReactDOMServerModule;
 
 // Extract the methods we need with proper fallbacks
-export const renderToReadableStream = 
-  ReactDOMServer.renderToReadableStream || 
-  ReactDOMServerModule.renderToReadableStream;
+export const renderToReadableStream =
+  ReactDOMServer.renderToReadableStream || ReactDOMServerModule.renderToReadableStream;
 
-export const renderToString = 
-  ReactDOMServer.renderToString || 
-  ReactDOMServerModule.renderToString;
+export const renderToString = ReactDOMServer.renderToString || ReactDOMServerModule.renderToString;
 
-export const renderToStaticMarkup = 
-  ReactDOMServer.renderToStaticMarkup || 
-  ReactDOMServerModule.renderToStaticMarkup;
+export const renderToStaticMarkup = ReactDOMServer.renderToStaticMarkup || ReactDOMServerModule.renderToStaticMarkup;
 
-export const renderToPipeableStream = 
-  ReactDOMServer.renderToPipeableStream || 
-  ReactDOMServerModule.renderToPipeableStream;
+export const renderToPipeableStream =
+  ReactDOMServer.renderToPipeableStream || ReactDOMServerModule.renderToPipeableStream;
 
 // Export default as well
 export default ReactDOMServer;

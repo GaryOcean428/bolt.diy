@@ -21,12 +21,14 @@ if ! pnpm typecheck; then
     exit 1
 fi
 
-# Run lint
+# Run lint and auto-fix
 echo "Running lint..."
 if ! pnpm lint; then
-    echo "❌ Linting failed! Run 'pnpm lint:fix' to fix the easy issues."
-    echo "Once you're done, don't forget to add your beautification to the commit! 🤩"
-    exit 1
+    echo "🔧 Linting failed! Auto-fixing issues..."
+    pnpm lint:fix
+    echo "📝 Auto-staged linting fixes"
+    git add .
+    echo "✅ Linting issues fixed and staged!"
 fi
 
 echo "👍 All checks passed! Committing changes..."
