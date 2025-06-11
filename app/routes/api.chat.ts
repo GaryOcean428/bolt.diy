@@ -1,4 +1,4 @@
-import { type ActionFunctionArgs } from '@remix-run/node';
+import { type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS } from '~/lib/.server/llm/constants';
 import { streamText, type Messages, type StreamingOptions } from '~/lib/.server/llm/stream-text';
 import SwitchableStream from '~/lib/.server/llm/switchable-stream';

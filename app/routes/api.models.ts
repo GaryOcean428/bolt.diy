@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node';
+import { json } from '@remix-run/cloudflare';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';

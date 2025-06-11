@@ -1,4 +1,4 @@
-import { type ActionFunctionArgs } from '@remix-run/node';
+import { type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { generateText } from 'ai';
 import { MAX_TOKENS } from '~/lib/.server/llm/constants';
 import { streamText } from '~/lib/.server/llm/stream-text';

@@ -128,6 +128,12 @@ importers:
       '@remix-run/cloudflare-pages':
         specifier: ^2.16.8
         version: 2.16.8(@cloudflare/workers-types@4.20250610.0)(typescript@5.8.3)
+      '@remix-run/express':
+        specifier: ^2.16.8
+        version: 2.16.8(express@4.21.2)(typescript@5.8.3)
+      '@remix-run/node':
+        specifier: ^2.16.8
+        version: 2.16.8(typescript@5.8.3)
       '@remix-run/react':
         specifier: ^2.16.8
         version: 2.16.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)
@@ -161,6 +167,9 @@ importers:
       chromadb:
         specifier: ^1.10.5
         version: 1.10.5
+      compression:
+        specifier: ^1.8.0
+        version: 1.8.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -170,6 +179,9 @@ importers:
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
+      express:
+        specifier: ^4.21.2
+        version: 4.21.2
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
@@ -197,6 +209,9 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
+      morgan:
+        specifier: ^1.10.0
+        version: 1.10.0
       nanostores:
         specifier: ^0.11.4
         version: 0.11.4
@@ -2436,6 +2451,16 @@ packages:
       wrangler:
         optional: true
 
+  '@remix-run/express@2.16.8':
+    resolution: {integrity: sha512-NNTosiAJ4jZCRDfWSjV+3Fyu7KoHPeEHruLZEPRNDuXO6Nm5EkRvIkMwdfwyJ+ajE5IPotu8MFtPyNtm3sw/gw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      express: ^4.20.0
+      typescript: ^5.1.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@remix-run/node@2.16.8':
     resolution: {integrity: sha512-foeYXU3mdaBJZnbtGbM8mNdHowz2+QnVGDRo7P3zgFkmsccMEflArGZNbkACGKd9xwDguTxxMJ6cuXBC4jIfgQ==}
     engines: {node: '>=18.0.0'}
@@ -3431,6 +3456,10 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
+  basic-auth@2.0.1:
+    resolution: {integrity: sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==}
+    engines: {node: '>= 0.8'}
+
   before-after-hook@3.0.2:
     resolution: {integrity: sha512-Nik3Sc0ncrMK4UUdXQmAnRtzmNQTAAXmXIopizwZ1W1t8QmfJj+zL4OA2I7XPTPW5z5TDqv4hRo/JzouDJnX3A==}
 
@@ -3730,6 +3759,14 @@ packages:
   common-tags@1.8.2:
     resolution: {integrity: sha512-gk/Z852D2Wtb//0I+kRFNKKE9dIIVirjoqPoA1wJU+XePVXZfGeBpk45+A1rKO4Q43prqWBNY/MiIeRLbPWUaA==}
     engines: {node: '>=4.0.0'}
+
+  compressible@2.0.18:
+    resolution: {integrity: sha512-AF3r7P5dWxL8MxyITRMlORQNaOA2IkAFaTr4k7BUumjPtRpGDTZpl0Pb1XCO6JeDCBdp126Cgs9sMxqSjgYyRg==}
+    engines: {node: '>= 0.6'}
+
+  compression@1.8.0:
+    resolution: {integrity: sha512-k6WLKfunuqCYD3t6AsuPGvQWaKwuLLh2/xHNcX4qE+vIfDNXpSqnrhwA7O53R7WVQUnt8dVAIW+YHr7xTgOgGA==}
+    engines: {node: '>= 0.8.0'}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -5736,6 +5773,10 @@ packages:
   modern-ahocorasick@1.1.0:
     resolution: {integrity: sha512-sEKPVl2rM+MNVkGQt3ChdmD8YsigmXdn5NifZn6jiwn9LRJpWm8F3guhaqrJT/JOat6pwpbXEk6kv+b9DMIjsQ==}
 
+  morgan@1.10.0:
+    resolution: {integrity: sha512-AbegBVI4sh6El+1gNwvD5YIck7nSA36weD7xvIxG4in80j/UoK8AEGaWnnz8v1GxonMCltmlNs5ZKbGvl9b1XQ==}
+    engines: {node: '>= 0.8.0'}
+
   motion-dom@11.18.1:
     resolution: {integrity: sha512-g76KvA001z+atjfxczdRtw/RXOM3OMSdd1f4DL77qCTF/+avrRJiawSG4yDibEQ215sr9kpinSlX2pCTJ9zbhw==}
 
@@ -5778,6 +5819,10 @@ packages:
 
   negotiator@0.6.3:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
+    engines: {node: '>= 0.6'}
+
+  negotiator@0.6.4:
+    resolution: {integrity: sha512-myRT3DiWPHqho5PrJaIRyaMv2kgYf0mUVgBNOYMuCH5Ki1yEiQaf/ZJuQ62nvpc44wL5WDbTX7yGJi1Neevw8w==}
     engines: {node: '>= 0.6'}
 
   node-domexception@1.0.0:
@@ -5880,8 +5925,16 @@ packages:
       zod:
         optional: true
 
+  on-finished@2.3.0:
+    resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
+    engines: {node: '>= 0.8'}
+
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
+    engines: {node: '>= 0.8'}
+
+  on-headers@1.0.2:
+    resolution: {integrity: sha512-pZAE+FJLoyITytdqK0U5s+FIpjN0JP3OzFi/u8Rx+EV5/W+JTWGXG8xFzevE7AjBfDqHv/8vL8qQsIhHnqRkrA==}
     engines: {node: '>= 0.8'}
 
   once@1.4.0:
@@ -10138,6 +10191,13 @@ snapshots:
       - ts-node
       - utf-8-validate
 
+  '@remix-run/express@2.16.8(express@4.21.2)(typescript@5.8.3)':
+    dependencies:
+      '@remix-run/node': 2.16.8(typescript@5.8.3)
+      express: 4.21.2
+    optionalDependencies:
+      typescript: 5.8.3
+
   '@remix-run/node@2.16.8(typescript@5.8.3)':
     dependencies:
       '@remix-run/server-runtime': 2.16.8(typescript@5.8.3)
@@ -11444,6 +11504,10 @@ snapshots:
 
   base64-js@1.5.1: {}
 
+  basic-auth@2.0.1:
+    dependencies:
+      safe-buffer: 5.1.2
+
   before-after-hook@3.0.2: {}
 
   binary-extensions@2.3.0: {}
@@ -11750,6 +11814,22 @@ snapshots:
   comma-separated-tokens@2.0.3: {}
 
   common-tags@1.8.2: {}
+
+  compressible@2.0.18:
+    dependencies:
+      mime-db: 1.52.0
+
+  compression@1.8.0:
+    dependencies:
+      bytes: 3.1.2
+      compressible: 2.0.18
+      debug: 2.6.9
+      negotiator: 0.6.4
+      on-headers: 1.0.2
+      safe-buffer: 5.2.1
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
 
   concat-map@0.0.1: {}
 
@@ -14535,6 +14615,16 @@ snapshots:
 
   modern-ahocorasick@1.1.0: {}
 
+  morgan@1.10.0:
+    dependencies:
+      basic-auth: 2.0.1
+      debug: 2.6.9
+      depd: 2.0.0
+      on-finished: 2.3.0
+      on-headers: 1.0.2
+    transitivePeerDependencies:
+      - supports-color
+
   motion-dom@11.18.1:
     dependencies:
       motion-utils: 11.18.1
@@ -14560,6 +14650,8 @@ snapshots:
   natural-compare@1.4.0: {}
 
   negotiator@0.6.3: {}
+
+  negotiator@0.6.4: {}
 
   node-domexception@1.0.0: {}
 
@@ -14687,9 +14779,15 @@ snapshots:
     optionalDependencies:
       zod: 3.25.57
 
+  on-finished@2.3.0:
+    dependencies:
+      ee-first: 1.1.1
+
   on-finished@2.4.1:
     dependencies:
       ee-first: 1.1.1
+
+  on-headers@1.0.2: {}
 
   once@1.4.0:
     dependencies:
