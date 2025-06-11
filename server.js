@@ -104,6 +104,8 @@ async function startServer() {
   }
 
   let remixBuild;
+  let remixLoaded = false;
+
   try {
     console.log('Loading Remix build from:', serverBuildPath);
     // Convert to file:// URL for ES module import
@@ -111,26 +113,49 @@ async function startServer() {
     remixBuild = await import(buildUrl);
     console.log('Remix build loaded successfully');
     console.log('Build exports:', Object.keys(remixBuild));
+
+    // Mark that Remix is loaded
+    app.locals.remixLoaded = true;
+    remixLoaded = true;
+
+    app.all(
+      '*',
+      createRequestHandler({
+        build: remixBuild,
+        mode: process.env.NODE_ENV || 'production',
+        getLoadContext() {
+          // Return what you need to access in your route loaders
+          return {};
+        },
+      })
+    );
   } catch (error) {
-    console.error('Failed to load Remix build:', error);
+    console.error('Failed to load Remix build:', error.message);
     console.error('Error details:', error.stack);
-    process.exit(1);
+    console.warn('⚠️ Server will continue without Remix app - only health check and fallback routes available');
+
+    // Add fallback routes when Remix fails
+    app.get('/', (req, res) => {
+      res.status(503).json({
+        error: 'Service Starting',
+        message: 'Application is initializing. Please try again in a moment.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        health_check_url: '/health',
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    app.all('*', (req, res) => {
+      res.status(503).json({
+        error: 'Service Starting',
+        message: 'Application is initializing. Please try again in a moment.',
+        path: req.path,
+        method: req.method,
+        health_check_url: '/health',
+        timestamp: new Date().toISOString()
+      });
+    });
   }
-
-  // Mark that Remix is loaded
-  app.locals.remixLoaded = true;
-
-  app.all(
-    '*',
-    createRequestHandler({
-      build: remixBuild,
-      mode: process.env.NODE_ENV || 'production',
-      getLoadContext() {
-        // Return what you need to access in your route loaders
-        return {};
-      },
-    })
-  );
 
   const port = process.env.PORT || 5173;
   const host = '0.0.0.0';
