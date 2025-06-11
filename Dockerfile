@@ -23,7 +23,8 @@ FROM base AS bolt-ai-production
 ENV WRANGLER_SEND_METRICS=false \
     RUNNING_IN_DOCKER=true \
     VITE_LOG_LEVEL=debug \
-    CI=false
+    CI=false \
+    NODE_ENV=production
 
 # Pre-configure wrangler to disable metrics
 RUN mkdir -p /root/.config/.wrangler && \
@@ -34,7 +35,7 @@ RUN touch .env.local
 
 RUN pnpm run build
 
-CMD [ "pnpm", "run", "server:simple"]
+CMD [ "pnpm", "run", "server"]
 
 # Development image
 FROM base AS bolt-ai-development
