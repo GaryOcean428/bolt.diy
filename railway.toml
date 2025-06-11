@@ -1,6 +1,6 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "./Dockerfile"
+dockerfilePath = "Dockerfile"
 
 [build.args]
 BASE = "node:20.18.0"
@@ -12,3 +12,6 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 healthcheckPath = "/health"
 healthcheckTimeout = 300
+
+[experimental]
+dockerfile = true
