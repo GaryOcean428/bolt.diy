@@ -18,6 +18,8 @@ console.log('Node version:', process.version);
 console.log('Current directory:', process.cwd());
 console.log('Environment:', process.env.NODE_ENV || 'production');
 console.log('Port:', process.env.PORT || 5173);
+console.log('Railway environment:', process.env.RAILWAY_ENVIRONMENT);
+console.log('Available env vars:', Object.keys(process.env).filter(key => !key.includes('SECRET') && !key.includes('KEY')).join(', '));
 
 app.use(compression());
 
@@ -121,17 +123,24 @@ async function startServer() {
     app.locals.remixLoaded = true;
     remixLoaded = true;
 
-    app.all(
-      '*',
-      createRequestHandler({
-        build: remixBuild,
-        mode: process.env.NODE_ENV || 'production',
-        getLoadContext() {
-          // Return what you need to access in your route loaders
-          return {};
-        },
-      }),
-    );
+    const requestHandler = createRequestHandler({
+      build: remixBuild,
+      mode: process.env.NODE_ENV || 'production',
+      getLoadContext() {
+        // Return what you need to access in your route loaders
+        return {};
+      },
+    });
+
+    app.all('*', (req, res, next) => {
+      console.log(`Request: ${req.method} ${req.path}`);
+      try {
+        return requestHandler(req, res, next);
+      } catch (error) {
+        console.error(`Error handling request ${req.path}:`, error);
+        next(error);
+      }
+    });
   } catch (error) {
     console.error('Failed to load Remix build:', error.message);
     console.error('Error details:', error.stack);
@@ -168,6 +177,17 @@ async function startServer() {
     NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
     PWD: process.cwd(),
+  });
+
+  // Error handling middleware - must be after all other middleware
+  app.use((err, req, res, next) => {
+    console.error('Express error handler:', err.stack);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+      path: req.path,
+      timestamp: new Date().toISOString(),
+    });
   });
 
   const server = app
