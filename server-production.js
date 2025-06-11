@@ -40,7 +40,12 @@ app.get('/health', (req, res) => {
 app.use(express.static('public', { maxAge: '1h' }));
 app.use('/build', express.static('build/client', { immutable: true, maxAge: '1y' }));
 
-// Logging middleware
+// Logging middleware - log ALL requests before any other middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - Headers: ${JSON.stringify(req.headers)}`);
+  next();
+});
+
 app.use(morgan('tiny'));
 
 // Global error handler
