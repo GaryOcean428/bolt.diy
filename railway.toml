@@ -6,6 +6,7 @@ dockerfilePath = "Dockerfile"
 BASE = "node:20.18.0"
 DOCKERFILE_TARGET = "bolt-ai-production"
 CI = "false"
+NODE_ENV = "production"
 
 [deploy]
 startCommand = "pnpm run server"
