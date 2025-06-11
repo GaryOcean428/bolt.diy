@@ -104,7 +104,7 @@ async function startServer() {
     })
   );
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 5173;
   const host = '0.0.0.0';
 
   console.log(`Starting server on ${host}:${port}...`);
