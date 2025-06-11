@@ -34,7 +34,7 @@ RUN touch .env.local
 
 RUN pnpm run build
 
-CMD [ "pnpm", "run", "server"]
+CMD [ "pnpm", "run", "server:simple"]
 
 # Development image
 FROM base AS bolt-ai-development

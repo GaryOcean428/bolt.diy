@@ -22,6 +22,7 @@
     "server": "node server.js",
     "server:railway": "node server-railway.js",
     "server:production": "node server-production.js",
+    "server:simple": "node server-simple.js",
     "dockerrun": "docker run -it -d --name bolt-ai-live -p 5173:5173 --env-file .env.local bolt-ai",
     "dockerbuild:prod": "docker build -t bolt-ai:production -t bolt-ai:latest --target bolt-ai-production .",
     "dockerbuild": "docker build -t bolt-ai:development -t bolt-ai:latest --target bolt-ai-development .",
