@@ -3,7 +3,7 @@ import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderHeadToString } from 'remix-island';
 import { Head } from './root';
-import { LLMManager } from '~/lib/modules/llm/manager';
+// import { LLMManager } from '~/lib/modules/llm/manager';
 import { themeStore } from '~/lib/stores/theme';
 
 // Dynamically import based on runtime environment
@@ -16,9 +16,9 @@ export default async function handleRequest(
   remixContext: EntryContext,
   _loadContext: AppLoadContext,
 ) {
-  // Initialize LLM manager and model list before rendering
-  const manager = LLMManager.getInstance();
-  await manager.updateModelList({});
+  // Skip LLM manager initialization during SSR to avoid server errors
+  // const manager = LLMManager.getInstance();
+  // await manager.updateModelList({});
 
   const head = renderHeadToString({ request, remixContext, Head });
 
