@@ -1,11 +1,25 @@
 // Wrapper for react-dom/server to handle ESM/CommonJS compatibility
-import ReactDOMServer from 'react-dom/server';
+import * as ReactDOMServerModule from 'react-dom/server';
 
-// Extract the methods we need
-export const renderToReadableStream =
-  ReactDOMServer.renderToReadableStream || ReactDOMServer.default?.renderToReadableStream;
-export const renderToString = ReactDOMServer.renderToString || ReactDOMServer.default?.renderToString;
-export const renderToStaticMarkup = ReactDOMServer.renderToStaticMarkup || ReactDOMServer.default?.renderToStaticMarkup;
+// Handle both ESM and CommonJS module formats
+const ReactDOMServer = ReactDOMServerModule.default || ReactDOMServerModule;
+
+// Extract the methods we need with proper fallbacks
+export const renderToReadableStream = 
+  ReactDOMServer.renderToReadableStream || 
+  ReactDOMServerModule.renderToReadableStream;
+
+export const renderToString = 
+  ReactDOMServer.renderToString || 
+  ReactDOMServerModule.renderToString;
+
+export const renderToStaticMarkup = 
+  ReactDOMServer.renderToStaticMarkup || 
+  ReactDOMServerModule.renderToStaticMarkup;
+
+export const renderToPipeableStream = 
+  ReactDOMServer.renderToPipeableStream || 
+  ReactDOMServerModule.renderToPipeableStream;
 
 // Export default as well
 export default ReactDOMServer;

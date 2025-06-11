@@ -28,7 +28,7 @@ export default defineConfig((config) => {
     },
     resolve: {
       alias: {
-        'react-dom/server': '/app/lib/react-dom-server-wrapper.js',
+        // Remove the react-dom/server alias entirely - let it use the default
       },
     },
     build: {
