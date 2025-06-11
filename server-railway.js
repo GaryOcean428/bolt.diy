@@ -109,17 +109,61 @@ async function setupRemixHandler() {
 async function loadRemixBuild(buildPath) {
   try {
     console.log('🚀 Loading Remix build from:', buildPath);
-    const buildUrl = new URL(`file://${buildPath}`).href;
-    const remixBuild = await import(buildUrl);
+
+    // Check if file exists and is readable
+    const stats = fs.statSync(buildPath);
+    console.log('📊 Build file stats:', {
+      size: stats.size,
+      isFile: stats.isFile(),
+      mode: stats.mode.toString(8),
+      created: stats.birthtime,
+      modified: stats.mtime
+    });
+
+    // Read first few bytes to check file content
+    const fileContent = fs.readFileSync(buildPath, 'utf8');
+    console.log('📄 Build file first 200 chars:', fileContent.substring(0, 200));
+
+    // Try different import methods
+    let remixBuild;
+
+    try {
+      // Method 1: Direct file URL import
+      const buildUrl = new URL(`file://${buildPath}`).href;
+      console.log('🔗 Trying import with URL:', buildUrl);
+      remixBuild = await import(buildUrl);
+    } catch (importError) {
+      console.error('❌ URL import failed:', importError.message);
+
+      // Method 2: Try with path resolution
+      try {
+        const resolvedPath = path.resolve(buildPath);
+        console.log('🔗 Trying import with resolved path:', resolvedPath);
+        remixBuild = await import(resolvedPath);
+      } catch (pathError) {
+        console.error('❌ Path import failed:', pathError.message);
+        throw pathError;
+      }
+    }
 
     console.log('✅ Remix build loaded successfully');
+    console.log('📋 Build type:', typeof remixBuild);
     console.log('📋 Build exports:', Object.keys(remixBuild));
+    console.log('📋 Default export?', !!remixBuild.default);
+
+    // Handle both default and named exports
+    const build = remixBuild.default || remixBuild;
+
+    // Validate the build object
+    if (!build || typeof build !== 'object') {
+      throw new Error('Invalid build object: ' + typeof build);
+    }
 
     // Set up Remix request handler
     app.all(
       '*',
       createRequestHandler({
-        build: remixBuild,
+        build: build,
         mode: process.env.NODE_ENV || 'production',
         getLoadContext() {
           return {};
@@ -130,7 +174,18 @@ async function loadRemixBuild(buildPath) {
     return true;
   } catch (error) {
     console.error('❌ Failed to load Remix build:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
     console.error('Stack trace:', error.stack);
+
+    // Additional debugging for module errors
+    if (error.code) {
+      console.error('Error code:', error.code);
+    }
+    if (error.url) {
+      console.error('Error URL:', error.url);
+    }
+
     return false;
   }
 }
