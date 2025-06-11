@@ -12,6 +12,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Log startup information
+console.log('=== Server Starting ===');
+console.log('Node version:', process.version);
+console.log('Current directory:', process.cwd());
+console.log('Environment:', process.env.NODE_ENV || 'production');
+console.log('Port:', process.env.PORT || 5173);
+
 app.use(compression());
 
 // http://expressjs.com/en/advanced/best-practice-security.html#at-a-minimum-disable-x-powered-by-header
@@ -25,13 +32,31 @@ app.use('/build', express.static('build/client', { immutable: true, maxAge: '1y'
 
 app.use(morgan('tiny'));
 
-// Add a simple health check route for Railway
+// Add a simple health check route for Railway - this runs before Remix is loaded
 app.get('/health', (req, res) => {
-  res.json({ 
+  console.log('Health check requested');
+  res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    server: 'express'
+    server: 'express',
+    node_version: process.version,
+    uptime: process.uptime()
   });
+});
+
+// Add a root health check as fallback
+app.get('/', (req, res, next) => {
+  // Only handle if it's exactly the root path and no Remix build is loaded yet
+  if (req.path === '/' && !app.locals.remixLoaded) {
+    console.log('Root health check (Remix not loaded yet)');
+    res.json({
+      status: 'starting',
+      message: 'Server is starting, Remix app not loaded yet',
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    next();
+  }
 });
 
 async function startServer() {
@@ -51,7 +76,7 @@ async function startServer() {
 
   if (!fs.existsSync(serverBuildPath)) {
     console.error('Server build not found:', serverBuildPath);
-    
+
     // Check if server directory exists
     const serverDir = path.join(BUILD_DIR, 'server');
     if (fs.existsSync(serverDir)) {
@@ -59,14 +84,14 @@ async function startServer() {
     } else {
       console.log('Server directory does not exist');
     }
-    
+
     // Try alternative build locations
     const alternatives = [
       path.join(BUILD_DIR, 'index.js'),
       path.join(BUILD_DIR, 'server.js'),
       path.join(BUILD_DIR, 'server/server.js')
     ];
-    
+
     console.log('Checking alternative build locations...');
     for (const altPath of alternatives) {
       if (fs.existsSync(altPath)) {
@@ -74,7 +99,7 @@ async function startServer() {
         break;
       }
     }
-    
+
     process.exit(1);
   }
 
@@ -91,6 +116,9 @@ async function startServer() {
     console.error('Error details:', error.stack);
     process.exit(1);
   }
+
+  // Mark that Remix is loaded
+  app.locals.remixLoaded = true;
 
   app.all(
     '*',
