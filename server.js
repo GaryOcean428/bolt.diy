@@ -1,10 +1,10 @@
-import express from 'express';
-import compression from 'compression';
-import morgan from 'morgan';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createRequestHandler } from '@remix-run/express';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import compression from 'compression';
+import express from 'express';
+import morgan from 'morgan';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -40,7 +40,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     server: 'express',
     node_version: process.version,
-    uptime: process.uptime()
+    uptime: process.uptime(),
   });
 });
 
@@ -52,7 +52,7 @@ app.get('/', (req, res, next) => {
     res.json({
       status: 'starting',
       message: 'Server is starting, Remix app not loaded yet',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } else {
     next();
@@ -79,6 +79,7 @@ async function startServer() {
 
     // Check if server directory exists
     const serverDir = path.join(BUILD_DIR, 'server');
+
     if (fs.existsSync(serverDir)) {
       console.log('Server directory contents:', fs.readdirSync(serverDir));
     } else {
@@ -89,10 +90,11 @@ async function startServer() {
     const alternatives = [
       path.join(BUILD_DIR, 'index.js'),
       path.join(BUILD_DIR, 'server.js'),
-      path.join(BUILD_DIR, 'server/server.js')
+      path.join(BUILD_DIR, 'server/server.js'),
     ];
 
     console.log('Checking alternative build locations...');
+
     for (const altPath of alternatives) {
       if (fs.existsSync(altPath)) {
         console.log('Found alternative build at:', altPath);
@@ -108,6 +110,7 @@ async function startServer() {
 
   try {
     console.log('Loading Remix build from:', serverBuildPath);
+
     // Convert to file:// URL for ES module import
     const buildUrl = new URL(`file://${serverBuildPath}`).href;
     remixBuild = await import(buildUrl);
@@ -127,7 +130,7 @@ async function startServer() {
           // Return what you need to access in your route loaders
           return {};
         },
-      })
+      }),
     );
   } catch (error) {
     console.error('Failed to load Remix build:', error.message);
@@ -141,7 +144,7 @@ async function startServer() {
         message: 'Application is initializing. Please try again in a moment.',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined,
         health_check_url: '/health',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -152,7 +155,7 @@ async function startServer() {
         path: req.path,
         method: req.method,
         health_check_url: '/health',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
   }
@@ -164,16 +167,18 @@ async function startServer() {
   console.log('Environment:', {
     NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
-    PWD: process.cwd()
+    PWD: process.cwd(),
   });
 
-  const server = app.listen(port, host, () => {
-    console.log(`✅ Express server listening on http://${host}:${port}`);
-    console.log(`🏥 Health check available at: http://${host}:${port}/health`);
-  }).on('error', (err) => {
-    console.error('❌ Server failed to start:', err);
-    process.exit(1);
-  });
+  const server = app
+    .listen(port, host, () => {
+      console.log(`✅ Express server listening on http://${host}:${port}`);
+      console.log(`🏥 Health check available at: http://${host}:${port}/health`);
+    })
+    .on('error', (err) => {
+      console.error('❌ Server failed to start:', err);
+      process.exit(1);
+    });
 
   // Handle graceful shutdown
   process.on('SIGTERM', () => {

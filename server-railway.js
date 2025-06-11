@@ -1,10 +1,10 @@
-import express from 'express';
-import compression from 'compression';
-import morgan from 'morgan';
-import { createRequestHandler } from '@remix-run/express';
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequestHandler } from '@remix-run/express';
+import compression from 'compression';
+import express from 'express';
+import morgan from 'morgan';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -18,13 +18,18 @@ console.log('Node version:', process.version);
 console.log('Current directory:', process.cwd());
 console.log('Environment:', process.env.NODE_ENV || 'production');
 console.log('Port:', process.env.PORT || 5173);
-console.log('Available environment variables:', Object.keys(process.env).filter(key => !key.includes('SECRET') && !key.includes('PASSWORD')));
+console.log(
+  'Available environment variables:',
+  Object.keys(process.env).filter((key) => !key.includes('SECRET') && !key.includes('PASSWORD')),
+);
 
 app.use(compression());
 app.disable('x-powered-by');
 
-// IMPORTANT: Set up health check BEFORE any other middleware
-// This ensures it always works, even if other parts fail
+/*
+ * IMPORTANT: Set up health check BEFORE any other middleware
+ * This ensures it always works, even if other parts fail
+ */
 app.get('/health', (req, res) => {
   console.log(`[${new Date().toISOString()}] Health check requested from ${req.ip}`);
   res.status(200).json({
@@ -62,6 +67,7 @@ async function setupRemixHandler() {
   if (!fs.existsSync(BUILD_DIR)) {
     console.error('❌ Build directory not found:', BUILD_DIR);
     console.error('Make sure to run "pnpm run build" before starting the server');
+
     return false;
   }
 
@@ -72,6 +78,7 @@ async function setupRemixHandler() {
     console.log('📦 Build directory contents:', buildContents);
 
     const serverDir = path.join(BUILD_DIR, 'server');
+
     if (fs.existsSync(serverDir)) {
       const serverContents = fs.readdirSync(serverDir);
       console.log('📦 Server directory contents:', serverContents);
@@ -87,10 +94,7 @@ async function setupRemixHandler() {
     console.error('❌ Server build not found at expected location');
 
     // Try alternative locations
-    const alternatives = [
-      path.join(BUILD_DIR, 'index.js'),
-      path.join(BUILD_DIR, 'server.js'),
-    ];
+    const alternatives = [path.join(BUILD_DIR, 'index.js'), path.join(BUILD_DIR, 'server.js')];
 
     for (const altPath of alternatives) {
       if (fs.existsSync(altPath)) {
@@ -100,6 +104,7 @@ async function setupRemixHandler() {
     }
 
     console.error('❌ Could not find Remix server build in any expected location');
+
     return false;
   }
 
@@ -117,7 +122,7 @@ async function loadRemixBuild(buildPath) {
       isFile: stats.isFile(),
       mode: stats.mode.toString(8),
       created: stats.birthtime,
-      modified: stats.mtime
+      modified: stats.mtime,
     });
 
     // Read first few bytes to check file content
@@ -163,12 +168,12 @@ async function loadRemixBuild(buildPath) {
     app.all(
       '*',
       createRequestHandler({
-        build: build,
+        build,
         mode: process.env.NODE_ENV || 'production',
         getLoadContext() {
           return {};
         },
-      })
+      }),
     );
 
     return true;
@@ -182,6 +187,7 @@ async function loadRemixBuild(buildPath) {
     if (error.code) {
       console.error('Error code:', error.code);
     }
+
     if (error.url) {
       console.error('Error URL:', error.url);
     }
@@ -213,19 +219,21 @@ async function startServer() {
 
   console.log(`🚀 Starting server on ${host}:${port}...`);
 
-  const server = app.listen(port, host, () => {
-    console.log(`✅ Express server listening on http://${host}:${port}`);
-    console.log(`🏥 Health check available at: http://${host}:${port}/health`);
-    console.log(`📊 Server status:`, {
-      remix_loaded: remixLoaded,
-      node_env: process.env.NODE_ENV,
-      port: port,
-      pid: process.pid,
+  const server = app
+    .listen(port, host, () => {
+      console.log(`✅ Express server listening on http://${host}:${port}`);
+      console.log(`🏥 Health check available at: http://${host}:${port}/health`);
+      console.log(`📊 Server status:`, {
+        remix_loaded: remixLoaded,
+        node_env: process.env.NODE_ENV,
+        port,
+        pid: process.pid,
+      });
+    })
+    .on('error', (err) => {
+      console.error('❌ Server failed to start:', err);
+      process.exit(1);
     });
-  }).on('error', (err) => {
-    console.error('❌ Server failed to start:', err);
-    process.exit(1);
-  });
 
   // Handle graceful shutdown
   const shutdown = (signal) => {

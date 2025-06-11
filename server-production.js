@@ -1,10 +1,10 @@
-import express from 'express';
-import compression from 'compression';
-import morgan from 'morgan';
-import { createRequestHandler } from '@remix-run/express';
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequestHandler } from '@remix-run/express';
+import compression from 'compression';
+import express from 'express';
+import morgan from 'morgan';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -73,9 +73,11 @@ async function startServer() {
     if (!fs.existsSync(serverBuildPath)) {
       // Check server directory
       const serverDir = path.join(BUILD_DIR, 'server');
+
       if (fs.existsSync(serverDir)) {
         console.log('📦 Server directory contents:', fs.readdirSync(serverDir));
       }
+
       throw new Error(`Server build not found: ${serverBuildPath}`);
     }
 
@@ -97,12 +99,11 @@ async function startServer() {
         getLoadContext() {
           return {};
         },
-      })
+      }),
     );
 
     remixLoaded = true;
     console.log('✅ Remix handler installed');
-
   } catch (error) {
     console.error('⚠️ Remix build load failed:', error.message);
     console.error('Stack:', error.stack);
@@ -135,23 +136,25 @@ async function startServer() {
 
   console.log(`🚀 Starting server on ${host}:${port}...`);
 
-  const server = app.listen(port, host, () => {
-    console.log(`✅ Express server listening on http://${host}:${port}`);
-    console.log(`🏥 Health check available at: http://${host}:${port}/health`);
-    console.log(`📊 Server status:`, {
-      remix_loaded: remixLoaded,
-      node_env: process.env.NODE_ENV || 'production',
-      port: port,
-      pid: process.pid,
-    });
+  const server = app
+    .listen(port, host, () => {
+      console.log(`✅ Express server listening on http://${host}:${port}`);
+      console.log(`🏥 Health check available at: http://${host}:${port}/health`);
+      console.log(`📊 Server status:`, {
+        remix_loaded: remixLoaded,
+        node_env: process.env.NODE_ENV || 'production',
+        port,
+        pid: process.pid,
+      });
 
-    if (!remixLoaded) {
-      console.warn('⚠️ Server running without Remix app - only health check is functional');
-    }
-  }).on('error', (err) => {
-    console.error('❌ Server failed to start:', err);
-    process.exit(1);
-  });
+      if (!remixLoaded) {
+        console.warn('⚠️ Server running without Remix app - only health check is functional');
+      }
+    })
+    .on('error', (err) => {
+      console.error('❌ Server failed to start:', err);
+      process.exit(1);
+    });
 
   // Handle graceful shutdown
   const shutdown = (signal) => {

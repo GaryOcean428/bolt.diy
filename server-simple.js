@@ -14,8 +14,8 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    port: port,
-    node_version: process.version
+    port,
+    node_version: process.version,
   });
 });
 
@@ -23,18 +23,20 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     message: 'Simple server is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
 // Start server
-app.listen(port, host, () => {
-  console.log(`Server listening on http://${host}:${port}`);
-  console.log(`Health check: http://${host}:${port}/health`);
-}).on('error', (err) => {
-  console.error('Server failed to start:', err);
-  process.exit(1);
-});
+app
+  .listen(port, host, () => {
+    console.log(`Server listening on http://${host}:${port}`);
+    console.log(`Health check: http://${host}:${port}/health`);
+  })
+  .on('error', (err) => {
+    console.error('Server failed to start:', err);
+    process.exit(1);
+  });
 
 // Handle shutdown
 process.on('SIGTERM', () => {
