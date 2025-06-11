@@ -31,63 +31,62 @@ export default async function handleRequest(
 
     return new Promise((resolve, reject) => {
       let shellRendered = false;
-      const { pipe, abort } = renderToPipeableStream(
-        <RemixServer context={remixContext} url={request.url} />,
-        {
-          onShellReady() {
-            shellRendered = true;
-            const body = new PassThrough();
+      const { pipe, abort } = renderToPipeableStream(<RemixServer context={remixContext} url={request.url} />, {
+        onShellReady() {
+          shellRendered = true;
 
-            responseHeaders.set('Content-Type', 'text/html');
-            responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
-            responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
+          const body = new PassThrough();
 
-            // Create a web standards Response
-            const stream = new ReadableStream({
-              start(controller) {
-                // Write the initial HTML
-                const encoder = new TextEncoder();
-                controller.enqueue(
-                  encoder.encode(
-                    `<!DOCTYPE html><html lang="en" data-theme="${themeStore.value}"><head>${head}</head><body><div id="root" class="w-full h-full">`
-                  )
-                );
+          responseHeaders.set('Content-Type', 'text/html');
+          responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
+          responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
 
-                body.on('data', (chunk) => {
-                  controller.enqueue(new Uint8Array(chunk));
-                });
+          // Create a web standards Response
+          const stream = new ReadableStream({
+            start(controller) {
+              // Write the initial HTML
+              const encoder = new TextEncoder();
+              controller.enqueue(
+                encoder.encode(
+                  `<!DOCTYPE html><html lang="en" data-theme="${themeStore.value}"><head>${head}</head><body><div id="root" class="w-full h-full">`,
+                ),
+              );
 
-                body.on('end', () => {
-                  controller.enqueue(encoder.encode('</div></body></html>'));
-                  controller.close();
-                });
+              body.on('data', (chunk) => {
+                controller.enqueue(new Uint8Array(chunk));
+              });
 
-                body.on('error', (error) => {
-                  controller.error(error);
-                });
+              body.on('end', () => {
+                controller.enqueue(encoder.encode('</div></body></html>'));
+                controller.close();
+              });
 
-                pipe(body);
-              },
-            });
+              body.on('error', (error) => {
+                controller.error(error);
+              });
 
-            resolve(
-              new Response(stream, {
-                headers: responseHeaders,
-                status: responseStatusCode,
-              })
-            );
-          },
-          onShellError(error: unknown) {
-            reject(error);
-          },
-          onError(error: unknown) {
-            responseStatusCode = 500;
-            if (shellRendered) {
-              console.error(error);
-            }
-          },
-        }
-      );
+              pipe(body);
+            },
+          });
+
+          resolve(
+            new Response(stream, {
+              headers: responseHeaders,
+              status: responseStatusCode,
+            }),
+          );
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          responseStatusCode = 500;
+
+          if (shellRendered) {
+            console.error(error);
+          }
+        },
+      });
 
       setTimeout(abort, ABORT_DELAY);
     });
@@ -95,25 +94,22 @@ export default async function handleRequest(
     // For Web Streams runtime (Cloudflare Workers)
     const { renderToReadableStream } = await import('react-dom/server');
 
-    const readable = await renderToReadableStream(
-      <RemixServer context={remixContext} url={request.url} />,
-      {
-        signal: request.signal,
-        onError(error: unknown) {
-          console.error(error);
-          responseStatusCode = 500;
-        },
-      }
-    );
+    const readable = await renderToReadableStream(<RemixServer context={remixContext} url={request.url} />, {
+      signal: request.signal,
+      onError(error: unknown) {
+        console.error(error);
+        responseStatusCode = 500;
+      },
+    });
 
     const body = new ReadableStream({
       start(controller) {
         controller.enqueue(
           new Uint8Array(
             new TextEncoder().encode(
-              `<!DOCTYPE html><html lang="en" data-theme="${themeStore.value}"><head>${head}</head><body><div id="root" class="w-full h-full">`
-            )
-          )
+              `<!DOCTYPE html><html lang="en" data-theme="${themeStore.value}"><head>${head}</head><body><div id="root" class="w-full h-full">`,
+            ),
+          ),
         );
 
         const reader = readable.getReader();
@@ -125,6 +121,7 @@ export default async function handleRequest(
               if (done) {
                 controller.enqueue(new Uint8Array(new TextEncoder().encode('</div></body></html>')));
                 controller.close();
+
                 return;
               }
 

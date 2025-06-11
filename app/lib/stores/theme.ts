@@ -14,12 +14,14 @@ export const DEFAULT_THEME = 'light';
 export const themeStore = atom<Theme>(DEFAULT_THEME);
 
 function initClientTheme() {
-  if (import.meta.env.SSR) return;
-  
+  if (import.meta.env.SSR) {
+    return;
+  }
+
   const persistedTheme = localStorage.getItem(kTheme) as Theme | undefined;
   const themeAttribute = document.querySelector('html')?.getAttribute('data-theme');
   const clientTheme = persistedTheme ?? (themeAttribute as Theme) ?? DEFAULT_THEME;
-  
+
   if (clientTheme !== themeStore.get()) {
     themeStore.set(clientTheme);
   }
