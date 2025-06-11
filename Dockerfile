@@ -33,7 +33,7 @@ RUN mkdir -p /root/.config/.wrangler && \
 # Create empty .env.local to prevent bindings.sh from failing
 RUN touch .env.local
 
-RUN pnpm run build
+RUN pnpm run build -- --config vite.config.node.ts
 
 CMD [ "pnpm", "run", "server:production"]
 
