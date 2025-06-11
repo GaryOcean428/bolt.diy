@@ -28,6 +28,11 @@ export default defineConfig((config) => {
       __APP_VERSION: JSON.stringify(process.env.npm_package_version),
       // 'process.env': JSON.stringify(process.env)
     },
+    resolve: {
+      alias: {
+        'react-dom/server': '/app/lib/react-dom-server-wrapper.js',
+      },
+    },
     build: {
       target: 'esnext',
     },
