@@ -84,6 +84,14 @@ If you are getting this, you are probably on Windows. The fix is generally to up
 
 ### **"Miniflare or Wrangler errors in Windows"**
 You will need to make sure you have the latest version of Visual Studio C++ installed (14.40.33816), more information here https://github.com/stackblitz-labs/bolt.diy/issues/19.
+
+### **"A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received"**
+This error is **not caused by bolt.diy** but by browser extensions or external scripts interfering with web page communication. To resolve this:
+- Disable browser extensions and try again
+- Test in a clean browser profile (e.g., Chrome Canary with no extensions)
+- Use an incognito/private browsing window
+
+This is not a security risk from bolt.diy, but these extensions may affect your experience with the application.
 </details>
 
 ---
