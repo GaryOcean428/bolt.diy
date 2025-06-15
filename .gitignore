@@ -28,6 +28,8 @@ dist-ssr
 /.cache
 /build
 .env.local
+package-lock.json
+tsconfig.tsbuildinfo
 .env
 .dev.vars
 *.vars
