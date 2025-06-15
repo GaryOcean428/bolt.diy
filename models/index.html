@@ -1,0 +1,940 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../FAQ/">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Models - bolt.diy Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#consolidated-models-document-complete-table" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="bolt.diy Docs" class="md-header__button md-logo" aria-label="bolt.diy Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            bolt.diy Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/GaryOcean428/cozy-remix-garden" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cozy-remix-garden
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Welcome to bolt diy
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CONTRIBUTING/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contribution Guidelines
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../FAQ/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Frequently Asked Questions (FAQ)
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Models
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="bolt.diy Docs" class="md-nav__button md-logo" aria-label="bolt.diy Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    bolt.diy Docs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/GaryOcean428/cozy-remix-garden" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    cozy-remix-garden
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Welcome to bolt diy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contribution Guidelines
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Frequently Asked Questions (FAQ)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#consolidated-models-document-complete-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      Consolidated Models Document (Complete Table)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consolidated Models Document (Complete Table)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-allowed-models-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Allowed Models Only
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-local-model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Local Model Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-model-installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Model Installation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-capabilities-granite-31-dense-2b" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Capabilities (Granite 3.1 Dense 2B)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-model-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Model Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-additional-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Additional Information
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-key-differences-claude-35-sonnet-vs-claude-35-haiku" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Key Differences: Claude 3.5 Sonnet vs. Claude 3.5 Haiku
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Best Practices
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-implementation-snippet" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Implementation Snippet
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-final-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Final Notes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Models</h1>
+
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;thoughts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="s2">&quot;We will present a unified table with all columns: Name, API Model Name, Provider, Parameters, Context Window, Max Output, Release Date, Key Strengths, Model Card Link, and Docs Link.&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="s2">&quot;We’ll keep Granite 3.1 Dense 2B as the local default model, but also preserve the details of all listed models.&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nt">&quot;tool_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;no_tool_used&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="nt">&quot;tool_args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="nt">&quot;next_steps&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="s2">&quot;Provide a final consolidated models.md with the updated table&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="s2">&quot;Ensure we keep the local model configuration referencing Granite 3.1 Dense 2B&quot;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="p">],</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nt">&quot;additional_info&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="nt">&quot;explanations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">      </span><span class="s2">&quot;This includes the newly provided Qwen2.5-Coder-32B-Instruct and llama3-groq-70b-8192-tool-use-preview models&quot;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="p">],</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="nt">&quot;resources&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">      </span><span class="s2">&quot;https://docs.x.ai/docs/overview&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">      </span><span class="s2">&quot;https://platform.openai.com/docs/models#current-model-aliases&quot;</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">    </span><span class="p">]</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="consolidated-models-document-complete-table"><strong>Consolidated Models Document (Complete Table)</strong><a class="headerlink" href="#consolidated-models-document-complete-table" title="Permanent link">&para;</a></h2>
+<p>Below is the updated <code>models.md</code> with the new table of models (including Qwen2.5-Coder-32B-Instruct and llama3-groq-70b-8192-tool-use-preview). <strong>Granite 3.1 Dense 2B</strong> remains the default local model.</p>
+<hr />
+<h3 id="1-allowed-models-only"><strong>1. Allowed Models Only</strong><a class="headerlink" href="#1-allowed-models-only" title="Permanent link">&para;</a></h3>
+<p>Use the table below to reference the <strong>exact</strong> naming conventions, parameters, context limits, release date, and key strengths. <strong>Any other models or older versions are disallowed</strong>.</p>
+<p>Name API Model Name Provider Parameters Context Window Max Output Release Date Key Strengths Model Card Link Docs Link
+Granite 3.1 Dense 2B granite3.1-dense:2b IBM/Ollama 2.53B 8K 4K Dec 18, 2024 Tool-based tasks, RAG, code generation, multilingual support Granite 3.1 Dense 2B | <a href="https://huggingface.co/ibm-granite/granite-3.1-2b-instruct">https://huggingface.co/ibm-granite/granite-3.1-2b-instruct</a> <a href="https://www.ibm.com/granite/docs/">https://www.ibm.com/granite/docs/</a>
+GPT-4o chatgpt-4o-latest OpenAI Not disclosed 128K 16,384 2024-11 Versatile flagship model with text/image input GPT-4o Model Card <a href="https://platform.openai.com/docs/models#current-model-aliases">https://platform.openai.com/docs/models#current-model-aliases</a>
+GPT-4o-mini gpt-4o-mini OpenAI Not disclosed 128K 16,384 2024-07 Fast, affordable for focused tasks GPT-4o-mini Card Models - OpenAI API
+o1 o1 OpenAI Not disclosed 200K 100K 2024-12 Complex reasoning capabilities o1 Model Card <a href="https://platform.openai.com/docs/models#current-model-aliases">https://platform.openai.com/docs/models#current-model-aliases</a>
+o1-mini o1-mini OpenAI Not disclosed 128K 65,536 2024-09 Fast reasoning for specialized tasks o1-mini Model Card <a href="https://platform.openai.com/docs/models#current-model-aliases">https://platform.openai.com/docs/models#current-model-aliases</a>
+gpt-4o-realtime-preview gpt-4o-realtime-preview OpenAI Not disclosed 128K 4096  These models are capable of responding to audio and text inputs in realtime over WebRTC or a WebSocket interface. <a href="https://platform.openai.com/docs/models#gpt-4o-realtime">https://platform.openai.com/docs/models#gpt-4o-realtime</a> <a href="https://platform.openai.com/docs/quickstart">https://platform.openai.com/docs/quickstart</a>
+Qwen2.5-Coder-32B-Instruct Qwen2.5-Coder-32B-Instruct Qwen 32.5B 32,768 Not specified 2024-11 Strong in math/coding, experimental research <a href="https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct">https://huggingface.co/Qwen/Qwen2.5-Coder-32B-Instruct</a> 
+Llama-3.3-70b-versatile llama-3.3-70b-versatile Groq 70B 128K 32,768 Current Versatile large language model Llama 3.3 Card <a href="https://console.groq.com/docs/models">https://console.groq.com/docs/models</a>
+Claude 3.5 Sonnet claude-3-5-sonnet-latest Anthropic Not disclosed 200K Not specified 2024-04 Most intelligent model, text/image input Claude 3.5 Sonnet <a href="https://docs.anthropic.com/en/docs/about-claude/models">https://docs.anthropic.com/en/docs/about-claude/models</a>
+Claude 3.5 Haiku claude-3-5-haiku-latest Anthropic Not disclosed 200K Not specified 2024-07 Fastest Claude 3.5 model Claude 3.5 Haiku <a href="https://docs.anthropic.com/en/docs/about-claude/models">https://docs.anthropic.com/en/docs/about-claude/models</a>
+Sonar Small llama-3.1-sonar-small-128k-online Perplexity 8B 127,072 Not specified Current Fast online search capabilities Sonar Small <a href="https://docs.perplexity.ai/guides/getting-started">https://docs.perplexity.ai/guides/getting-started</a>
+Sonar Large llama-3.1-sonar-large-128k-online Perplexity 70B 127,072 Not specified Current Advanced reasoning with integrated search Sonar Large <a href="https://docs.perplexity.ai/guides/getting-started">https://docs.perplexity.ai/guides/getting-started</a>
+Sonar Huge llama-3.1-sonar-huge-128k-online Perplexity 405B 127,072 Not specified Current Most powerful search-augmented model Sonar Huge <a href="https://docs.perplexity.ai/guides/getting-started">https://docs.perplexity.ai/guides/getting-started</a>
+grok-beta grok-beta xAI Not disclosed 131,072 Not specified Beta Large context window for text (Beta) Grok Beta <a href="https://docs.x.ai/docs/overview">https://docs.x.ai/docs/overview</a>
+grok-vision-beta grok-vision-beta xAI Not disclosed 8,192 Not specified Beta Image-to-text generation (Beta) Grok Vision Beta <a href="https://docs.x.ai/docs/overview">https://docs.x.ai/docs/overview</a>
+grok-2-latest grok-2-latest xAI Not disclosed 131,072 Not specified Current Large context window for text, updated generation Grok 2-latest <a href="https://docs.x.ai/docs/overview">https://docs.x.ai/docs/overview</a>
+grok-2-vision-1212 grok-2-vision-1212 xAI Not disclosed 32,768 Not specified Current Vision tasks with text output Grok 2-vision-1212 <a href="https://docs.x.ai/docs/overview">https://docs.x.ai/docs/overview</a>
+llama3-groq-70b-8192-tool-use-preview llama3-groq-70b-8192-tool-use-preview groq 70B 8192 Not specified Preview Tool Use <a href="https://huggingface.co/Groq/Llama-3-Groq-70B-Tool-Use">https://huggingface.co/Groq/Llama-3-Groq-70B-Tool-Use</a> <a href="https://console.groq.com/docs/models">https://console.groq.com/docs/models</a></p>
+<hr />
+<h3 id="2-local-model-configuration"><strong>2. Local Model Configuration</strong><a class="headerlink" href="#2-local-model-configuration" title="Permanent link">&para;</a></h3>
+<p>The <strong>default local model</strong> for <strong>development</strong> and <strong>production</strong> is <strong>Granite 3.1 Dense 2B</strong>. This model offers:</p>
+<ul>
+<li>Optimized for tool-based use cases and RAG applications  </li>
+<li>Efficient code generation and debugging capabilities  </li>
+<li>Support for 12 languages including English, German, Spanish, French, Japanese  </li>
+<li>Trained on over 12 trillion tokens of data  </li>
+<li>Apache 2.0 license for commercial use  </li>
+<li>Quantized to Q4_K_M for optimal performance (~1.5GB)  </li>
+<li>Knowledge Cutoff Date: April 2024  </li>
+</ul>
+<hr />
+<h3 id="3-model-installation"><strong>3. Model Installation</strong><a class="headerlink" href="#3-model-installation" title="Permanent link">&para;</a></h3>
+<p>To install this local model:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ollama<span class="w"> </span>run<span class="w"> </span>granite3.1-dense:2b
+</code></pre></div></p>
+<hr />
+<h3 id="4-capabilities-granite-31-dense-2b"><strong>4. Capabilities (Granite 3.1 Dense 2B)</strong><a class="headerlink" href="#4-capabilities-granite-31-dense-2b" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Summarization  </li>
+<li>Text classification  </li>
+<li>Text extraction  </li>
+<li>Question-answering  </li>
+<li>Retrieval Augmented Generation (RAG)  </li>
+<li>Code-related tasks  </li>
+<li>Function-calling tasks  </li>
+<li>Multilingual dialog use cases  </li>
+<li>Long-context tasks (document/meeting summarization, document QA)</li>
+</ul>
+<hr />
+<h3 id="5-model-parameters"><strong>5. Model Parameters</strong><a class="headerlink" href="#5-model-parameters" title="Permanent link">&para;</a></h3>
+<p>Default parameters for optimal performance:
+- <strong>Temperature</strong>: 0.7<br />
+- <strong>Max Tokens</strong>: 4096<br />
+- <strong>Top P</strong>: 0.9<br />
+- <strong>Frequency Penalty</strong>: 0.0<br />
+- <strong>Presence Penalty</strong>: 0.0  </p>
+<hr />
+<h3 id="6-additional-information"><strong>6. Additional Information</strong><a class="headerlink" href="#6-additional-information" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Developer</strong>: IBM Research  </li>
+<li><strong>GitHub</strong>: ibm-granite/granite-language-models  </li>
+<li><strong>Documentation</strong>: Granite Docs  </li>
+<li><strong>License</strong>: Apache 2.0  </li>
+<li><strong>Size</strong>: ~1.5GB (Quantized Q4_K_M)  </li>
+<li><strong>System Context</strong>: Knowledge Cutoff Date: April 2024  </li>
+</ul>
+<hr />
+<h3 id="7-key-differences-claude-35-sonnet-vs-claude-35-haiku"><strong>7. Key Differences: Claude 3.5 Sonnet vs. Claude 3.5 Haiku</strong><a class="headerlink" href="#7-key-differences-claude-35-sonnet-vs-claude-35-haiku" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Claude 3.5 Sonnet</strong>  </li>
+<li>Higher reasoning benchmarks (MMLU, HumanEval)  </li>
+<li>Multimodal features (beta)  </li>
+<li>
+<p>More expensive; excels at complex tasks with better accuracy  </p>
+</li>
+<li>
+<p><strong>Claude 3.5 Haiku</strong>  </p>
+</li>
+<li>Faster inference speed  </li>
+<li>Lower cost per million tokens  </li>
+<li>Excellent for quick prototypes and lighter tasks  </li>
+</ul>
+<hr />
+<h3 id="8-best-practices"><strong>8. Best Practices</strong><a class="headerlink" href="#8-best-practices" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Model Selection</strong>  </li>
+<li>Default to <strong>Granite 3.1 Dense 2B</strong> for local inference  </li>
+<li>Switch to a specialized model only if needed (e.g., GPT-4o for multimodal input)  </li>
+<li>Use <strong>Sonar</strong> series for <strong>search-augmented</strong> tasks  </li>
+<li>
+<p>Consider <strong>Grok</strong> models for large context or image/text tasks as needed  </p>
+</li>
+<li>
+<p><strong>Versioning</strong>  </p>
+</li>
+<li>Use <code>:latest</code> for dev/testing  </li>
+<li>Lock to specific date-stamped versions for production  </li>
+<li>
+<p>Periodically review release notes for updates  </p>
+</li>
+<li>
+<p><strong>Context Window Management</strong>  </p>
+</li>
+<li>Monitor token usage carefully (especially for 128K+ contexts)  </li>
+<li>
+<p>Implement chunking or summarization if input is too large  </p>
+</li>
+<li>
+<p><strong>Fallback &amp; Error Handling</strong>  </p>
+</li>
+<li>Have a fallback model (e.g., <code>llama-3.3-70b-versatile</code>) configured  via api fallback.</li>
+<li>Log errors and fallback triggers  </li>
+<li>
+<p>Use partial streaming for large outputs  </p>
+</li>
+<li>
+<p><strong>Security</strong>  </p>
+</li>
+<li>Strictly validate user inputs  </li>
+<li>Rate-limit API calls  </li>
+<li>Monitor resource usage to avoid denial-of-service  </li>
+</ol>
+<hr />
+<h3 id="9-implementation-snippet"><strong>9. Implementation Snippet</strong><a class="headerlink" href="#9-implementation-snippet" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// Example environment configuration</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// Granite 3.1 Dense 2B as the default local model</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nx">defaultLocalModel</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;granite3.1-dense:2b&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nx">fallbackModel</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;llama-3.3-70b-versatile&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="c1">// Full set of available models</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nx">availableModels</span><span class="o">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="s2">&quot;chatgpt-4o-latest&quot;</span><span class="p">,</span><span class="w">         </span><span class="c1">// GPT-4o</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="s2">&quot;gpt-4o-mini&quot;</span><span class="p">,</span><span class="w">    </span><span class="c1">// GPT-4o-mini</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="s2">&quot;o1&quot;</span><span class="p">,</span><span class="w">             </span><span class="c1">// o1</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="s2">&quot;o1-mini&quot;</span><span class="p">,</span><span class="w">        </span><span class="c1">// o1-mini</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="s2">&quot;Qwen2.5-Coder-32B-Instruct&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="s2">&quot;llama-3.3-70b-versatile&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="s2">&quot;claude-3-5-sonnet-v2@20241022&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="s2">&quot;claude-3-5-haiku@20241022&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="s2">&quot;llama-3.1-sonar-small-128k-online&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="s2">&quot;llama-3.1-sonar-large-128k-online&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="s2">&quot;llama-3.1-sonar-huge-128k-online&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="s2">&quot;grok-beta&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">    </span><span class="s2">&quot;grok-vision-beta&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="s2">&quot;grok-2-latest&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">    </span><span class="s2">&quot;grok-2-vision-1212&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">    </span><span class="s2">&quot;llama3-groq-70b-8192-tool-use-preview&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="s2">&quot;granite3.1-dense:2b&quot;</span><span class="w"> </span><span class="c1">// included for completeness</span>
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">  </span><span class="p">]</span>
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="p">};</span>
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>
+<a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="c1">// Utility to select a model, defaulting to local Granite 3.1 Dense 2B</span>
+<a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="kd">function</span><span class="w"> </span><span class="nx">getModel</span><span class="p">(</span><span class="nx">modelName?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">modelName</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">config</span><span class="p">.</span><span class="nx">availableModels</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">modelName</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">defaultLocalModel</span><span class="p">;</span>
+<a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-2-35" name="__codelineno-2-35" href="#__codelineno-2-35"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">modelName</span><span class="p">;</span>
+<a id="__codelineno-2-36" name="__codelineno-2-36" href="#__codelineno-2-36"></a><span class="p">}</span>
+<a id="__codelineno-2-37" name="__codelineno-2-37" href="#__codelineno-2-37"></a>
+<a id="__codelineno-2-38" name="__codelineno-2-38" href="#__codelineno-2-38"></a><span class="c1">// Usage</span>
+<a id="__codelineno-2-39" name="__codelineno-2-39" href="#__codelineno-2-39"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">generateResponse</span><span class="p">(</span><span class="nx">prompt</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">,</span><span class="w"> </span><span class="nx">chosenModel?</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-40" name="__codelineno-2-40" href="#__codelineno-2-40"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">getModel</span><span class="p">(</span><span class="nx">chosenModel</span><span class="p">);</span>
+<a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="w">  </span><span class="c1">// Implementation details for calling the appropriate endpoint/runtime</span>
+<a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="cm">/* ...call model inference... */</span><span class="p">;</span>
+<a id="__codelineno-2-43" name="__codelineno-2-43" href="#__codelineno-2-43"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h3 id="10-final-notes"><strong>10. Final Notes</strong><a class="headerlink" href="#10-final-notes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Older or unlisted models</strong> are prohibited to avoid confusion or legacy behavior  </li>
+<li>Always <strong>log model usage</strong> for traceability and debugging  </li>
+<li>For specialized tasks not covered by the above list, consult your team lead before adding new models  </li>
+</ul>
+<p><strong>This completes the updated <code>models.md</code> document with the new table and Granite 3.1 Dense 2B as the default local model.</strong></p>
+<p>Gemini Developer API
+Get a Gemini API Key
+Get a Gemini API key and make your first API request in minutes.</p>
+<p>https://ai.google.dev/gemini-api/docs/models/gemini#gemini-2.0-flash</p>
+<p>const { GoogleGenerativeAI } = require("@google/generative-ai");</p>
+<p>const genAI = new GoogleGenerativeAI("YOUR_API_KEY");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });</p>
+<p>const prompt = "Explain how AI works";</p>
+<p>const result = await model.generateContent(prompt);
+console.log(result.response.text());</p>
+<p>Model details
+Property    Description
+Model code  models/gemini-2.0-flash-exp
+Supported data types
+Inputs</p>
+<p>Audio, images, video, and text</p>
+<p>Output</p>
+<p>Audio (coming soon), images (coming soon), and text</p>
+<p>Token limits[*]
+Input token limit</p>
+<p>1,048,576</p>
+<p>Output token limit</p>
+<p>8,192</p>
+<p>Rate limits[**]
+10 RPM
+4 million TPM
+1,500 RPD
+Capabilities
+Structured outputs</p>
+<p>Supported</p>
+<p>Caching</p>
+<p>Not supported</p>
+<p>Tuning</p>
+<p>Not supported</p>
+<p>Function calling</p>
+<p>Supported</p>
+<p>Code execution</p>
+<p>Supported</p>
+<p>Search</p>
+<p>Supported</p>
+<p>Image generation</p>
+<p>Supported</p>
+<p>Native tool use</p>
+<p>Supported</p>
+<p>Audio generation</p>
+<p>Supported</p>
+<p>Multimodal Live API</p>
+<p>Supported</p>
+<p>Versions  <br />
+Read the model version patterns for more details.
+Latest: gemini-2.0-flash-exp
+Latest update   December 2024
+Knowledge cutoff    August 2024</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/stackblitz-labs/bolt.diy" target="_blank" rel="noopener" title="bolt.diy" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://thinktank.ottomator.ai/" target="_blank" rel="noopener" title="bolt.diy Discourse" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M225.9 32C103.3 32 0 130.5 0 252.1 0 256 .1 480 .1 480l225.8-.2c122.7 0 222.1-102.3 222.1-223.9S348.6 32 225.9 32M224 384c-19.4 0-37.9-4.3-54.4-12.1L88.5 392l22.9-75c-9.8-18.1-15.4-38.9-15.4-61 0-70.7 57.3-128 128-128s128 57.3 128 128-57.3 128-128 128"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://x.com/bolt_diy" target="_blank" rel="noopener" title="bolt.diy on X" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8l164.9-188.5L26.8 48h145.6l100.5 132.9zm-24.8 373.8h39.1L151.1 88h-42z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://bsky.app/profile/bolt.diy" target="_blank" rel="noopener" title="bolt.diy on Bluesky" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M111.8 62.2C170.2 105.9 233 194.7 256 242.4c23-47.6 85.8-136.4 144.2-180.2 42.1-31.6 110.3-56 110.3 21.8 0 15.5-8.9 130.5-14.1 149.2-18.2 64.8-84.4 81.4-143.3 71.3C456 322 482.2 380 425.6 438c-107.4 110.2-154.3-27.6-166.3-62.9-1.7-4.9-2.6-7.8-3.3-7.8s-1.6 3-3.3 7.8c-12 35.3-59 173.1-166.3 62.9-56.5-58-30.4-116 72.5-133.5C100 314.6 33.8 298 15.7 233.1 10.4 214.4 1.5 99.4 1.5 83.9c0-77.8 68.2-53.4 110.3-21.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "toc.follow", "toc.integrate", "navigation.top", "search.suggest", "search.highlight", "content.tabs.link", "content.code.annotation", "content.code.copy"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>
