@@ -20,6 +20,7 @@ const getGitHash = () => {
 
 export default defineConfig((config) => {
   return {
+    base: '/build/',
     define: {
       __COMMIT_HASH: JSON.stringify(getGitHash()),
       __APP_VERSION: JSON.stringify(process.env.npm_package_version),
@@ -49,6 +50,7 @@ export default defineConfig((config) => {
       remixVitePlugin({
         serverBuildFile: 'index.js',
         buildDirectory: 'build',
+        publicPath: '/build/',
         future: {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,
