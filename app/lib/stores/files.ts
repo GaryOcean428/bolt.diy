@@ -58,8 +58,26 @@ export class FilesStore {
       import.meta.hot.data.modifiedFiles = this.#modifiedFiles;
     }
 
-    this.#init();
+    // Only start initialization if not in SSR context
+    if (!import.meta.env.SSR) {
+      this.#init();
+    }
   }
+
+  // Method to manually start initialization (useful for client-side mounting)
+  startWatching() {
+    if (!import.meta.env.SSR) {
+      // Add a small delay to ensure the webcontainer is ready
+      setTimeout(() => this.#init(), 500);
+    }
+  }
+
+  // Method to check if file watching is active
+  isWatching() {
+    return this.#watchingActive;
+  }
+
+  #watchingActive = false;
 
   getFile(filePath: string) {
     const dirent = this.files.get()[filePath];
@@ -116,14 +134,23 @@ export class FilesStore {
     try {
       const webcontainer = await this.#webcontainer;
 
+      // Validate webcontainer and workdir
+      if (!webcontainer || !webcontainer.workdir) {
+        logger.warn('WebContainer or workdir not available, will retry file watching later');
+        setTimeout(() => this.#init(), 1000);
+
+        return;
+      }
+
       // Use webcontainer.workdir instead of WORK_DIR to ensure we're watching the correct directory
       const watchDir = `${webcontainer.workdir}/**`;
 
       // Check if the work directory exists before setting up file watching
       try {
         await webcontainer.fs.readdir('.');
-      } catch {
+      } catch (dirError) {
         logger.info('Work directory not yet available, will retry file watching later');
+        logger.debug('Directory check error:', dirError);
 
         // Retry after a short delay
         setTimeout(() => this.#init(), 1000);
@@ -133,12 +160,23 @@ export class FilesStore {
 
       logger.info('Setting up file watcher for:', watchDir);
 
-      webcontainer.internal.watchPaths(
-        { include: [watchDir], exclude: ['**/node_modules', '.git'], includeContent: true },
-        bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
-      );
+      try {
+        webcontainer.internal.watchPaths(
+          { include: [watchDir], exclude: ['**/node_modules', '.git'], includeContent: true },
+          bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
+        );
+        this.#watchingActive = true;
+        logger.info('File watcher initialized successfully');
+      } catch (watchError) {
+        logger.error('Failed to setup file watcher:', watchError);
+        this.#watchingActive = false;
+
+        // Don't retry immediately if watchPaths fails - it might be a permanent issue
+        setTimeout(() => this.#init(), 5000);
+      }
     } catch (error) {
       logger.error('Failed to initialize file watching:', error);
+      this.#watchingActive = false;
 
       // Retry after a delay if initialization fails
       setTimeout(() => this.#init(), 2000);
