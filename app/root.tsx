@@ -67,8 +67,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    if (!import.meta.env.SSR) {
-      document.querySelector('html')?.setAttribute('data-theme', theme);
+    if (!import.meta.env.SSR && typeof document !== 'undefined') {
+      const htmlElement = document.querySelector('html');
+
+      if (htmlElement) {
+        htmlElement.setAttribute('data-theme', theme);
+      }
     }
   }, [theme]);
 
@@ -86,8 +90,12 @@ export function ErrorBoundary() {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    if (!import.meta.env.SSR) {
-      document.querySelector('html')?.setAttribute('data-theme', theme);
+    if (!import.meta.env.SSR && typeof document !== 'undefined') {
+      const htmlElement = document.querySelector('html');
+
+      if (htmlElement) {
+        htmlElement.setAttribute('data-theme', theme);
+      }
     }
   }, [theme]);
 
@@ -100,9 +108,28 @@ export function ErrorBoundary() {
   } else if (error instanceof Error) {
     errorMessage = 'Application Error';
     errorDetails = error.message;
+
+    // Log the full error for debugging but don't expose it to users in production
+    if (import.meta.env.DEV) {
+      console.error('Root Error Boundary (DEV):', error);
+    } else {
+      // In production, log only basic info
+      console.error('Root Error Boundary:', errorMessage);
+    }
+  } else {
+    // Handle unexpected error types
+    console.error('Root Error Boundary: Unknown error type', error);
   }
 
-  console.error('Root Error Boundary:', error);
+  const handleReload = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+    } catch (e) {
+      console.error('Failed to reload page:', e);
+    }
+  };
 
   return (
     <html data-theme={theme}>
@@ -118,7 +145,7 @@ export function ErrorBoundary() {
             <h1 className="text-2xl font-bold mb-2">{errorMessage}</h1>
             <p className="text-bolt-elements-textSecondary mb-6">{errorDetails}</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleReload}
               className="bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text px-4 py-2 rounded"
             >
               Reload Page
@@ -135,7 +162,7 @@ export default function App() {
   const theme = useStore(themeStore);
 
   useEffect(() => {
-    if (!import.meta.env.SSR) {
+    if (!import.meta.env.SSR && typeof window !== 'undefined' && typeof navigator !== 'undefined') {
       logStore.logSystem('Application initialized', {
         theme,
         platform: navigator.platform,

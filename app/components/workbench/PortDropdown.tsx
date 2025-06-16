@@ -46,14 +46,16 @@ export const PortDropdown = memo(
         }
       };
 
-      if (isDropdownOpen) {
+      if (isDropdownOpen && typeof window !== 'undefined') {
         window.addEventListener('mousedown', handleClickOutside);
-      } else {
+      } else if (typeof window !== 'undefined') {
         window.removeEventListener('mousedown', handleClickOutside);
       }
 
       return () => {
-        window.removeEventListener('mousedown', handleClickOutside);
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('mousedown', handleClickOutside);
+        }
       };
     }, [isDropdownOpen]);
 
