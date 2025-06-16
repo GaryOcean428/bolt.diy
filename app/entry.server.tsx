@@ -7,8 +7,10 @@ import { Head } from './root';
 // import { LLMManager } from '~/lib/modules/llm/manager';
 import { themeStore } from '~/lib/stores/theme';
 
-// Dynamically import based on runtime environment
-const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+// Force Node.js rendering for Railway deployment
+// The build process polyfills some globals which can interfere with runtime detection
+// Since Railway is always Node.js, we can safely force the Node.js path
+const isNode = true;
 
 export default async function handleRequest(
   request: Request,
