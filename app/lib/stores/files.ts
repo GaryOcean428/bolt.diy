@@ -4,7 +4,6 @@ import type { PathWatcherEvent, WebContainer } from '@webcontainer/api';
 import { getEncoding } from 'istextorbinary';
 import { map, type MapStore } from 'nanostores';
 import { bufferWatchEvents } from '~/utils/buffer';
-import { WORK_DIR } from '~/utils/constants';
 import { computeFileModifications } from '~/utils/diff';
 import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
@@ -114,72 +113,106 @@ export class FilesStore {
   }
 
   async #init() {
-    const webcontainer = await this.#webcontainer;
+    try {
+      const webcontainer = await this.#webcontainer;
 
-    webcontainer.internal.watchPaths(
-      { include: [`${WORK_DIR}/**`], exclude: ['**/node_modules', '.git'], includeContent: true },
-      bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
-    );
+      // Use webcontainer.workdir instead of WORK_DIR to ensure we're watching the correct directory
+      const watchDir = `${webcontainer.workdir}/**`;
+
+      // Check if the work directory exists before setting up file watching
+      try {
+        await webcontainer.fs.readdir('.');
+      } catch {
+        logger.info('Work directory not yet available, will retry file watching later');
+
+        // Retry after a short delay
+        setTimeout(() => this.#init(), 1000);
+
+        return;
+      }
+
+      logger.info('Setting up file watcher for:', watchDir);
+
+      webcontainer.internal.watchPaths(
+        { include: [watchDir], exclude: ['**/node_modules', '.git'], includeContent: true },
+        bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
+      );
+    } catch (error) {
+      logger.error('Failed to initialize file watching:', error);
+
+      // Retry after a delay if initialization fails
+      setTimeout(() => this.#init(), 2000);
+    }
   }
 
   #processEventBuffer(events: Array<[events: PathWatcherEvent[]]>) {
-    const watchEvents = events.flat(2);
+    try {
+      const watchEvents = events.flat(2);
 
-    for (const { type, path, buffer } of watchEvents) {
-      // remove any trailing slashes
-      const sanitizedPath = path.replace(/\/+$/g, '');
+      for (const { type, path, buffer } of watchEvents) {
+        try {
+          // remove any trailing slashes
+          const sanitizedPath = path.replace(/\/+$/g, '');
 
-      switch (type) {
-        case 'add_dir': {
-          // we intentionally add a trailing slash so we can distinguish files from folders in the file tree
-          this.files.setKey(sanitizedPath, { type: 'folder' });
-          break;
-        }
-        case 'remove_dir': {
-          this.files.setKey(sanitizedPath, undefined);
+          switch (type) {
+            case 'add_dir': {
+              // we intentionally add a trailing slash so we can distinguish files from folders in the file tree
+              this.files.setKey(sanitizedPath, { type: 'folder' });
+              break;
+            }
+            case 'remove_dir': {
+              this.files.setKey(sanitizedPath, undefined);
 
-          for (const [direntPath] of Object.entries(this.files)) {
-            if (direntPath.startsWith(sanitizedPath)) {
-              this.files.setKey(direntPath, undefined);
+              for (const [direntPath] of Object.entries(this.files)) {
+                if (direntPath.startsWith(sanitizedPath)) {
+                  this.files.setKey(direntPath, undefined);
+                }
+              }
+
+              break;
+            }
+            case 'add_file':
+            case 'change': {
+              if (type === 'add_file') {
+                this.#size++;
+              }
+
+              let content = '';
+
+              /**
+               * @note This check is purely for the editor. The way we detect this is not
+               * bullet-proof and it's a best guess so there might be false-positives.
+               * The reason we do this is because we don't want to display binary files
+               * in the editor nor allow to edit them.
+               */
+              const isBinary = isBinaryFile(buffer);
+
+              if (!isBinary) {
+                content = this.#decodeFileContent(buffer);
+              }
+
+              this.files.setKey(sanitizedPath, { type: 'file', content, isBinary });
+
+              break;
+            }
+            case 'remove_file': {
+              this.#size--;
+              this.files.setKey(sanitizedPath, undefined);
+              break;
+            }
+            case 'update_directory': {
+              // we don't care about these events
+              break;
             }
           }
+        } catch (error) {
+          logger.error(`Error processing file event for path ${path}:`, error);
 
-          break;
-        }
-        case 'add_file':
-        case 'change': {
-          if (type === 'add_file') {
-            this.#size++;
-          }
-
-          let content = '';
-
-          /**
-           * @note This check is purely for the editor. The way we detect this is not
-           * bullet-proof and it's a best guess so there might be false-positives.
-           * The reason we do this is because we don't want to display binary files
-           * in the editor nor allow to edit them.
-           */
-          const isBinary = isBinaryFile(buffer);
-
-          if (!isBinary) {
-            content = this.#decodeFileContent(buffer);
-          }
-
-          this.files.setKey(sanitizedPath, { type: 'file', content, isBinary });
-
-          break;
-        }
-        case 'remove_file': {
-          this.#size--;
-          this.files.setKey(sanitizedPath, undefined);
-          break;
-        }
-        case 'update_directory': {
-          // we don't care about these events
-          break;
+          // Continue processing other events even if one fails
         }
       }
+    } catch (error) {
+      logger.error('Error processing file event buffer:', error);
     }
   }
 

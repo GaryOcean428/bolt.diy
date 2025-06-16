@@ -32,6 +32,14 @@ if (!import.meta.env.SSR) {
       .then(async (webcontainer) => {
         webcontainerContext.loaded = true;
 
+        // Ensure the work directory exists
+        try {
+          await webcontainer.fs.mkdir(WORK_DIR_NAME, { recursive: true });
+        } catch (error) {
+          // Directory might already exist, that's fine
+          console.log('Work directory setup:', error instanceof Error ? error.message : 'Unknown error');
+        }
+
         const { workbenchStore } = await import('~/lib/stores/workbench');
 
         // Listen for preview errors
@@ -52,6 +60,13 @@ if (!import.meta.env.SSR) {
         });
 
         return webcontainer;
+      })
+      .catch((error) => {
+        console.error('WebContainer initialization failed:', error);
+        webcontainerContext.loaded = false;
+
+        // Re-throw to maintain promise rejection behavior
+        throw error;
       });
 
   if (import.meta.hot) {
