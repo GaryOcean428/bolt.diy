@@ -123,12 +123,12 @@ export const ScreenshotSelector = memo(
         tempCtx.drawImage(videoRef.current, 0, 0);
 
         // Calculate scale factor between video and screen
-        const scaleX = videoRef.current.videoWidth / window.innerWidth;
-        const scaleY = videoRef.current.videoHeight / window.innerHeight;
+        const scaleX = videoRef.current.videoWidth / (typeof window !== 'undefined' ? window.innerWidth : 1000);
+        const scaleY = videoRef.current.videoHeight / (typeof window !== 'undefined' ? window.innerHeight : 1000);
 
         // Get window scroll position
-        const scrollX = window.scrollX;
-        const scrollY = window.scrollY + 40;
+        const scrollX = typeof window !== 'undefined' ? window.scrollX : 0;
+        const scrollY = (typeof window !== 'undefined' ? window.scrollY : 0) + 40;
 
         // Get the container's position in the page
         const containerRect = containerRef.current.getBoundingClientRect();

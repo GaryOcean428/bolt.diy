@@ -34,7 +34,7 @@ export const Preview = memo(() => {
     side: null as ResizeSide,
     startX: 0,
     startWidthPercent: 37.5,
-    windowWidth: window.innerWidth,
+    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 1000,
   });
 
   // Define the scaling factor
@@ -123,16 +123,20 @@ export const Preview = memo(() => {
     }
 
     // Prevent text selection
-    document.body.style.userSelect = 'none';
+    if (typeof document !== 'undefined') {
+      document.body.style.userSelect = 'none';
+    }
 
     resizingState.current.isResizing = true;
     resizingState.current.side = side;
     resizingState.current.startX = e.clientX;
     resizingState.current.startWidthPercent = widthPercent;
-    resizingState.current.windowWidth = window.innerWidth;
+    resizingState.current.windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1000;
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
 
     e.preventDefault(); // Prevent any text selection on mousedown
   };
@@ -165,11 +169,14 @@ export const Preview = memo(() => {
   const onMouseUp = () => {
     resizingState.current.isResizing = false;
     resizingState.current.side = null;
-    document.removeEventListener('mousemove', onMouseMove);
-    document.removeEventListener('mouseup', onMouseUp);
 
-    // Restore text selection
-    document.body.style.userSelect = '';
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      // Restore text selection
+      document.body.style.userSelect = '';
+    }
   };
 
   // Handle window resize to ensure widthPercent remains valid
@@ -181,11 +188,15 @@ export const Preview = memo(() => {
        */
     };
 
-    window.addEventListener('resize', handleWindowResize);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleWindowResize);
 
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
+      return () => {
+        window.removeEventListener('resize', handleWindowResize);
+      };
+    }
+
+    return undefined;
   }, []);
 
   // A small helper component for the handle's "grip" icon

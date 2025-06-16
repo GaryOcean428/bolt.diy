@@ -58,11 +58,15 @@ export const FileBreadcrumb = memo<FileBreadcrumbProps>(({ files, pathSegments =
       }
     };
 
-    document.addEventListener('mousedown', handleOutsideClick);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousedown', handleOutsideClick);
 
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
+      return () => {
+        document.removeEventListener('mousedown', handleOutsideClick);
+      };
+    }
+
+    return undefined;
   }, [activeIndex]);
 
   if (files === undefined || pathSegments.length === 0) {

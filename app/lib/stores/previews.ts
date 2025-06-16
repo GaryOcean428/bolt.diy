@@ -26,6 +26,7 @@ export class PreviewsStore {
   #refreshTimeouts = new Map<string, NodeJS.Timeout>();
   #REFRESH_DELAY = 300;
   #storageChannel: BroadcastChannel;
+  #fileWatcher: any = null;
 
   previews = atom<PreviewInfo[]>([]);
 
@@ -36,36 +37,48 @@ export class PreviewsStore {
 
     // Listen for preview updates from other tabs
     this.#broadcastChannel.onmessage = (event) => {
-      const { type, previewId } = event.data;
+      try {
+        const { type, previewId } = event.data;
 
-      if (type === 'file-change') {
-        const timestamp = event.data.timestamp;
-        const lastUpdate = this.#lastUpdate.get(previewId) || 0;
+        if (type === 'file-change') {
+          const timestamp = event.data.timestamp;
+          const lastUpdate = this.#lastUpdate.get(previewId) || 0;
 
-        if (timestamp > lastUpdate) {
-          this.#lastUpdate.set(previewId, timestamp);
-          this.refreshPreview(previewId);
+          if (timestamp > lastUpdate) {
+            this.#lastUpdate.set(previewId, timestamp);
+            this.refreshPreview(previewId);
+          }
         }
+      } catch (error) {
+        console.error('[Preview] Error handling broadcast message:', error);
       }
     };
 
     // Listen for storage sync messages
     this.#storageChannel.onmessage = (event) => {
-      const { storage, source } = event.data;
+      try {
+        const { storage, source } = event.data;
 
-      if (storage && source !== this._getTabId()) {
-        this._syncStorage(storage);
+        if (storage && source !== this._getTabId()) {
+          this._syncStorage(storage);
+        }
+      } catch (error) {
+        console.error('[Preview] Error handling storage sync message:', error);
       }
     };
 
     // Override localStorage setItem to catch all changes
-    if (typeof window !== 'undefined') {
-      const originalSetItem = localStorage.setItem;
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      try {
+        const originalSetItem = localStorage.setItem;
 
-      localStorage.setItem = (...args) => {
-        originalSetItem.apply(localStorage, args);
-        this._broadcastStorageSync();
-      };
+        localStorage.setItem = (...args) => {
+          originalSetItem.apply(localStorage, args);
+          this._broadcastStorageSync();
+        };
+      } catch (error) {
+        console.error('[Preview] Error overriding localStorage:', error);
+      }
     }
 
     this.#init();
@@ -86,7 +99,7 @@ export class PreviewsStore {
 
   // Sync storage data between tabs
   private _syncStorage(storage: Record<string, string>) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       Object.entries(storage).forEach(([key, value]) => {
         try {
           const originalSetItem = Object.getPrototypeOf(localStorage).setItem;
@@ -106,36 +119,48 @@ export class PreviewsStore {
         }
       });
 
-      // Reload the page content
-      if (typeof window !== 'undefined' && window.location) {
-        const iframe = document.querySelector('iframe');
+      // Reload the page content - add null checks
+      try {
+        if (typeof window !== 'undefined' && window.location) {
+          const iframe = document.querySelector('iframe');
 
-        if (iframe) {
-          iframe.src = iframe.src;
+          if (iframe && iframe.src) {
+            iframe.src = iframe.src;
+          }
         }
+      } catch (error) {
+        console.error('[Preview] Error reloading iframe:', error);
       }
     }
   }
 
   // Broadcast storage state to other tabs
   private _broadcastStorageSync() {
-    if (typeof window !== 'undefined') {
-      const storage: Record<string, string> = {};
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      try {
+        const storage: Record<string, string> = {};
 
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
 
-        if (key) {
-          storage[key] = localStorage.getItem(key) || '';
+          if (key) {
+            const value = localStorage.getItem(key);
+
+            if (value !== null) {
+              storage[key] = value;
+            }
+          }
         }
-      }
 
-      this.#storageChannel.postMessage({
-        type: 'storage-sync',
-        storage,
-        source: this._getTabId(),
-        timestamp: Date.now(),
-      });
+        this.#storageChannel.postMessage({
+          type: 'storage-sync',
+          storage,
+          source: this._getTabId(),
+          timestamp: Date.now(),
+        });
+      } catch (error) {
+        console.error('[Preview] Error broadcasting storage sync:', error);
+      }
     }
   }
 
@@ -152,35 +177,46 @@ export class PreviewsStore {
     });
 
     try {
-      // Watch for file changes
-      const watcher = await webcontainer.fs.watch('**/*', { persistent: true });
+      /*
+       * Watch for file changes using the correct WebContainer API
+       * The watch method takes a callback, not an EventTarget
+       */
+      const watcher = webcontainer.fs.watch('**/*', { persistent: true }, (event, filename) => {
+        if (event === 'change' || event === 'rename') {
+          console.log('[Preview] File changed:', filename);
 
-      // Use the native watch events
-      (watcher as any).addEventListener('change', async () => {
-        const previews = this.previews.get();
+          const previews = this.previews.get();
 
-        for (const preview of previews) {
-          const previewId = this.getPreviewId(preview.baseUrl);
+          for (const preview of previews) {
+            const previewId = this.getPreviewId(preview.baseUrl);
 
-          if (previewId) {
-            this.broadcastFileChange(previewId);
+            if (previewId) {
+              this.broadcastFileChange(previewId);
+            }
           }
         }
       });
 
-      // Watch for DOM changes that might affect storage
-      if (typeof window !== 'undefined') {
-        const observer = new MutationObserver((_mutations) => {
-          // Broadcast storage changes when DOM changes
-          this._broadcastStorageSync();
-        });
+      // Store watcher for cleanup if needed
+      this.#fileWatcher = watcher;
 
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-          characterData: true,
-          attributes: true,
-        });
+      // Watch for DOM changes that might affect storage
+      if (typeof window !== 'undefined' && typeof document !== 'undefined' && document.body) {
+        try {
+          const observer = new MutationObserver((_mutations) => {
+            // Broadcast storage changes when DOM changes
+            this._broadcastStorageSync();
+          });
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+          });
+        } catch (error) {
+          console.error('[Preview] Error setting up DOM observer:', error);
+        }
       }
     } catch (error) {
       console.error('[Preview] Error setting up watchers:', error);
@@ -290,6 +326,33 @@ export class PreviewsStore {
     }, this.#REFRESH_DELAY);
 
     this.#refreshTimeouts.set(previewId, timeout);
+  }
+
+  // Cleanup method to properly dispose of resources
+  dispose() {
+    try {
+      // Close file watcher
+      if (this.#fileWatcher && typeof this.#fileWatcher.close === 'function') {
+        this.#fileWatcher.close();
+      }
+
+      // Clear all timeouts
+      this.#refreshTimeouts.forEach((timeout) => {
+        clearTimeout(timeout);
+      });
+      this.#refreshTimeouts.clear();
+
+      // Close broadcast channels
+      if (this.#broadcastChannel) {
+        this.#broadcastChannel.close();
+      }
+
+      if (this.#storageChannel) {
+        this.#storageChannel.close();
+      }
+    } catch (error) {
+      console.error('[Preview] Error during cleanup:', error);
+    }
   }
 }
 

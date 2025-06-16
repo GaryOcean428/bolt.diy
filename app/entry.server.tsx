@@ -7,9 +7,11 @@ import { Head } from './root';
 // import { LLMManager } from '~/lib/modules/llm/manager';
 import { themeStore } from '~/lib/stores/theme';
 
-// Force Node.js rendering for Railway deployment
-// The build process polyfills some globals which can interfere with runtime detection
-// Since Railway is always Node.js, we can safely force the Node.js path
+/*
+ * Force Node.js rendering for Railway deployment
+ * The build process polyfills some globals which can interfere with runtime detection
+ * Since Railway is always Node.js, we can safely force the Node.js path
+ */
 const isNode = true;
 
 export default async function handleRequest(
