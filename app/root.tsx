@@ -85,6 +85,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Error throttling to prevent infinite loops
+const errorThrottleMap = new Map<string, number>();
+const ERROR_THROTTLE_DURATION = 5000; // 5 seconds
+
+function shouldThrottleError(errorKey: string): boolean {
+  const now = Date.now();
+  const lastErrorTime = errorThrottleMap.get(errorKey);
+
+  if (!lastErrorTime || now - lastErrorTime > ERROR_THROTTLE_DURATION) {
+    errorThrottleMap.set(errorKey, now);
+    return false;
+  }
+
+  return true;
+}
+
 export function ErrorBoundary() {
   const error = useRouteError();
   const theme = useStore(themeStore);
@@ -101,24 +117,34 @@ export function ErrorBoundary() {
 
   let errorMessage = 'Something went wrong';
   let errorDetails = 'An unexpected error occurred';
+  let errorKey = 'unknown';
 
   if (isRouteErrorResponse(error)) {
     errorMessage = `${error.status} ${error.statusText}`;
     errorDetails = error.data?.message || `Error ${error.status}`;
+    errorKey = `route-${error.status}`;
   } else if (error instanceof Error) {
     errorMessage = 'Application Error';
     errorDetails = error.message;
+    errorKey = `error-${error.name}-${error.message.substring(0, 50)}`;
 
-    // Log the full error for debugging but don't expose it to users in production
-    if (import.meta.env.DEV) {
-      console.error('Root Error Boundary (DEV):', error);
-    } else {
-      // In production, log only basic info
-      console.error('Root Error Boundary:', errorMessage);
+    // Only log if not throttled to prevent spam
+    if (!shouldThrottleError(errorKey)) {
+      // Log the full error for debugging but don't expose it to users in production
+      if (import.meta.env.DEV) {
+        console.error('Root Error Boundary (DEV):', error);
+      } else {
+        // In production, log only basic info
+        console.error('Root Error Boundary:', errorMessage);
+      }
     }
   } else {
     // Handle unexpected error types
-    console.error('Root Error Boundary: Unknown error type', error);
+    errorKey = `unknown-${typeof error}`;
+
+    if (!shouldThrottleError(errorKey)) {
+      console.error('Root Error Boundary: Unknown error type', error);
+    }
   }
 
   const handleReload = () => {
