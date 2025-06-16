@@ -35,9 +35,26 @@ if (!import.meta.env.SSR) {
         // Ensure the work directory exists
         try {
           await webcontainer.fs.mkdir(WORK_DIR_NAME, { recursive: true });
+          console.log('Work directory created/verified:', webcontainer.workdir);
         } catch (error) {
           // Directory might already exist, that's fine
           console.log('Work directory setup:', error instanceof Error ? error.message : 'Unknown error');
+          console.log('WebContainer workdir:', webcontainer.workdir);
+        }
+
+        // Validate workdir is properly set
+        if (!webcontainer.workdir) {
+          console.warn('WebContainer workdir is not set, this may cause file watching issues');
+        } else {
+          console.log('WebContainer initialized with workdir:', webcontainer.workdir);
+        }
+
+        // Add additional validation to ensure webcontainer is working properly
+        try {
+          await webcontainer.fs.readdir('.');
+          console.log('WebContainer filesystem is accessible');
+        } catch (fsError) {
+          console.warn('WebContainer filesystem access test failed:', fsError);
         }
 
         const { workbenchStore } = await import('~/lib/stores/workbench');

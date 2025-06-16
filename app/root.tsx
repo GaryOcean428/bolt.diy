@@ -189,13 +189,73 @@ export default function App() {
 
   useEffect(() => {
     if (!import.meta.env.SSR && typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+      // Set up global error handlers to prevent uncaught errors from breaking hydration
+      const handleError = (event: ErrorEvent) => {
+        console.error('Global error caught:', event.error);
+
+        // Prevent the error from bubbling up and breaking React
+        event.preventDefault();
+      };
+
+      const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+        console.error('Unhandled promise rejection:', event.reason);
+
+        // Prevent the error from bubbling up and breaking React
+        event.preventDefault();
+      };
+
+      window.addEventListener('error', handleError);
+      window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
       logStore.logSystem('Application initialized', {
         theme,
         platform: navigator.platform,
         userAgent: navigator.userAgent,
         timestamp: new Date().toISOString(),
       });
+
+      /*
+       * Initialize file watching after the app is loaded on the client
+       * Use a longer delay and better error handling to prevent issues
+       */
+      const initializeFileWatching = async () => {
+        try {
+          // Wait for the DOM to be fully loaded
+          await new Promise((resolve) => {
+            if (document.readyState === 'complete') {
+              resolve(true);
+            } else {
+              window.addEventListener('load', resolve, { once: true });
+            }
+          });
+
+          // Additional delay to ensure webcontainer has time to initialize
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          const { workbenchStore } = await import('~/lib/stores/workbench');
+
+          if (workbenchStore?.filesStore?.startWatching) {
+            workbenchStore.filesStore.startWatching();
+            console.log('File watching initialized');
+          }
+        } catch (error) {
+          console.warn('Failed to initialize file watching:', error);
+
+          // Don't re-throw the error to prevent crashing the app
+        }
+      };
+
+      initializeFileWatching();
+
+      // Cleanup event listeners on unmount
+      return () => {
+        window.removeEventListener('error', handleError);
+        window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      };
     }
+
+    // Return undefined if SSR or window/navigator not available
+    return undefined;
   }, []);
 
   return <Outlet />;
