@@ -1,5 +1,6 @@
 import type { WebContainer } from '@webcontainer/api';
 import { atom } from 'nanostores';
+import { webcontainer } from '~/lib/webcontainer';
 
 // Extend Window interface to include our custom property
 declare global {
@@ -165,91 +166,110 @@ export class PreviewsStore {
   }
 
   async #init() {
-    const webcontainer = await this.#webcontainer;
-
-    // Listen for server ready events
-    webcontainer.on('server-ready', (port, url) => {
-      console.log('[Preview] Server ready on port:', port, url);
-      this.broadcastUpdate(url);
-
-      // Initial storage sync when preview is ready
-      this._broadcastStorageSync();
-    });
-
     try {
-      /*
-       * Watch for file changes using the correct WebContainer API
-       * The watch method takes a callback, not an EventTarget
-       */
-      const watcher = webcontainer.fs.watch('**/*', { persistent: true }, (event, filename) => {
-        if (event === 'change' || event === 'rename') {
-          console.log('[Preview] File changed:', filename);
+      const webcontainer = await this.#webcontainer;
 
-          const previews = this.previews.get();
-
-          for (const preview of previews) {
-            const previewId = this.getPreviewId(preview.baseUrl);
-
-            if (previewId) {
-              this.broadcastFileChange(previewId);
-            }
-          }
-        }
-      });
-
-      // Store watcher for cleanup if needed
-      this.#fileWatcher = watcher;
-
-      // Watch for DOM changes that might affect storage
-      if (typeof window !== 'undefined' && typeof document !== 'undefined' && document.body) {
-        try {
-          const observer = new MutationObserver((_mutations) => {
-            // Broadcast storage changes when DOM changes
-            this._broadcastStorageSync();
-          });
-
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true,
-          });
-        } catch (error) {
-          console.error('[Preview] Error setting up DOM observer:', error);
-        }
-      }
-    } catch (error) {
-      console.error('[Preview] Error setting up watchers:', error);
-    }
-
-    // Listen for port events
-    webcontainer.on('port', (port, type, url) => {
-      let previewInfo = this.#availablePreviews.get(port);
-
-      if (type === 'close' && previewInfo) {
-        this.#availablePreviews.delete(port);
-        this.previews.set(this.previews.get().filter((preview) => preview.port !== port));
-
+      // Ensure webcontainer is properly initialized before setting up listeners
+      if (!webcontainer || typeof webcontainer.on !== 'function') {
+        console.warn('[Preview] WebContainer not properly initialized, skipping preview setup');
         return;
       }
 
-      const previews = this.previews.get();
-
-      if (!previewInfo) {
-        previewInfo = { port, ready: type === 'open', baseUrl: url };
-        this.#availablePreviews.set(port, previewInfo);
-        previews.push(previewInfo);
-      }
-
-      previewInfo.ready = type === 'open';
-      previewInfo.baseUrl = url;
-
-      this.previews.set([...previews]);
-
-      if (type === 'open') {
+      // Listen for server ready events
+      webcontainer.on('server-ready', (port, url) => {
+        console.log('[Preview] Server ready on port:', port, url);
         this.broadcastUpdate(url);
+
+        // Initial storage sync when preview is ready
+        this._broadcastStorageSync();
+      });
+
+      try {
+        /*
+         * Watch for file changes using the correct WebContainer API
+         * The watch method takes a callback, not an EventTarget
+         * Only set up file watching if we have a real WebContainer with fs API
+         */
+        if (webcontainer && webcontainer.fs && typeof webcontainer.fs.watch === 'function') {
+          const watcher = webcontainer.fs.watch('**/*', { persistent: true }, (event, filename) => {
+            if (event === 'change' || event === 'rename') {
+              console.log('[Preview] File changed:', filename);
+
+              const previews = this.previews.get();
+
+              for (const preview of previews) {
+                const previewId = this.getPreviewId(preview.baseUrl);
+
+                if (previewId) {
+                  this.broadcastFileChange(previewId);
+                }
+              }
+            }
+          });
+
+          // Store watcher for cleanup if needed
+          this.#fileWatcher = watcher;
+        } else {
+          console.warn('[Preview] WebContainer fs.watch not available, file watching disabled');
+        }
+
+        // Watch for DOM changes that might affect storage
+        if (typeof window !== 'undefined' && typeof document !== 'undefined' && document.body) {
+          try {
+            const observer = new MutationObserver((_mutations) => {
+              // Broadcast storage changes when DOM changes
+              this._broadcastStorageSync();
+            });
+
+            observer.observe(document.body, {
+              childList: true,
+              subtree: true,
+              characterData: true,
+              attributes: true,
+            });
+          } catch (error) {
+            console.error('[Preview] Error setting up DOM observer:', error);
+          }
+        }
+      } catch (error) {
+        console.error('[Preview] Error setting up watchers:', error);
+
+        // Don't rethrow - let the app continue without file watching
       }
-    });
+
+      // Listen for port events
+      webcontainer.on('port', (port, type, url) => {
+        let previewInfo = this.#availablePreviews.get(port);
+
+        if (type === 'close' && previewInfo) {
+          this.#availablePreviews.delete(port);
+          this.previews.set(this.previews.get().filter((preview) => preview.port !== port));
+
+          return;
+        }
+
+        const previews = this.previews.get();
+
+        if (!previewInfo) {
+          previewInfo = { port, ready: type === 'open', baseUrl: url };
+          this.#availablePreviews.set(port, previewInfo);
+          previews.push(previewInfo);
+        }
+
+        previewInfo.ready = type === 'open';
+        previewInfo.baseUrl = url;
+
+        this.previews.set([...previews]);
+
+        if (type === 'open') {
+          this.broadcastUpdate(url);
+        }
+      });
+    } catch (error) {
+      console.error('[Preview] Error initializing preview store:', error);
+
+      // Continue execution - the app should work without previews
+    }
   }
 
   // Helper to extract preview ID from URL
@@ -362,10 +382,10 @@ let previewsStore: PreviewsStore | null = null;
 export function usePreviewStore() {
   if (!previewsStore) {
     /*
-     * Initialize with a Promise that resolves to WebContainer
-     * This should match how you're initializing WebContainer elsewhere
+     * Initialize with the actual webcontainer Promise
+     * Use the same webcontainer instance that's used throughout the app
      */
-    previewsStore = new PreviewsStore(Promise.resolve({} as WebContainer));
+    previewsStore = new PreviewsStore(webcontainer);
   }
 
   return previewsStore;
