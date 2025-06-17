@@ -103,17 +103,65 @@ function shouldThrottleError(errorKey: string): boolean {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  const theme = useStore(themeStore);
 
-  useEffect(() => {
-    if (!import.meta.env.SSR && typeof document !== 'undefined') {
-      const htmlElement = document.querySelector('html');
+  // Determine theme without hooks that might fail in error state
+  const getThemeSafely = (): string => {
+    // First try to get theme from DOM
+    try {
+      if (typeof document !== 'undefined') {
+        const htmlTheme = document.querySelector('html')?.getAttribute('data-theme');
 
-      if (htmlElement) {
-        htmlElement.setAttribute('data-theme', theme);
+        if (htmlTheme && (htmlTheme === 'dark' || htmlTheme === 'light')) {
+          return htmlTheme;
+        }
       }
+    } catch {
+      // Ignore DOM errors
     }
-  }, [theme]);
+
+    // Then try localStorage
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const storedTheme = localStorage.getItem('bolt_theme');
+
+        if (storedTheme && (storedTheme === 'dark' || storedTheme === 'light')) {
+          return storedTheme;
+        }
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+
+    // Finally try media query
+    try {
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+    } catch {
+      // Ignore media query errors
+    }
+
+    // Ultimate fallback
+    return 'light';
+  };
+
+  const resolvedTheme = getThemeSafely();
+
+  // Apply theme to document in a safe way
+  useEffect(() => {
+    try {
+      if (!import.meta.env.SSR && typeof document !== 'undefined') {
+        const htmlElement = document.querySelector('html');
+
+        if (htmlElement) {
+          htmlElement.setAttribute('data-theme', resolvedTheme);
+        }
+      }
+    } catch (e) {
+      // Silently handle any DOM errors to prevent cascading failures
+      console.warn('ErrorBoundary: Failed to set theme attribute:', e);
+    }
+  }, [resolvedTheme]);
 
   let errorMessage = 'Something went wrong';
   let errorDetails = 'An unexpected error occurred';
@@ -158,7 +206,7 @@ export function ErrorBoundary() {
   };
 
   return (
-    <html data-theme={theme}>
+    <html data-theme={resolvedTheme}>
       <head>
         <title>Oops! - Bolt.diy</title>
         <Meta />
