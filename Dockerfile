@@ -3,28 +3,36 @@ FROM ${BASE} AS base
 
 WORKDIR /app
 
+# Install system dependencies for Railway compatibility
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies (this step is cached as long as the dependencies don't change)
 COPY package.json pnpm-lock.yaml ./
 
-# Install pnpm using npm instead of corepack to avoid signature verification issues
-RUN npm install -g pnpm@9.4.0 && pnpm install
+# Install pnpm and dependencies with Railway-optimized settings
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm install -g pnpm@9.4.0 --unsafe-perm && \
+    pnpm install --frozen-lockfile
 
 # Copy the rest of your app's source code
 COPY . .
 
 # Expose the port - Railway will override this with PORT env var
-EXPOSE 3001
+EXPOSE 5173
 
 # Production image
 FROM base AS bolt-ai-production
 
-# Only set environment variables that are needed at build time or have default values
-# Railway will inject all other environment variables at runtime
+# Railway-optimized environment variables
 ENV WRANGLER_SEND_METRICS=false \
     RUNNING_IN_DOCKER=true \
     VITE_LOG_LEVEL=debug \
     CI=false \
-    NODE_ENV=production
+    NODE_ENV=production \
+    PORT=5173
 
 # Pre-configure wrangler to disable metrics
 RUN mkdir -p /root/.config/.wrangler && \
@@ -33,18 +41,26 @@ RUN mkdir -p /root/.config/.wrangler && \
 # Create empty .env.local to prevent bindings.sh from failing
 RUN touch .env.local
 
+# Build the application
 RUN pnpm run build
 
-CMD [ "pnpm", "run", "server:production"]
+# Verify build was successful
+RUN ls -la build/ && ls -la build/server/
+
+# Health check for Railway
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-5173}/health || exit 1
+
+CMD [ "pnpm", "run", "server:railway"]
 
 # Development image
 FROM base AS bolt-ai-development
 
-# Only set environment variables that are needed at build time or have default values
-# Railway will inject all other environment variables at runtime
+# Development environment variables
 ENV RUNNING_IN_DOCKER=true \
     PORT=5173 \
-    VITE_LOG_LEVEL=debug
+    VITE_LOG_LEVEL=debug \
+    NODE_ENV=development
 
 # Create empty .env.local to prevent bindings.sh from failing
 RUN touch .env.local

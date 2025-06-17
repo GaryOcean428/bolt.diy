@@ -15,5 +15,9 @@ restartPolicyMaxRetries = 10
 healthcheckPath = "/health"
 healthcheckTimeout = 60
 
+# Railway environment configuration
+[services.bolt-app]
+variables = { NODE_ENV = "production", PORT = "5173" }
+
 [experimental]
 dockerfile = true
