@@ -32,13 +32,12 @@ if (!import.meta.env.SSR) {
       .then(async (webcontainer) => {
         webcontainerContext.loaded = true;
 
-        // Ensure the work directory exists
+        // Validate the work directory exists (WebContainer manages this automatically)
         try {
-          await webcontainer.fs.mkdir(WORK_DIR_NAME, { recursive: true });
-          console.log('Work directory created/verified:', webcontainer.workdir);
+          await webcontainer.fs.readdir('.');
+          console.log('Work directory verified:', webcontainer.workdir);
         } catch (error) {
-          // Directory might already exist, that's fine
-          console.log('Work directory setup:', error instanceof Error ? error.message : 'Unknown error');
+          console.warn('Work directory validation failed:', error instanceof Error ? error.message : 'Unknown error');
           console.log('WebContainer workdir:', webcontainer.workdir);
         }
 

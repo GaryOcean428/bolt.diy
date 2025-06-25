@@ -75,13 +75,22 @@ export function diffFiles(fileName: string, oldFileContent: string, newFileConte
   return unifiedDiff;
 }
 
-const regex = new RegExp(`^${WORK_DIR}\/`);
+// WebContainer uses /home/workspace as the actual workdir, not just /workspace
+const workDirRegex = new RegExp(`^${WORK_DIR}\/`);
+const webContainerWorkDirRegex = new RegExp(`^\/home${WORK_DIR}\/`);
 
 /**
  * Strips out the work directory from the file path.
+ * Handles both the conceptual work dir (/workspace) and the actual WebContainer workdir (/home/workspace).
  */
 export function extractRelativePath(filePath: string) {
-  return filePath.replace(regex, '');
+  // First try to match the WebContainer's actual workdir path
+  if (webContainerWorkDirRegex.test(filePath)) {
+    return filePath.replace(webContainerWorkDirRegex, '');
+  }
+
+  // Fallback to the original logic for backward compatibility
+  return filePath.replace(workDirRegex, '');
 }
 
 /**
