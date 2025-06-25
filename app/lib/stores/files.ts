@@ -78,6 +78,9 @@ export class FilesStore {
   }
 
   #watchingActive = false;
+  #initRetryCount = 0;
+  #maxRetries = 10; // Maximum number of initialization retries
+  #baseRetryDelay = 1000; // Base delay in milliseconds
 
   getFile(filePath: string) {
     const dirent = this.files.get()[filePath];
@@ -136,9 +139,13 @@ export class FilesStore {
 
       // Validate webcontainer and workdir
       if (!webcontainer || !webcontainer.workdir) {
-        logger.warn('WebContainer or workdir not available, will retry file watching later');
-        setTimeout(() => this.#init(), 1000);
+        if (this.#initRetryCount >= this.#maxRetries) {
+          logger.error('WebContainer initialization failed after maximum retries, giving up file watching');
+          return;
+        }
 
+        logger.warn(`WebContainer or workdir not available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+        this.#scheduleRetry();
         return;
       }
 
@@ -150,12 +157,15 @@ export class FilesStore {
         // Check the actual workdir that will be watched, not just current directory
         await webcontainer.fs.readdir(webcontainer.workdir);
       } catch (dirError) {
-        logger.info('Work directory not yet available, will retry file watching later');
+        if (this.#initRetryCount >= this.#maxRetries) {
+          logger.error('Work directory never became available after maximum retries, giving up file watching');
+          return;
+        }
+
+        logger.info(`Work directory not yet available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
         logger.debug('Directory check error:', dirError);
 
-        // Retry after a short delay
-        setTimeout(() => this.#init(), 1000);
-
+        this.#scheduleRetry();
         return;
       }
 
@@ -167,10 +177,16 @@ export class FilesStore {
           bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
         );
         this.#watchingActive = true;
+        this.#initRetryCount = 0; // Reset retry count on success
         logger.info('File watcher initialized successfully');
       } catch (watchError) {
         logger.error('Failed to setup file watcher:', watchError);
         this.#watchingActive = false;
+
+        if (this.#initRetryCount >= this.#maxRetries) {
+          logger.error('File watcher setup failed after maximum retries, giving up');
+          return;
+        }
 
         // Check if it's a directory not found error and retry sooner
         const isDirectoryError =
@@ -178,20 +194,37 @@ export class FilesStore {
           (watchError.message.includes('ENOENT') || watchError.message.includes('no such file or directory'));
 
         if (isDirectoryError) {
-          logger.info('Directory not found during watch setup, will retry soon');
-          setTimeout(() => this.#init(), 1000);
+          logger.info(`Directory not found during watch setup, will retry soon (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+          this.#scheduleRetry();
         } else {
           // Don't retry immediately if watchPaths fails with other errors - it might be a permanent issue
-          setTimeout(() => this.#init(), 5000);
+          logger.warn(`Non-directory error during watch setup, will retry with longer delay (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+          this.#scheduleRetry(5000); // Use longer delay for non-directory errors
         }
       }
     } catch (error) {
       logger.error('Failed to initialize file watching:', error);
       this.#watchingActive = false;
 
+      if (this.#initRetryCount >= this.#maxRetries) {
+        logger.error('File watching initialization failed after maximum retries, giving up');
+        return;
+      }
+
       // Retry after a delay if initialization fails
-      setTimeout(() => this.#init(), 2000);
+      this.#scheduleRetry(2000);
     }
+  }
+
+  #scheduleRetry(baseDelay?: number) {
+    this.#initRetryCount++;
+    const delay = baseDelay || this.#baseRetryDelay;
+    // Exponential backoff with jitter: delay * (2^retryCount) + random(0, 1000)
+    const exponentialDelay = delay * Math.pow(2, Math.min(this.#initRetryCount - 1, 5)) + Math.random() * 1000;
+    const cappedDelay = Math.min(exponentialDelay, 30000); // Cap at 30 seconds
+
+    logger.debug(`Scheduling retry in ${Math.round(cappedDelay)}ms`);
+    setTimeout(() => this.#init(), cappedDelay);
   }
 
   #processEventBuffer(events: Array<[events: PathWatcherEvent[]]>) {
