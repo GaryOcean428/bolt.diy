@@ -147,7 +147,8 @@ export class FilesStore {
 
       // Check if the work directory exists before setting up file watching
       try {
-        await webcontainer.fs.readdir('.');
+        // Check the actual workdir that will be watched, not just current directory
+        await webcontainer.fs.readdir(webcontainer.workdir);
       } catch (dirError) {
         logger.info('Work directory not yet available, will retry file watching later');
         logger.debug('Directory check error:', dirError);
@@ -171,8 +172,18 @@ export class FilesStore {
         logger.error('Failed to setup file watcher:', watchError);
         this.#watchingActive = false;
 
-        // Don't retry immediately if watchPaths fails - it might be a permanent issue
-        setTimeout(() => this.#init(), 5000);
+        // Check if it's a directory not found error and retry sooner
+        const isDirectoryError =
+          watchError instanceof Error &&
+          (watchError.message.includes('ENOENT') || watchError.message.includes('no such file or directory'));
+
+        if (isDirectoryError) {
+          logger.info('Directory not found during watch setup, will retry soon');
+          setTimeout(() => this.#init(), 1000);
+        } else {
+          // Don't retry immediately if watchPaths fails with other errors - it might be a permanent issue
+          setTimeout(() => this.#init(), 5000);
+        }
       }
     } catch (error) {
       logger.error('Failed to initialize file watching:', error);
