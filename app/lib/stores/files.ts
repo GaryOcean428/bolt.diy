@@ -4,6 +4,7 @@ import type { PathWatcherEvent, WebContainer } from '@webcontainer/api';
 import { getEncoding } from 'istextorbinary';
 import { map, type MapStore } from 'nanostores';
 import { bufferWatchEvents } from '~/utils/buffer';
+import { WORK_DIR_NAME } from '~/utils/constants';
 import { computeFileModifications } from '~/utils/diff';
 import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
@@ -147,10 +148,11 @@ export class FilesStore {
 
       // Check if the work directory exists before setting up file watching
       try {
-        // Check the actual workdir that will be watched, not just current directory
-        await webcontainer.fs.readdir(webcontainer.workdir);
+        // Check if the workspace directory exists (this is what we'll actually be watching)
+        await webcontainer.fs.readdir(WORK_DIR_NAME);
+        logger.debug('Workspace directory exists and is accessible');
       } catch (dirError) {
-        logger.info('Work directory not yet available, will retry file watching later');
+        logger.info('Workspace directory not yet available, will retry file watching later');
         logger.debug('Directory check error:', dirError);
 
         // Retry after a short delay
