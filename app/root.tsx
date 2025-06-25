@@ -206,29 +206,19 @@ export function ErrorBoundary() {
   };
 
   return (
-    <html data-theme={resolvedTheme}>
-      <head>
-        <title>Oops! - Bolt.diy</title>
-        <Meta />
-        <Links />
-      </head>
-      <body className="bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
-          <div className="text-center max-w-md">
-            <div className="text-6xl mb-4">⚡</div>
-            <h1 className="text-2xl font-bold mb-2">{errorMessage}</h1>
-            <p className="text-bolt-elements-textSecondary mb-6">{errorDetails}</p>
-            <button
-              onClick={handleReload}
-              className="bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text px-4 py-2 rounded"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-        <Scripts />
-      </body>
-    </html>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
+      <div className="text-center max-w-md">
+        <div className="text-6xl mb-4">⚡</div>
+        <h1 className="text-2xl font-bold mb-2">{errorMessage}</h1>
+        <p className="text-bolt-elements-textSecondary mb-6">{errorDetails}</p>
+        <button
+          onClick={handleReload}
+          className="bg-bolt-elements-button-primary-background hover:bg-bolt-elements-button-primary-backgroundHover text-bolt-elements-button-primary-text px-4 py-2 rounded"
+        >
+          Reload Page
+        </button>
+      </div>
+    </div>
   );
 }
 
