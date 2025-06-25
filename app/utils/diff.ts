@@ -88,6 +88,7 @@ export function extractRelativePath(filePath: string) {
   if (webContainerWorkDirRegex.test(filePath)) {
     return filePath.replace(webContainerWorkDirRegex, '');
   }
+
   // Fallback to the original logic for backward compatibility
   return filePath.replace(workDirRegex, '');
 }
