@@ -144,8 +144,11 @@ export class FilesStore {
           return;
         }
 
-        logger.warn(`WebContainer or workdir not available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+        logger.warn(
+          `WebContainer or workdir not available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`,
+        );
         this.#scheduleRetry();
+
         return;
       }
 
@@ -162,10 +165,13 @@ export class FilesStore {
           return;
         }
 
-        logger.info(`Work directory not yet available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+        logger.info(
+          `Work directory not yet available, will retry file watching later (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`,
+        );
         logger.debug('Directory check error:', dirError);
 
         this.#scheduleRetry();
+
         return;
       }
 
@@ -194,11 +200,15 @@ export class FilesStore {
           (watchError.message.includes('ENOENT') || watchError.message.includes('no such file or directory'));
 
         if (isDirectoryError) {
-          logger.info(`Directory not found during watch setup, will retry soon (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+          logger.info(
+            `Directory not found during watch setup, will retry soon (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`,
+          );
           this.#scheduleRetry();
         } else {
           // Don't retry immediately if watchPaths fails with other errors - it might be a permanent issue
-          logger.warn(`Non-directory error during watch setup, will retry with longer delay (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`);
+          logger.warn(
+            `Non-directory error during watch setup, will retry with longer delay (attempt ${this.#initRetryCount + 1}/${this.#maxRetries})`,
+          );
           this.#scheduleRetry(5000); // Use longer delay for non-directory errors
         }
       }
@@ -218,7 +228,9 @@ export class FilesStore {
 
   #scheduleRetry(baseDelay?: number) {
     this.#initRetryCount++;
+
     const delay = baseDelay || this.#baseRetryDelay;
+
     // Exponential backoff with jitter: delay * (2^retryCount) + random(0, 1000)
     const exponentialDelay = delay * Math.pow(2, Math.min(this.#initRetryCount - 1, 5)) + Math.random() * 1000;
     const cappedDelay = Math.min(exponentialDelay, 30000); // Cap at 30 seconds

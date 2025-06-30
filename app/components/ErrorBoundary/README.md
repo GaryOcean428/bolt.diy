@@ -9,34 +9,41 @@ The ErrorBoundary component is a class-based React component that catches JavaSc
 ## Design Decisions
 
 ### 1. Class-based Component
+
 - **Why**: React requires error boundaries to be class components with `componentDidCatch` lifecycle method
 - **Trade-off**: While the rest of the app uses functional components, error boundaries must be classes
 
 ### 2. Retry Mechanism
+
 - **Why**: Many errors are transient (network issues, race conditions) and can be resolved by retrying
 - **Implementation**: Configurable retry count with exponential backoff to prevent infinite loops
 - **Safety**: Maximum retry limits prevent infinite error-retry cycles
 
 ### 3. Comprehensive Logging
+
 - **Why**: Error tracking is crucial for debugging and monitoring
 - **Integration**: Uses the existing `logStore` system for consistency
 - **Fallback**: If logging fails, falls back to console logging to ensure errors are never silently lost
 
 ### 4. Development vs Production Behavior
+
 - **Development**: Shows detailed error information including stack traces and component stacks
 - **Production**: Shows user-friendly messages while still logging detailed information
 - **Configurable**: `showErrorDetails` prop allows manual override
 
 ### 5. Accessibility First
+
 - **ARIA attributes**: Proper `role="alert"`, `aria-labelledby`, and `aria-describedby`
 - **Screen reader support**: Hidden descriptions for buttons and actions
 - **Keyboard navigation**: All interactive elements are properly focusable
 
 ### 6. Theme Integration
+
 - **CSS Custom Properties**: Uses the app's existing CSS custom properties for consistent theming
 - **Responsive Design**: Works well on both desktop and mobile devices
 
 ### 7. Error Categorization
+
 - **Error IDs**: Unique identifiers for tracking specific error instances
 - **Boundary IDs**: Identifies which error boundary caught the error (useful for multiple boundaries)
 - **Enhanced Error Info**: Includes URL, user agent, timestamp for debugging
@@ -48,11 +55,11 @@ The ErrorBoundary component is a class-based React component that catches JavaSc
 ```typescript
 interface ErrorBoundaryProps {
   children: ReactNode;
-  id?: string;                    // Unique identifier for this boundary
-  maxRetries?: number;            // Maximum retry attempts (default: 3)
-  showErrorDetails?: boolean;     // Show detailed error info (default: DEV mode)
-  onError?: ErrorReportCallback;  // Custom error handler
-  onRetry?: RetryCallback;        // Custom retry handler
+  id?: string; // Unique identifier for this boundary
+  maxRetries?: number; // Maximum retry attempts (default: 3)
+  showErrorDetails?: boolean; // Show detailed error info (default: DEV mode)
+  onError?: ErrorReportCallback; // Custom error handler
+  onRetry?: RetryCallback; // Custom retry handler
   fallback?: React.ComponentType<ErrorBoundaryFallbackProps> | React.ReactElement;
 }
 ```
@@ -124,19 +131,11 @@ function MyComponent() {
 ```tsx
 import { ErrorBoundary, ErrorBoundaryFallbackProps } from '~/components/ErrorBoundary';
 
-const CustomErrorFallback: React.FC<ErrorBoundaryFallbackProps> = ({
-  error,
-  resetError,
-  canRetry,
-}) => (
+const CustomErrorFallback: React.FC<ErrorBoundaryFallbackProps> = ({ error, resetError, canRetry }) => (
   <div className="custom-error-ui">
     <h2>Oops! Something went wrong in this feature</h2>
     <p>Error: {error.message}</p>
-    {canRetry && (
-      <button onClick={resetError}>
-        Try Again
-      </button>
-    )}
+    {canRetry && <button onClick={resetError}>Try Again</button>}
   </div>
 );
 
@@ -156,17 +155,17 @@ function App() {
   return (
     <ErrorBoundary id="app-root" maxRetries={3}>
       <Header />
-      
+
       <main>
         <ErrorBoundary id="sidebar" maxRetries={2}>
           <Sidebar />
         </ErrorBoundary>
-        
+
         <ErrorBoundary id="content" maxRetries={1}>
           <MainContent />
         </ErrorBoundary>
       </main>
-      
+
       <Footer />
     </ErrorBoundary>
   );
@@ -214,17 +213,18 @@ Uses the app's existing CSS custom properties:
 
 This ErrorBoundary complements (doesn't replace) the Remix ErrorBoundary:
 
-| Feature | React ErrorBoundary | Remix ErrorBoundary |
-|---------|-------------------|-------------------|
-| Catches | JavaScript errors in components | Route loading/action errors |
-| Scope | Component tree | Route level |
-| Retry | Configurable retry logic | Page reload only |
-| Logging | Integrated with app logging | Basic console logging |
-| Fallback | Customizable component | Route-level error page |
+| Feature  | React ErrorBoundary             | Remix ErrorBoundary         |
+| -------- | ------------------------------- | --------------------------- |
+| Catches  | JavaScript errors in components | Route loading/action errors |
+| Scope    | Component tree                  | Route level                 |
+| Retry    | Configurable retry logic        | Page reload only            |
+| Logging  | Integrated with app logging     | Basic console logging       |
+| Fallback | Customizable component          | Route-level error page      |
 
 ## Best Practices
 
 ### 1. Granular Boundaries
+
 Place error boundaries around logical feature areas, not just at the root:
 
 ```tsx
@@ -246,6 +246,7 @@ Place error boundaries around logical feature areas, not just at the root:
 ```
 
 ### 2. Meaningful IDs
+
 Use descriptive boundary IDs for easier debugging:
 
 ```tsx
@@ -314,16 +315,19 @@ npm test ErrorBoundary
 ## Performance Considerations
 
 ### Memory Management
+
 - Cleans up timers in `componentWillUnmount`
 - Limits retry attempts to prevent memory leaks
 - Throttles error logging to prevent spam
 
 ### Bundle Size
+
 - Tree-shakeable exports
 - Optional fallback components
 - Minimal dependencies
 
 ### Runtime Performance
+
 - Efficient error state management
 - Lazy error ID generation
 - Optimized re-renders
@@ -333,9 +337,11 @@ npm test ErrorBoundary
 ### Common Issues
 
 1. **Error boundaries don't catch async errors**
+
    - Solution: Use the global error handlers in App.tsx for unhandled promises
 
 2. **Error boundary doesn't catch event handler errors**
+
    - Solution: Wrap event handlers in try-catch blocks
 
 3. **Development error overlay conflicts**
@@ -344,11 +350,13 @@ npm test ErrorBoundary
 ### Debugging
 
 Check the browser console for:
+
 - Error boundary activation logs
 - Retry attempt logs
 - Fallback logging if logStore fails
 
 Check the app's log store for:
+
 - Structured error information
 - Retry history
 - User actions

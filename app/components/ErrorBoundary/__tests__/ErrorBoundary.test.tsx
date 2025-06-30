@@ -1,7 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ErrorBoundary } from '../ErrorBoundary';
+import React from 'react';
+import { ErrorBoundary } from '~/components/ErrorBoundary/ErrorBoundary';
 import { logStore } from '~/lib/stores/logs';
 
 // Mock the logger and logStore
@@ -27,6 +27,7 @@ const ErrorThrowingComponent: React.FC<{ shouldThrow?: boolean }> = ({ shouldThr
   if (shouldThrow) {
     throw new Error('Test error message');
   }
+
   return <div>No error occurred</div>;
 };
 
@@ -35,10 +36,12 @@ const WorkingComponent: React.FC = () => <div>Working component</div>;
 
 describe('ErrorBoundary', () => {
   let consoleErrorSpy: jest.SpyInstance;
-  
+
   beforeEach(() => {
     // Suppress console.error during tests to avoid cluttering output
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {
+      // Suppress console.error during tests
+    });
     jest.clearAllMocks();
   });
 
@@ -51,7 +54,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <WorkingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Working component')).toBeInTheDocument();
@@ -63,7 +66,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
@@ -76,7 +79,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(logStore.logError).toHaveBeenCalledWith(
@@ -88,7 +91,7 @@ describe('ErrorBoundary', () => {
           errorId: expect.any(String),
           boundaryId: expect.any(String),
           componentStack: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -96,7 +99,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText(/Error ID:/)).toBeInTheDocument();
@@ -106,11 +109,11 @@ describe('ErrorBoundary', () => {
   describe('retry functionality', () => {
     it('should allow retry when within retry limit', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ErrorBoundary maxRetries={2}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = screen.getByRole('button', { name: /try again/i });
@@ -123,17 +126,17 @@ describe('ErrorBoundary', () => {
         expect.objectContaining({
           retryCount: 1,
           maxRetries: 2,
-        })
+        }),
       );
     });
 
     it('should disable retry after max attempts', async () => {
       const user = userEvent.setup();
-      
+
       render(
         <ErrorBoundary maxRetries={1}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // First retry
@@ -149,28 +152,28 @@ describe('ErrorBoundary', () => {
   describe('custom configuration', () => {
     it('should call custom error handler when provided', () => {
       const onError = jest.fn();
-      
+
       render(
         <ErrorBoundary onError={onError}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({ message: 'Test error message' }),
         expect.objectContaining({ componentStack: expect.any(String) }),
-        expect.any(String)
+        expect.any(String),
       );
     });
 
     it('should call custom retry handler when provided', async () => {
       const onRetry = jest.fn();
       const user = userEvent.setup();
-      
+
       render(
         <ErrorBoundary onRetry={onRetry}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = screen.getByRole('button', { name: /try again/i });
@@ -181,11 +184,11 @@ describe('ErrorBoundary', () => {
 
     it('should use custom boundary ID when provided', () => {
       const customId = 'custom-boundary-id';
-      
+
       render(
         <ErrorBoundary id={customId}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(logStore.logError).toHaveBeenCalledWith(
@@ -193,7 +196,7 @@ describe('ErrorBoundary', () => {
         expect.any(Object),
         expect.objectContaining({
           boundaryId: customId,
-        })
+        }),
       );
     });
   });
@@ -207,7 +210,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary showErrorDetails={true}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.getByText('Error Details (Development)')).toBeInTheDocument();
@@ -220,7 +223,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary showErrorDetails={false}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(screen.queryByText('Error Details (Development)')).not.toBeInTheDocument();
@@ -232,7 +235,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const errorContainer = screen.getByRole('alert');
@@ -246,7 +249,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = screen.getByRole('button', { name: /try again/i });
@@ -267,7 +270,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should still render the error UI despite logging failure
@@ -282,7 +285,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary onError={onError}>
           <ErrorThrowingComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should still render the error UI despite custom handler failure

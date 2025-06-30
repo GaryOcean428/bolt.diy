@@ -1,5 +1,5 @@
-import { executeApi, ApiError, get, post, put, patch, del } from '../executeApi';
 import { logStore } from '~/lib/stores/logs';
+import { executeApi, ApiError, get, post, put, patch, del } from '~/utils/api/executeApi';
 
 // Mock the logger and logStore
 jest.mock('~/utils/logger', () => ({
@@ -74,7 +74,7 @@ describe('executeApi', () => {
     it('should handle successful POST request with body', async () => {
       const requestData = { name: 'New User', email: 'user@example.com' };
       const responseData = { id: '123', ...requestData };
-      
+
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 201,
@@ -104,7 +104,7 @@ describe('executeApi', () => {
 
     it('should handle text responses', async () => {
       const textResponse = 'Plain text response';
-      
+
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -154,7 +154,7 @@ describe('executeApi', () => {
       });
 
       await expect(executeApi('/api/nonexistent')).rejects.toThrow(ApiError);
-      
+
       try {
         await executeApi('/api/nonexistent');
       } catch (error) {
@@ -168,7 +168,7 @@ describe('executeApi', () => {
       mockFetch.mockRejectedValueOnce(new TypeError('Network error'));
 
       await expect(executeApi('/api/test')).rejects.toThrow(ApiError);
-      
+
       try {
         await executeApi('/api/test');
       } catch (error) {
@@ -176,7 +176,7 @@ describe('executeApi', () => {
         expect((error as ApiError).status).toBe(0);
         expect((error as ApiError).isNetworkError()).toBe(true);
         expect((error as ApiError).getUserMessage()).toBe(
-          'Network connection failed. Please check your internet connection and try again.'
+          'Network connection failed. Please check your internet connection and try again.',
         );
       }
     });
@@ -197,19 +197,15 @@ describe('executeApi', () => {
 
       try {
         await executeApi('/api/test');
-      } catch (error) {
+      } catch {
         // Error should be logged
-        expect(logStore.logError).toHaveBeenCalledWith(
-          'API request failed',
-          expect.any(ApiError),
-          {
-            requestId: expect.any(String),
-            url: '/api/test',
-            method: 'GET',
-            attempt: 1,
-            duration: 0,
-          }
-        );
+        expect(logStore.logError).toHaveBeenCalledWith('API request failed', expect.any(ApiError), {
+          requestId: expect.any(String),
+          url: '/api/test',
+          method: 'GET',
+          attempt: 1,
+          duration: 0,
+        });
       }
     });
   });
@@ -299,9 +295,14 @@ describe('executeApi', () => {
   describe('timeout handling', () => {
     it('should handle request timeouts', async () => {
       jest.useFakeTimers();
-      
+
       // Mock a fetch that never resolves
-      mockFetch.mockImplementation(() => new Promise(() => {}));
+      mockFetch.mockImplementation(
+        () =>
+          new Promise(() => {
+            // Mock fetch that never resolves
+          }),
+      );
 
       const requestPromise = executeApi('/api/test', { timeout: 1000 });
 
@@ -326,48 +327,63 @@ describe('executeApi', () => {
 
     it('should handle GET requests', async () => {
       await get('/api/test');
-      
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'GET',
-      }));
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'GET',
+        }),
+      );
     });
 
     it('should handle POST requests', async () => {
       const body = { data: 'test' };
       await post('/api/test', body);
-      
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify(body),
-      }));
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify(body),
+        }),
+      );
     });
 
     it('should handle PUT requests', async () => {
       const body = { data: 'test' };
       await put('/api/test', body);
-      
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify(body),
-      }));
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'PUT',
+          body: JSON.stringify(body),
+        }),
+      );
     });
 
     it('should handle PATCH requests', async () => {
       const body = { data: 'test' };
       await patch('/api/test', body);
-      
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'PATCH',
-        body: JSON.stringify(body),
-      }));
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify(body),
+        }),
+      );
     });
 
     it('should handle DELETE requests', async () => {
       await del('/api/test');
-      
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        method: 'DELETE',
-      }));
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          method: 'DELETE',
+        }),
+      );
     });
   });
 
@@ -375,7 +391,7 @@ describe('executeApi', () => {
     it('should provide user-friendly messages for common errors', () => {
       const networkError = new ApiError('Network error', 0, null, 'req-1', '/api/test', 'GET');
       expect(networkError.getUserMessage()).toBe(
-        'Network connection failed. Please check your internet connection and try again.'
+        'Network connection failed. Please check your internet connection and try again.',
       );
 
       const notFoundError = new ApiError('Not found', 404, null, 'req-2', '/api/test', 'GET');
@@ -423,19 +439,22 @@ describe('executeApi', () => {
 
       await executeApi('/api/test', {
         headers: {
-          'Authorization': 'Bearer token123',
+          Authorization: 'Bearer token123',
           'X-Custom-Header': 'custom-value',
         },
       });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Request-ID': expect.any(String),
-          'Authorization': 'Bearer token123',
-          'X-Custom-Header': 'custom-value',
-        },
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Request-ID': expect.any(String),
+            Authorization: 'Bearer token123',
+            'X-Custom-Header': 'custom-value',
+          },
+        }),
+      );
     });
 
     it('should use custom error prefix', async () => {
@@ -446,10 +465,12 @@ describe('executeApi', () => {
         headers: new Headers(),
       });
 
-      await expect(executeApi('/api/test', { 
-        errorPrefix: 'Custom Operation',
-        retries: 0 
-      })).rejects.toThrow('Custom Operation failed: 500 Internal Server Error');
+      await expect(
+        executeApi('/api/test', {
+          errorPrefix: 'Custom Operation',
+          retries: 0,
+        }),
+      ).rejects.toThrow('Custom Operation failed: 500 Internal Server Error');
     });
 
     it('should handle custom credentials', async () => {
@@ -462,9 +483,12 @@ describe('executeApi', () => {
 
       await executeApi('/api/test', { credentials: 'include' });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-        credentials: 'include',
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/test',
+        expect.objectContaining({
+          credentials: 'include',
+        }),
+      );
     });
   });
 });

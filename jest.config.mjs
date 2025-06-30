@@ -6,7 +6,10 @@ export default {
     '^.+\\.(css|scss)$': 'identity-obj-proxy',
     '^~/(.*)$': '<rootDir>/app/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/app/lib/modules/agents/__tests__/test-setup.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/app/__tests__/jest-setup.ts',
+    '<rootDir>/app/lib/modules/agents/__tests__/test-setup.ts',
+  ],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',

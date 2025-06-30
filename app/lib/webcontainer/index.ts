@@ -39,7 +39,7 @@ if (!import.meta.env.SSR) {
         } catch (error) {
           console.warn('Work directory validation failed:', error instanceof Error ? error.message : 'Unknown error');
           console.log('WebContainer workdir:', webcontainer.workdir);
-          
+
           // Try to create the workspace directory if it doesn't exist
           try {
             console.log('Attempting to ensure workspace directory exists...');
@@ -55,13 +55,14 @@ if (!import.meta.env.SSR) {
           console.warn('WebContainer workdir is not set, this may cause file watching issues');
         } else {
           console.log('WebContainer initialized with workdir:', webcontainer.workdir);
-          
+
           // Ensure the workdir actually exists before proceeding
           try {
             await webcontainer.fs.readdir(webcontainer.workdir);
             console.log('WebContainer workdir confirmed accessible');
           } catch (workdirError) {
             console.warn('WebContainer workdir not accessible, attempting to create:', workdirError);
+
             try {
               await webcontainer.fs.mkdir(webcontainer.workdir, { recursive: true });
               console.log('WebContainer workdir created successfully');

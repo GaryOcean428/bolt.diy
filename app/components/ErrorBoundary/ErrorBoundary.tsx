@@ -1,13 +1,8 @@
 import React, { Component, type ReactNode } from 'react';
+import { DefaultErrorFallback } from './ErrorFallback';
+import type { ErrorBoundaryState, ErrorInfo, ErrorBoundaryConfig, ErrorBoundaryFallbackProps } from './types';
 import { logStore } from '~/lib/stores/logs';
 import { createScopedLogger } from '~/utils/logger';
-import { DefaultErrorFallback } from './ErrorFallback';
-import type { 
-  ErrorBoundaryState, 
-  ErrorInfo, 
-  ErrorBoundaryConfig,
-  ErrorBoundaryFallbackProps 
-} from './types';
 
 const logger = createScopedLogger('ErrorBoundary');
 
@@ -16,6 +11,7 @@ const logger = createScopedLogger('ErrorBoundary');
  */
 export interface ErrorBoundaryProps extends ErrorBoundaryConfig {
   children: ReactNode;
+
   /** Unique identifier for this error boundary instance */
   id?: string;
 }
@@ -23,7 +19,7 @@ export interface ErrorBoundaryProps extends ErrorBoundaryConfig {
 /**
  * A robust React Error Boundary component that catches JavaScript errors anywhere in the child
  * component tree, logs those errors, and displays a fallback UI instead of the component tree that crashed.
- * 
+ *
  * Design Decisions:
  * 1. Class-based component: Required by React for error boundaries
  * 2. Retry mechanism: Allows users to attempt recovery from transient errors
@@ -33,16 +29,16 @@ export interface ErrorBoundaryProps extends ErrorBoundaryConfig {
  * 6. Development vs Production: Shows detailed errors in development, user-friendly messages in production
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  private retryTimeoutId: NodeJS.Timeout | null = null;
-  private readonly maxRetries: number;
-  private readonly boundaryId: string;
+  private _retryTimeoutId: NodeJS.Timeout | null = null;
+  private readonly _maxRetries: number;
+  private readonly _boundaryId: string;
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    
-    this.maxRetries = props.maxRetries ?? 3;
-    this.boundaryId = props.id ?? `boundary-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    
+
+    this._maxRetries = props.maxRetries ?? 3;
+    this._boundaryId = props.id ?? `boundary-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
     this.state = {
       hasError: false,
       error: null,
@@ -59,7 +55,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Generate a unique error ID for tracking
     const errorId = `error-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    
+
     return {
       hasError: true,
       error,
@@ -78,7 +74,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Enhanced error information
     const enhancedError = {
       ...error,
-      boundaryId: this.boundaryId,
+      boundaryId: this._boundaryId,
       timestamp: new Date().toISOString(),
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
       url: typeof window !== 'undefined' ? window.location.href : 'unknown',
@@ -91,7 +87,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     try {
       logStore.logError('React Error Boundary caught an error', enhancedError, {
         errorId,
-        boundaryId: this.boundaryId,
+        boundaryId: this._boundaryId,
         componentStack: errorInfo.componentStack,
         retryCount: this.state.retryCount,
       });
@@ -108,7 +104,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         error: enhancedError,
         errorInfo,
         errorId,
-        boundaryId: this.boundaryId,
+        boundaryId: this._boundaryId,
       });
     }
 
@@ -125,21 +121,21 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   /**
    * Reset the error boundary state and attempt to recover
    */
-  private resetError = (): void => {
+  private _resetError = (): void => {
     const { onRetry } = this.props;
     const newRetryCount = this.state.retryCount + 1;
 
     // Clear any existing retry timeout
-    if (this.retryTimeoutId) {
-      clearTimeout(this.retryTimeoutId);
-      this.retryTimeoutId = null;
+    if (this._retryTimeoutId) {
+      clearTimeout(this._retryTimeoutId);
+      this._retryTimeoutId = null;
     }
 
     // Log the retry attempt
     logStore.logUserAction('Error boundary retry attempted', {
-      boundaryId: this.boundaryId,
+      boundaryId: this._boundaryId,
       retryCount: newRetryCount,
-      maxRetries: this.maxRetries,
+      maxRetries: this._maxRetries,
       errorId: this.state.errorId,
     });
 
@@ -165,16 +161,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   /**
    * Check if retry is allowed based on retry count
    */
-  private canRetry(): boolean {
-    return this.state.retryCount < this.maxRetries;
+  private _canRetry(): boolean {
+    return this.state.retryCount < this._maxRetries;
   }
 
   /**
    * Component cleanup
    */
   componentWillUnmount(): void {
-    if (this.retryTimeoutId) {
-      clearTimeout(this.retryTimeoutId);
+    if (this._retryTimeoutId) {
+      clearTimeout(this._retryTimeoutId);
     }
   }
 
@@ -186,9 +182,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       const fallbackProps: ErrorBoundaryFallbackProps = {
         error,
         errorInfo: errorInfo!,
-        resetError: this.resetError,
+        resetError: this._resetError,
         retryCount: this.state.retryCount,
-        canRetry: this.canRetry(),
+        canRetry: this._canRetry(),
         errorId,
       };
 
@@ -198,7 +194,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           if (React.isValidElement(fallback)) {
             return fallback;
           }
-          
+
           if (typeof fallback === 'function') {
             const FallbackComponent = fallback;
             return <FallbackComponent {...fallbackProps} />;
@@ -211,11 +207,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       // Render default fallback UI
       return (
-        <DefaultErrorFallback 
-          {...fallbackProps}
-          showErrorDetails={showErrorDetails}
-          boundaryId={this.boundaryId}
-        />
+        <DefaultErrorFallback {...fallbackProps} showErrorDetails={showErrorDetails} boundaryId={this._boundaryId} />
       );
     }
 

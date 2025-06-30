@@ -34,12 +34,16 @@ export type RetryCallback = () => void;
 export interface ErrorBoundaryConfig {
   /** Maximum number of retry attempts before disabling retry */
   maxRetries?: number;
+
   /** Whether to show detailed error information in development */
   showErrorDetails?: boolean;
+
   /** Custom error reporting callback */
   onError?: ErrorReportCallback;
+
   /** Custom retry callback */
   onRetry?: RetryCallback;
+
   /** Fallback component or element to render on error */
   fallback?: React.ComponentType<ErrorBoundaryFallbackProps> | React.ReactElement;
 }
