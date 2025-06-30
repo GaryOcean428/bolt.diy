@@ -67,8 +67,8 @@ export class FilesStore {
   // Method to manually start initialization (useful for client-side mounting)
   startWatching() {
     if (!import.meta.env.SSR) {
-      // Add a small delay to ensure the webcontainer is ready
-      setTimeout(() => this.#init(), 500);
+      // Increased delay to ensure WebContainer is fully ready before starting file watching
+      setTimeout(() => this.#init(), 2000);
     }
   }
 
@@ -79,8 +79,8 @@ export class FilesStore {
 
   #watchingActive = false;
   #initRetryCount = 0;
-  #maxRetries = 10; // Maximum number of initialization retries
-  #baseRetryDelay = 1000; // Base delay in milliseconds
+  #maxRetries = 15; // Increased retries for WebContainer initialization
+  #baseRetryDelay = 2000; // Increased base delay for WebContainer stability
 
   getFile(filePath: string) {
     const dirent = this.files.get()[filePath];
@@ -152,13 +152,14 @@ export class FilesStore {
         return;
       }
 
-      // Use webcontainer.workdir instead of WORK_DIR to ensure we're watching the correct directory
-      const watchDir = `${webcontainer.workdir}/**`;
+      // Use relative path pattern to avoid path concatenation issues
+      const watchDir = '**/*';
 
       // Check if the work directory exists before setting up file watching
       try {
-        // Check the actual workdir that will be watched, not just current directory
-        await webcontainer.fs.readdir(webcontainer.workdir);
+        // Check using relative path to avoid absolute path concatenation issues
+        await webcontainer.fs.readdir('.');
+        logger.debug('Work directory confirmed accessible for file watching');
       } catch (dirError) {
         if (this.#initRetryCount >= this.#maxRetries) {
           logger.error('Work directory never became available after maximum retries, giving up file watching');
@@ -218,11 +219,17 @@ export class FilesStore {
 
       if (this.#initRetryCount >= this.#maxRetries) {
         logger.error('File watching initialization failed after maximum retries, giving up');
+
+        // In environments where WebContainer is not supported, log this as info instead of error
+        if (typeof window === 'undefined' || !('WebContainer' in window)) {
+          logger.info('WebContainer not available in this environment, file watching disabled');
+        }
+
         return;
       }
 
       // Retry after a delay if initialization fails
-      this.#scheduleRetry(2000);
+      this.#scheduleRetry(3000); // Increased delay for initialization failures
     }
   }
 
