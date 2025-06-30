@@ -3,6 +3,7 @@ import ignore from 'ignore';
 import { MAX_TOKENS } from './constants';
 import { PromptLibrary } from '~/lib/common/prompt-library';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
+import { LLMManager } from '~/lib/modules/llm/manager';
 import type { IProviderSetting } from '~/types/model';
 import {
   DEFAULT_MODEL,
@@ -176,9 +177,7 @@ export async function streamText(props: {
   });
 
   // Get provider instance from LLMManager
-  const manager = await import('~/lib/modules/llm/manager').then((m) =>
-    m.LLMManager.getInstance(serverEnv as unknown as Record<string, string>),
-  );
+  const manager = LLMManager.getInstance(serverEnv as unknown as Record<string, string>);
   const provider = manager.getProvider(currentProvider) || manager.getDefaultProvider();
 
   // Get dynamic max tokens based on the model
