@@ -9,33 +9,39 @@ The `executeApi` function and its convenience wrappers provide a standardized wa
 ## Design Decisions
 
 ### 1. Unified Error Handling
+
 - **Custom ApiError class**: Provides structured error information with user-friendly messages
 - **Error categorization**: Distinguishes between network, client (4xx), and server (5xx) errors
 - **User-friendly messages**: Translates technical errors into actionable user messages
 
 ### 2. Automatic Retry Logic
+
 - **Configurable retries**: Default 2 retries, configurable up to any limit
 - **Exponential backoff**: Prevents overwhelming servers with immediate retries
 - **Intelligent retry conditions**: Only retries transient errors (network, 5xx, 429)
 - **No retry for client errors**: Avoids wasting resources on non-transient errors (4xx except 429)
 
 ### 3. Request/Response Logging
+
 - **Integrated logging**: Uses the app's existing `logStore` for consistency
 - **Request tracking**: Unique request IDs for correlating logs
 - **Performance monitoring**: Tracks request duration
 - **Debug information**: Comprehensive logging in development mode
 
 ### 4. Timeout Handling
+
 - **Configurable timeouts**: Default 30 seconds, adjustable per request
 - **AbortController integration**: Clean request cancellation
 - **External signal support**: Can be cancelled by parent components
 
 ### 5. Type Safety
+
 - **Generic response types**: Full TypeScript support for response data
 - **Strict interfaces**: Well-defined types for all configuration options
 - **Runtime type checking**: Validates response content types
 
 ### 6. Content Type Handling
+
 - **Automatic JSON parsing**: Handles JSON responses automatically
 - **Text content support**: Handles text responses
 - **Binary data support**: Can handle other content types
@@ -53,15 +59,15 @@ executeApi<TData>(url: string, config?: ApiRequestConfig): Promise<ApiResponse<T
 
 ```typescript
 interface ApiRequestConfig {
-  method?: HttpMethod;                    // HTTP method (default: 'GET')
-  headers?: Record<string, string>;       // Request headers
-  body?: unknown;                         // Request body (auto-serialized)
-  timeout?: number;                       // Timeout in ms (default: 30000)
-  retries?: number;                       // Retry attempts (default: 2)
-  retryDelay?: number;                    // Delay between retries (default: 1000)
-  credentials?: RequestCredentials;       // Include credentials (default: 'same-origin')
-  signal?: AbortSignal;                   // Abort signal
-  errorPrefix?: string;                   // Custom error message prefix
+  method?: HttpMethod; // HTTP method (default: 'GET')
+  headers?: Record<string, string>; // Request headers
+  body?: unknown; // Request body (auto-serialized)
+  timeout?: number; // Timeout in ms (default: 30000)
+  retries?: number; // Retry attempts (default: 2)
+  retryDelay?: number; // Delay between retries (default: 1000)
+  credentials?: RequestCredentials; // Include credentials (default: 'same-origin')
+  signal?: AbortSignal; // Abort signal
+  errorPrefix?: string; // Custom error message prefix
 }
 ```
 
@@ -69,12 +75,13 @@ interface ApiRequestConfig {
 
 ```typescript
 interface ApiResponse<TData> {
-  data: TData;                           // Response data
-  status: number;                        // HTTP status code
-  headers: Headers;                      // Response headers
-  success: boolean;                      // Success indicator
-  error?: string;                        // Error message if failed
-  metadata: {                            // Request metadata
+  data: TData; // Response data
+  status: number; // HTTP status code
+  headers: Headers; // Response headers
+  success: boolean; // Success indicator
+  error?: string; // Error message if failed
+  metadata: {
+    // Request metadata
     url: string;
     method: string;
     duration: number;
@@ -88,17 +95,17 @@ interface ApiResponse<TData> {
 
 ```typescript
 class ApiError extends Error {
-  status: number;                        // HTTP status code
-  response: Response | null;             // Original response (if any)
-  requestId: string;                     // Unique request ID
-  url: string;                           // Request URL
-  method: string;                        // HTTP method
-  
+  status: number; // HTTP status code
+  response: Response | null; // Original response (if any)
+  requestId: string; // Unique request ID
+  url: string; // Request URL
+  method: string; // HTTP method
+
   // Helper methods
-  isNetworkError(): boolean;             // No response received
-  isClientError(): boolean;              // 4xx status code
-  isServerError(): boolean;              // 5xx status code
-  getUserMessage(): string;              // User-friendly error message
+  isNetworkError(): boolean; // No response received
+  isClientError(): boolean; // 4xx status code
+  isServerError(): boolean; // 5xx status code
+  getUserMessage(): string; // User-friendly error message
 }
 ```
 
@@ -153,7 +160,7 @@ async function createUser(userData: CreateUserRequest): Promise<CreateUserRespon
       timeout: 15000,
       errorPrefix: 'User Creation',
     });
-    
+
     return response.data;
   } catch (error) {
     if (error instanceof ApiError) {
@@ -199,11 +206,11 @@ import { executeApi } from '~/utils/api';
 const response = await executeApi<ApiData>('/api/protected-resource', {
   method: 'GET',
   headers: {
-    'Authorization': `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
     'X-Client-Version': '1.0.0',
   },
-  timeout: 60000,  // 1 minute timeout
-  retries: 5,      // More retries for important requests
+  timeout: 60000, // 1 minute timeout
+  retries: 5, // More retries for important requests
   retryDelay: 2000, // 2 second delay between retries
 });
 
@@ -252,7 +259,7 @@ async function robustApiCall() {
         throw new Error(error.getUserMessage());
       }
     }
-    
+
     // Handle non-API errors
     console.error('Unexpected error:', error);
     throw new Error('An unexpected error occurred');
@@ -276,12 +283,12 @@ function UserProfile({ userId }: { userId: string }) {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await executeApi<User>(`/api/users/${userId}`, {
           timeout: 10000,
           retries: 2,
         });
-        
+
         setUser(response.data);
       } catch (error) {
         if (error instanceof ApiError) {
@@ -417,8 +424,8 @@ try {
 const status = await get<Status>('/api/status', { timeout: 5000 });
 
 // Longer timeout for file uploads
-const result = await post<UploadResult>('/api/upload', formData, { 
-  timeout: 120000  // 2 minutes
+const result = await post<UploadResult>('/api/upload', formData, {
+  timeout: 120000, // 2 minutes
 });
 
 // Very short timeout for health checks
@@ -435,7 +442,7 @@ const paymentResult = await post<PaymentResult>('/api/payment', data, {
 });
 
 // Quick operations - fewer retries
-const search = await get<SearchResults>('/api/search', { 
+const search = await get<SearchResults>('/api/search', {
   retries: 1,
   timeout: 5000,
 });
@@ -449,21 +456,21 @@ const analytics = await post<void>('/api/analytics', data, { retries: 0 });
 ```typescript
 function useApiData(url: string) {
   const [data, setData] = useState(null);
-  
+
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     executeApi(url, { signal: abortController.signal })
-      .then(response => setData(response.data))
-      .catch(error => {
+      .then((response) => setData(response.data))
+      .catch((error) => {
         if (error.name !== 'AbortError') {
           console.error('API error:', error);
         }
       });
-    
+
     return () => abortController.abort();
   }, [url]);
-  
+
   return data;
 }
 ```
@@ -471,16 +478,19 @@ function useApiData(url: string) {
 ## Performance Considerations
 
 ### Memory Management
+
 - Request objects are properly cleaned up after completion
 - AbortController signals prevent memory leaks from cancelled requests
 - Response data is not unnecessarily cloned
 
 ### Network Efficiency
+
 - Automatic retry with exponential backoff prevents server overload
 - Configurable timeouts prevent hanging requests
 - Request deduplication should be implemented at the application level if needed
 
 ### Bundle Size
+
 - Tree-shakeable exports allow importing only needed functions
 - Minimal external dependencies
 - Efficient error handling without bloating bundle size
@@ -502,7 +512,7 @@ describe('executeApi', () => {
 
   it('should handle successful GET request', async () => {
     const mockData = { id: '1', name: 'Test' };
-    
+
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       status: 200,
@@ -511,7 +521,7 @@ describe('executeApi', () => {
     });
 
     const response = await executeApi<typeof mockData>('/api/test');
-    
+
     expect(response.data).toEqual(mockData);
     expect(response.success).toBe(true);
     expect(response.status).toBe(200);
@@ -529,7 +539,7 @@ describe('executeApi', () => {
       });
 
     const response = await executeApi('/api/test', { retries: 2 });
-    
+
     expect(fetch).toHaveBeenCalledTimes(3);
     expect(response.success).toBe(true);
   });
@@ -541,14 +551,17 @@ describe('executeApi', () => {
 ### Common Issues
 
 1. **Requests timing out too quickly**
+
    - Solution: Increase timeout for slow operations
    - Check network conditions
 
 2. **Too many retries on client errors**
+
    - Solution: Client errors (4xx) are not retried by default
    - Check if you're correctly handling validation errors
 
 3. **Memory leaks with cancelled requests**
+
    - Solution: Always provide AbortSignal for cancellable operations
    - Clean up in component unmount effects
 
@@ -559,6 +572,7 @@ describe('executeApi', () => {
 ### Debugging
 
 Check browser DevTools for:
+
 - Network tab for actual HTTP requests
 - Console for detailed error messages
 - Application logs for structured error information

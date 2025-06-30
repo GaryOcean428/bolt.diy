@@ -11,7 +11,15 @@ interface Logger {
   setLevel: (level: DebugLevel) => void;
 }
 
-let currentLevel: DebugLevel = (import.meta.env.VITE_LOG_LEVEL ?? import.meta.env.DEV) ? 'debug' : 'info';
+let currentLevel: DebugLevel;
+
+try {
+  // Try to access import.meta.env safely
+  currentLevel = (import.meta.env.VITE_LOG_LEVEL ?? import.meta.env.DEV) ? 'debug' : 'info';
+} catch {
+  // Fallback for test environments or when import.meta is not available
+  currentLevel = 'info';
+}
 
 export const logger: Logger = {
   trace: (...messages: any[]) => log('trace', undefined, messages),

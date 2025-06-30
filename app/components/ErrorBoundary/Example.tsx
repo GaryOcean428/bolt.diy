@@ -12,6 +12,7 @@ const ProblemComponent: React.FC<{ shouldThrow: boolean }> = ({ shouldThrow }) =
   if (shouldThrow) {
     throw new Error('Intentional error for demonstration');
   }
+
   return <div className="p-4 bg-green-100 text-green-800 rounded">Component working correctly!</div>;
 };
 
@@ -25,12 +26,12 @@ const ApiExampleComponent: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await executeApi<{ message: string; timestamp: string }>(url, {
         timeout: 5000,
         retries: 2,
       });
-      
+
       setData(response.data);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -46,7 +47,7 @@ const ApiExampleComponent: React.FC = () => {
   return (
     <div className="p-4 space-y-4">
       <h3 className="text-lg font-semibold">API Example</h3>
-      
+
       <div className="space-x-2">
         <button
           onClick={() => makeApiCall('/api/status')}
@@ -55,7 +56,7 @@ const ApiExampleComponent: React.FC = () => {
         >
           {loading ? 'Loading...' : 'Test Valid API'}
         </button>
-        
+
         <button
           onClick={() => makeApiCall('/api/nonexistent')}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
@@ -63,7 +64,7 @@ const ApiExampleComponent: React.FC = () => {
         >
           {loading ? 'Loading...' : 'Test 404 Error'}
         </button>
-        
+
         <button
           onClick={() => makeApiCall('/api/slow-endpoint')}
           className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
@@ -107,15 +108,13 @@ export const ErrorBoundaryExample: React.FC = () => {
           <p className="text-gray-600 mb-4">
             The ErrorBoundary catches JavaScript errors in the component tree and displays a user-friendly fallback UI.
           </p>
-          
+
           <div className="space-y-4">
             <div>
               <button
                 onClick={() => setThrowError(!throwError)}
                 className={`px-4 py-2 rounded ${
-                  throwError 
-                    ? 'bg-green-500 hover:bg-green-600 text-white' 
-                    : 'bg-red-500 hover:bg-red-600 text-white'
+                  throwError ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                 }`}
               >
                 {throwError ? 'Fix Component' : 'Break Component'}
@@ -142,10 +141,10 @@ export const ErrorBoundaryExample: React.FC = () => {
         <section className="border rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">API Utilities Demo</h2>
           <p className="text-gray-600 mb-4">
-            The executeApi utility provides robust HTTP request handling with automatic retries, 
-            error categorization, and comprehensive logging.
+            The executeApi utility provides robust HTTP request handling with automatic retries, error categorization,
+            and comprehensive logging.
           </p>
-          
+
           <ErrorBoundary
             id="api-demo-boundary"
             maxRetries={1}
@@ -172,7 +171,7 @@ export const ErrorBoundaryExample: React.FC = () => {
                 <li>• Custom error and retry handlers</li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="font-semibold text-blue-600 mb-2">API Utilities Features</h3>
               <ul className="text-sm space-y-1 text-gray-600">
@@ -192,20 +191,20 @@ export const ErrorBoundaryExample: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">Implementation Notes</h2>
           <div className="text-sm text-gray-700 space-y-2">
             <p>
-              <strong>Design Decision:</strong> The ErrorBoundary uses a class-based component (required by React)
-              but maintains modern patterns with comprehensive TypeScript support and hooks integration.
+              <strong>Design Decision:</strong> The ErrorBoundary uses a class-based component (required by React) but
+              maintains modern patterns with comprehensive TypeScript support and hooks integration.
             </p>
             <p>
-              <strong>Logging Integration:</strong> Both components integrate with the existing logStore system
-              for consistent error tracking and debugging capabilities.
+              <strong>Logging Integration:</strong> Both components integrate with the existing logStore system for
+              consistent error tracking and debugging capabilities.
             </p>
             <p>
-              <strong>Accessibility:</strong> The fallback UI includes proper ARIA attributes, semantic HTML,
-              and screen reader support for inclusive design.
+              <strong>Accessibility:</strong> The fallback UI includes proper ARIA attributes, semantic HTML, and screen
+              reader support for inclusive design.
             </p>
             <p>
-              <strong>Performance:</strong> Error boundaries are strategically placed to isolate failures
-              and prevent cascading errors from breaking the entire application.
+              <strong>Performance:</strong> Error boundaries are strategically placed to isolate failures and prevent
+              cascading errors from breaking the entire application.
             </p>
           </div>
         </section>

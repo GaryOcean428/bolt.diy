@@ -11,7 +11,7 @@ interface DefaultErrorFallbackProps extends ErrorBoundaryFallbackProps {
 
 /**
  * Default fallback UI component displayed when an error occurs in the ErrorBoundary
- * 
+ *
  * Design Decisions:
  * 1. User-friendly messaging: Avoids technical jargon for production users
  * 2. Actionable buttons: Provides clear next steps (retry, reload)
@@ -53,10 +53,11 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
     };
 
     const errorText = JSON.stringify(errorDetails, null, 2);
-    
+
     if (navigator.clipboard) {
       navigator.clipboard.writeText(errorText).catch((clipboardError) => {
         console.error('Failed to copy to clipboard:', clipboardError);
+
         // Fallback: log to console for manual copying
         console.log('Error details for manual copying:', errorText);
       });
@@ -67,7 +68,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
   };
 
   return (
-    <div 
+    <div
       className="flex flex-col items-center justify-center min-h-96 p-6 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary border border-bolt-elements-borderColor rounded-lg"
       role="alert"
       aria-labelledby="error-title"
@@ -80,10 +81,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
         </div>
 
         {/* Error Title */}
-        <h1 
-          id="error-title"
-          className="text-2xl font-semibold mb-3 text-bolt-elements-textPrimary"
-        >
+        <h1 id="error-title" className="text-2xl font-semibold mb-3 text-bolt-elements-textPrimary">
           Something went wrong
         </h1>
 
@@ -92,12 +90,8 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
           <p className="text-bolt-elements-textSecondary mb-2">
             We encountered an unexpected error. Please try one of the options below to continue.
           </p>
-          
-          {retryCount > 0 && (
-            <p className="text-sm text-bolt-elements-textTertiary">
-              Retry attempts: {retryCount}
-            </p>
-          )}
+
+          {retryCount > 0 && <p className="text-sm text-bolt-elements-textTertiary">Retry attempts: {retryCount}</p>}
         </div>
 
         {/* Action Buttons */}
@@ -111,7 +105,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
               Try Again
             </button>
           )}
-          
+
           <button
             onClick={handleReload}
             className="bg-bolt-elements-button-secondary-background hover:bg-bolt-elements-button-secondary-backgroundHover text-bolt-elements-button-secondary-text px-6 py-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus focus:ring-offset-2"
@@ -123,12 +117,8 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
 
         {/* Hidden descriptions for screen readers */}
         <div className="sr-only">
-          <div id="retry-description">
-            Retry the last operation that caused the error
-          </div>
-          <div id="reload-description">
-            Reload the entire page to start fresh
-          </div>
+          <div id="retry-description">Retry the last operation that caused the error</div>
+          <div id="reload-description">Reload the entire page to start fresh</div>
         </div>
 
         {/* Error Details (Development Only) */}
@@ -137,23 +127,23 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
             <summary className="cursor-pointer text-sm font-medium text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary mb-2">
               Error Details (Development)
             </summary>
-            
+
             <div className="bg-bolt-elements-background-depth-2 p-4 rounded border text-xs font-mono">
               <div className="mb-3">
                 <strong className="text-bolt-elements-textPrimary">Error ID:</strong>
                 <span className="ml-2 text-bolt-elements-textSecondary">{errorId}</span>
               </div>
-              
+
               <div className="mb-3">
                 <strong className="text-bolt-elements-textPrimary">Boundary ID:</strong>
                 <span className="ml-2 text-bolt-elements-textSecondary">{boundaryId}</span>
               </div>
-              
+
               <div className="mb-3">
                 <strong className="text-bolt-elements-textPrimary">Error Message:</strong>
                 <pre className="mt-1 whitespace-pre-wrap text-red-400">{error.message}</pre>
               </div>
-              
+
               {error.stack && (
                 <div className="mb-3">
                   <strong className="text-bolt-elements-textPrimary">Stack Trace:</strong>
@@ -162,7 +152,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
                   </pre>
                 </div>
               )}
-              
+
               {errorInfo.componentStack && (
                 <div className="mb-3">
                   <strong className="text-bolt-elements-textPrimary">Component Stack:</strong>
@@ -171,7 +161,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
                   </pre>
                 </div>
               )}
-              
+
               <button
                 onClick={handleCopyError}
                 className="mt-2 text-xs bg-bolt-elements-button-secondary-background hover:bg-bolt-elements-button-secondary-backgroundHover text-bolt-elements-button-secondary-text px-3 py-1 rounded"
@@ -185,9 +175,7 @@ export const DefaultErrorFallback: React.FC<DefaultErrorFallbackProps> = ({
         {/* Error ID for Support */}
         <div className="mt-4 text-xs text-bolt-elements-textTertiary">
           <span>Error ID: </span>
-          <code className="bg-bolt-elements-background-depth-2 px-1 py-0.5 rounded">
-            {errorId}
-          </code>
+          <code className="bg-bolt-elements-background-depth-2 px-1 py-0.5 rounded">{errorId}</code>
         </div>
 
         {!canRetry && (

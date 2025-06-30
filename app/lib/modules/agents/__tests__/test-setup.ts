@@ -9,6 +9,17 @@ import {
   type TaskComplexity,
 } from '~/lib/modules/agents/types';
 
+// Mock import.meta.env for tests
+global.globalThis.import = {
+  meta: {
+    env: {
+      VITE_LOG_LEVEL: 'debug',
+      DEV: true,
+      SSR: false,
+    },
+  },
+} as any;
+
 export function createMockAgentManager(): AgentManager {
   const manager = new AgentManager();
   const mockLanguageAgent = createMockLanguageAgent();
