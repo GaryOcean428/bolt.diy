@@ -23,6 +23,11 @@ if (!import.meta.env.SSR) {
     import.meta.hot?.data.webcontainer ??
     Promise.resolve()
       .then(() => {
+        // Check if WebContainer is supported in this environment
+        if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
+          console.warn('WebContainer requires Cross-Origin Isolation. Some features may not work properly.');
+        }
+
         return WebContainer.boot({
           coep: 'credentialless',
           workdirName: WORK_DIR_NAME,
@@ -32,42 +37,26 @@ if (!import.meta.env.SSR) {
       .then(async (webcontainer) => {
         webcontainerContext.loaded = true;
 
-        // Validate the work directory exists (WebContainer manages this automatically)
-        try {
-          await webcontainer.fs.readdir('.');
-          console.log('Work directory verified:', webcontainer.workdir);
-        } catch (error) {
-          console.warn('Work directory validation failed:', error instanceof Error ? error.message : 'Unknown error');
-          console.log('WebContainer workdir:', webcontainer.workdir);
-
-          // Try to create the workspace directory if it doesn't exist
-          try {
-            console.log('Attempting to ensure workspace directory exists...');
-            await webcontainer.fs.mkdir(webcontainer.workdir || WORK_DIR_NAME, { recursive: true });
-            console.log('Workspace directory created successfully');
-          } catch (createError) {
-            console.warn('Failed to create workspace directory:', createError);
-          }
-        }
-
-        // Validate workdir is properly set
+        // Validate workdir is properly set and accessible
         if (!webcontainer.workdir) {
           console.warn('WebContainer workdir is not set, this may cause file watching issues');
         } else {
           console.log('WebContainer initialized with workdir:', webcontainer.workdir);
 
-          // Ensure the workdir actually exists before proceeding
+          // Validate the work directory exists using relative path to avoid path concatenation issues
           try {
-            await webcontainer.fs.readdir(webcontainer.workdir);
-            console.log('WebContainer workdir confirmed accessible');
-          } catch (workdirError) {
-            console.warn('WebContainer workdir not accessible, attempting to create:', workdirError);
+            await webcontainer.fs.readdir('.');
+            console.log('Work directory verified:', webcontainer.workdir);
+          } catch (error) {
+            console.warn('Work directory validation failed, attempting to create workspace');
+            console.debug('Directory validation error:', error instanceof Error ? error.message : 'Unknown error');
 
             try {
-              await webcontainer.fs.mkdir(webcontainer.workdir, { recursive: true });
-              console.log('WebContainer workdir created successfully');
-            } catch (createWorkdirError) {
-              console.error('Failed to create WebContainer workdir:', createWorkdirError);
+              // Use relative path for workspace creation to avoid path issues
+              await webcontainer.fs.mkdir('.', { recursive: true });
+              console.log('Workspace directory created successfully');
+            } catch (createError) {
+              console.warn('Failed to create workspace directory:', createError);
             }
           }
         }
@@ -104,6 +93,23 @@ if (!import.meta.env.SSR) {
       .catch((error) => {
         console.error('WebContainer initialization failed:', error);
         webcontainerContext.loaded = false;
+
+        // Provide more detailed error information for debugging
+        if (error instanceof Error) {
+          console.error('WebContainer error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          });
+        }
+
+        /*
+         * In server environments like Railway, WebContainer might not be available
+         * Log this as a warning rather than an error for these cases
+         */
+        if (typeof window === 'undefined' || !window.WebContainerSupported) {
+          console.warn('WebContainer is not supported in this environment (likely server-side)');
+        }
 
         // Re-throw to maintain promise rejection behavior
         throw error;
