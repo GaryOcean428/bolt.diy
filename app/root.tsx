@@ -6,6 +6,7 @@ import xtermStyles from '@xterm/xterm/css/xterm.css?url';
 import { useEffect } from 'react';
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import { createHead } from 'remix-island';
+import { ErrorBoundary as ReactErrorBoundary } from './components/ErrorBoundary';
 import { logStore } from './lib/stores/logs';
 import { themeStore } from './lib/stores/theme';
 import globalStyles from './styles/index.scss?url';
@@ -296,5 +297,27 @@ export default function App() {
     return undefined;
   }, []);
 
-  return <Outlet />;
+  return (
+    <ReactErrorBoundary
+      id="app-root"
+      maxRetries={3}
+      onError={(error, errorInfo, errorId) => {
+        // Custom error reporting - could integrate with external services
+        logStore.logError('App-level error boundary triggered', error, {
+          errorId,
+          errorInfo: errorInfo.componentStack,
+          context: 'App root',
+        });
+      }}
+      onRetry={() => {
+        // Custom retry logic - could clear caches, reset state, etc.
+        logStore.logUserAction('App-level error boundary retry', {
+          context: 'App root',
+          timestamp: new Date().toISOString(),
+        });
+      }}
+    >
+      <Outlet />
+    </ReactErrorBoundary>
+  );
 }
