@@ -1,6 +1,7 @@
 import { WebContainer } from '@webcontainer/api';
 import { WORK_DIR_NAME } from '~/utils/constants';
 import { cleanStackTrace } from '~/utils/stacktrace';
+import { WorkspaceInitializer } from '~/utils/workspace-init';
 
 interface WebContainerContext {
   loaded: boolean;
@@ -43,10 +44,17 @@ if (!import.meta.env.SSR) {
         } else {
           console.log('WebContainer initialized with workdir:', webcontainer.workdir);
 
-          // Validate the work directory exists using relative path to avoid path concatenation issues
+          // Use enhanced workspace initialization
           try {
-            await webcontainer.fs.readdir('.');
-            console.log('Work directory verified:', webcontainer.workdir);
+            const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.');
+
+            if (workspaceReady) {
+              // Validate the work directory exists using relative path to avoid path concatenation issues
+              await webcontainer.fs.readdir('.');
+              console.log('Work directory verified:', webcontainer.workdir);
+            } else {
+              console.warn('Virtual workspace validation failed');
+            }
           } catch (error) {
             console.warn('Work directory validation failed, attempting to create workspace');
             console.debug('Directory validation error:', error instanceof Error ? error.message : 'Unknown error');

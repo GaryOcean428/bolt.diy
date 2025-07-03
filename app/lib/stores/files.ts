@@ -7,6 +7,7 @@ import { bufferWatchEvents } from '~/utils/buffer';
 import { computeFileModifications } from '~/utils/diff';
 import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
+import { WorkspaceInitializer } from '~/utils/workspace-init';
 
 const logger = createScopedLogger('FilesStore');
 
@@ -157,9 +158,16 @@ export class FilesStore {
 
       // Check if the work directory exists before setting up file watching
       try {
-        // Check using relative path to avoid absolute path concatenation issues
-        await webcontainer.fs.readdir('.');
-        logger.debug('Work directory confirmed accessible for file watching');
+        // Use WorkspaceInitializer to ensure virtual workspace is ready
+        const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.');
+
+        if (workspaceReady) {
+          // Check using relative path to avoid absolute path concatenation issues
+          await webcontainer.fs.readdir('.');
+          logger.debug('Work directory confirmed accessible for file watching');
+        } else {
+          logger.warn('Virtual workspace initialization indicated issues');
+        }
       } catch (dirError) {
         if (this.#initRetryCount >= this.#maxRetries) {
           logger.error('Work directory never became available after maximum retries, giving up file watching');
