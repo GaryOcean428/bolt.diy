@@ -29,7 +29,16 @@ export class FileWatcher {
       }
 
       // Dynamically import chokidar
-      const chokidar = await import('chokidar');
+      let chokidar;
+
+      try {
+        chokidar = await import('chokidar');
+      } catch (importError) {
+        logger.error('Failed to import chokidar module:', importError);
+        throw new Error(
+          `File watching not available: ${importError instanceof Error ? importError.message : 'Unknown import error'}`,
+        );
+      }
 
       // Initialize watcher with error handling
       this._watcher = chokidar.watch(this._workdir, {
@@ -103,13 +112,17 @@ export class FileWatcher {
     await this.close();
 
     // Wait a bit before restarting
-    setTimeout(async () => {
-      try {
-        await this.initialize();
-      } catch (error) {
-        logger.error('Failed to restart file watcher:', error);
-      }
-    }, 2000);
+    await new Promise<void>((resolve) => {
+      setTimeout(async () => {
+        try {
+          await this.initialize();
+          resolve();
+        } catch (error) {
+          logger.error('Failed to restart file watcher:', error);
+          resolve();
+        }
+      }, 2000);
+    });
   }
 
   async close(): Promise<void> {

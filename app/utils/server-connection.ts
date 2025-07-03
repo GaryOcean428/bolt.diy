@@ -31,33 +31,37 @@ export class ServerConnection {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this._config.timeout);
 
-        const response = await fetch(`${this._config.url}${endpoint}`, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers,
-          },
-          signal: controller.signal,
-        });
+        try {
+          const response = await fetch(`${this._config.url}${endpoint}`, {
+            ...options,
+            headers: {
+              'Content-Type': 'application/json',
+              ...options?.headers,
+            },
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
 
-        clearTimeout(timeoutId);
+          if (!response.ok) {
+            const errorMessage = `Server error: ${response.status} ${response.statusText}`;
 
-        if (!response.ok) {
-          const errorMessage = `Server error: ${response.status} ${response.statusText}`;
-
-          if (response.status === 500) {
-            // Server errors are retryable
-            throw new Error(errorMessage);
-          } else if (response.status >= 400 && response.status < 500) {
-            // Client errors are typically not retryable
-            logger.error(`Client error (${response.status}), not retrying: ${errorMessage}`);
-            throw new Error(errorMessage);
+            if (response.status === 500) {
+              // Server errors are retryable
+              throw new Error(errorMessage);
+            } else if (response.status >= 400 && response.status < 500) {
+              // Client errors are typically not retryable
+              logger.error(`Client error (${response.status}), not retrying: ${errorMessage}`);
+              throw new Error(errorMessage);
+            }
           }
+
+          logger.debug(`Successfully connected to ${endpoint} on attempt ${attempt + 1}`);
+
+          return response;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          throw error;
         }
-
-        logger.debug(`Successfully connected to ${endpoint} on attempt ${attempt + 1}`);
-
-        return response;
       } catch (error) {
         lastError = error as Error;
         logger.warn(`Attempt ${attempt + 1} failed:`, error);

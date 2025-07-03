@@ -40,9 +40,19 @@ export class WorkspaceInitializer {
           logger.error('Workspace not writable:', error);
           return false;
         }
-      } catch {
-        logger.warn('Node.js fs module not available, assuming virtual environment');
-        return true;
+      } catch (importError) {
+        // Check if it's a legitimate module import error vs virtual environment
+        if (
+          importError instanceof Error &&
+          (importError.message.includes('Cannot resolve module') || importError.message.includes('MODULE_NOT_FOUND'))
+        ) {
+          logger.warn('Node.js fs module not available, assuming virtual environment');
+          return true;
+        } else {
+          // Re-throw legitimate import errors
+          logger.error('Failed to import Node.js fs module:', importError);
+          throw importError;
+        }
       }
     } catch (error) {
       logger.error('Failed to initialize workspace:', error);
