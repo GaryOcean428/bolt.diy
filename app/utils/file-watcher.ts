@@ -30,11 +30,14 @@ export class FileWatcher {
 
       // Dynamically import chokidar
       let chokidar;
+
       try {
         chokidar = await import('chokidar');
       } catch (importError) {
         logger.error('Failed to import chokidar module:', importError);
-        throw new Error(`File watching not available: ${importError instanceof Error ? importError.message : 'Unknown import error'}`);
+        throw new Error(
+          `File watching not available: ${importError instanceof Error ? importError.message : 'Unknown import error'}`,
+        );
       }
 
       // Initialize watcher with error handling

@@ -42,9 +42,10 @@ export class WorkspaceInitializer {
         }
       } catch (importError) {
         // Check if it's a legitimate module import error vs virtual environment
-        if (importError instanceof Error && 
-            (importError.message.includes('Cannot resolve module') || 
-             importError.message.includes('MODULE_NOT_FOUND'))) {
+        if (
+          importError instanceof Error &&
+          (importError.message.includes('Cannot resolve module') || importError.message.includes('MODULE_NOT_FOUND'))
+        ) {
           logger.warn('Node.js fs module not available, assuming virtual environment');
           return true;
         } else {

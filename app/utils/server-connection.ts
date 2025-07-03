@@ -56,6 +56,7 @@ export class ServerConnection {
           }
 
           logger.debug(`Successfully connected to ${endpoint} on attempt ${attempt + 1}`);
+
           return response;
         } catch (error) {
           clearTimeout(timeoutId);

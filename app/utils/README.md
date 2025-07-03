@@ -5,6 +5,7 @@ This directory contains utility classes that address common issues with workspac
 ## Overview
 
 The utilities were created to address these specific issues:
+
 - **File System Error**: ENOENT error when trying to watch workspace directories
 - **Server Error (500)**: Failed request to Railway server with proper retry logic
 - **Development Environment**: Better error handling and workspace management
@@ -16,12 +17,14 @@ The utilities were created to address these specific issues:
 Ensures workspace directories are properly initialized across different environments.
 
 **Features:**
+
 - Browser-safe initialization (returns true in browser environments)
 - Server environment workspace creation and validation
 - Graceful fallback when Node.js fs module is not available
 - Virtual workspace validation for WebContainer environments
 
 **Usage:**
+
 ```typescript
 import { WorkspaceInitializer } from '~/utils/workspace-init';
 
@@ -37,6 +40,7 @@ const virtualReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.'
 Provides file watching capabilities using chokidar with enhanced error handling and recovery.
 
 **Features:**
+
 - Browser-safe (gracefully returns null in browser environments)
 - Automatic retry and recovery mechanisms
 - Configurable ignore patterns for common files/directories
@@ -44,6 +48,7 @@ Provides file watching capabilities using chokidar with enhanced error handling 
 - Automatic workspace validation before watching
 
 **Usage:**
+
 ```typescript
 import { FileWatcher } from '~/utils/file-watcher';
 
@@ -64,6 +69,7 @@ await watcher.close();
 Robust server communication with retry logic, timeout handling, and error recovery.
 
 **Features:**
+
 - Configurable retry attempts and delays
 - Exponential backoff with jitter
 - Request timeout handling
@@ -72,6 +78,7 @@ Robust server communication with retry logic, timeout handling, and error recove
 - Proper error categorization (client vs server errors)
 
 **Usage:**
+
 ```typescript
 import { ServerConnection } from '~/utils/server-connection';
 
@@ -79,13 +86,13 @@ const connection = new ServerConnection({
   url: 'https://api.example.com',
   retryAttempts: 3,
   retryDelay: 1000,
-  timeout: 5000
+  timeout: 5000,
 });
 
 // Make a request with retry logic
 const response = await connection.fetchWithRetry('/api/data', {
   method: 'POST',
-  body: JSON.stringify({ data: 'test' })
+  body: JSON.stringify({ data: 'test' }),
 });
 
 // Test connectivity
@@ -102,12 +109,14 @@ if (result.success) {
 Example integration showing how to use ServerConnection for Railway server communication.
 
 **Features:**
+
 - Railway-specific configuration
 - Command execution with retry logic
 - Health monitoring
 - Connection testing
 
 **Usage:**
+
 ```typescript
 import { createRailwayClient } from '~/utils/railway-client';
 
@@ -157,6 +166,7 @@ if (workspaceReady) {
 ## Error Handling
 
 All utilities follow the project's error handling patterns:
+
 - Comprehensive logging using the project's logger
 - Graceful degradation in unsupported environments
 - Proper error categorization and recovery
@@ -165,6 +175,7 @@ All utilities follow the project's error handling patterns:
 ## Testing
 
 Basic tests are included in `app/utils/__tests__/utilities.test.ts` to verify:
+
 - Browser environment handling
 - Error scenarios
 - Basic functionality
@@ -182,7 +193,7 @@ const connection = new ServerConnection({
   url: 'https://my-server.com',
   retryAttempts: 5,
   retryDelay: 2000,
-  timeout: 15000
+  timeout: 15000,
 });
 ```
 
