@@ -258,30 +258,55 @@ export default function App() {
        * Use a longer delay and better error handling to prevent issues
        */
       const initializeFileWatching = async () => {
-        try {
-          // Wait for the DOM to be fully loaded
-          await new Promise((resolve) => {
-            if (document.readyState === 'complete') {
-              resolve(true);
-            } else {
-              window.addEventListener('load', resolve, { once: true });
+        let retryCount = 0;
+        const maxRetries = 3;
+        
+        const attemptInitialization = async () => {
+          try {
+            // Wait for the DOM to be fully loaded
+            await new Promise((resolve) => {
+              if (document.readyState === 'complete') {
+                resolve(true);
+              } else {
+                window.addEventListener('load', resolve, { once: true });
+              }
+            });
+
+            // Additional delay to ensure webcontainer has time to initialize
+            // Use exponential backoff for retries
+            const baseDelay = 2000;
+            const delay = baseDelay * Math.pow(2, retryCount);
+            await new Promise((resolve) => setTimeout(resolve, Math.min(delay, 10000)));
+
+            // First, check if WebContainer is available
+            if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
+              console.warn('WebContainer requires Cross-Origin Isolation, file watching may not work properly');
+              return;
             }
-          });
 
-          // Additional delay to ensure webcontainer has time to initialize
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+            const { workbenchStore } = await import('~/lib/stores/workbench');
 
-          const { workbenchStore } = await import('~/lib/stores/workbench');
-
-          if (workbenchStore?.filesStore?.startWatching) {
-            workbenchStore.filesStore.startWatching();
-            console.log('File watching initialized');
+            if (workbenchStore?.filesStore?.startWatching) {
+              workbenchStore.filesStore.startWatching();
+              console.log('File watching initialized successfully');
+            } else {
+              console.warn('File watching not available in workbench store');
+            }
+          } catch (error) {
+            console.warn(`Failed to initialize file watching (attempt ${retryCount + 1}/${maxRetries}):`, error);
+            
+            // Retry with exponential backoff
+            if (retryCount < maxRetries) {
+              retryCount++;
+              setTimeout(attemptInitialization, 1000 * Math.pow(2, retryCount));
+            } else {
+              console.error('File watching initialization failed after all retries');
+            }
           }
-        } catch (error) {
-          console.warn('Failed to initialize file watching:', error);
+        };
 
-          // Don't re-throw the error to prevent crashing the app
-        }
+        // Start the initialization attempt
+        attemptInitialization();
       };
 
       initializeFileWatching();
