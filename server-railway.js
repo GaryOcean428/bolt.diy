@@ -171,7 +171,7 @@ async function loadRemixBuild(buildPath) {
         build,
         mode: process.env.NODE_ENV || 'production',
         getLoadContext() {
-          return {};
+          return { cloudflare: { env: process.env } };
         },
       }),
     );

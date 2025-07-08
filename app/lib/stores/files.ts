@@ -60,8 +60,10 @@ export class FilesStore {
     }
 
     // Only start initialization if not in SSR context
+    // NOTE: Removed automatic initialization to prevent ENOENT errors
+    // File watching will be started explicitly when workspace is ready
     if (!import.meta.env.SSR) {
-      this.#init();
+      // this.#init(); // Removed - will be called via startWatching() when ready
     }
   }
 
@@ -188,7 +190,7 @@ export class FilesStore {
 
       try {
         webcontainer.internal.watchPaths(
-          { include: [watchDir], exclude: ['**/node_modules', '.git'], includeContent: true },
+          { include: [watchDir], exclude: ['**/node_modules', '.git'], includeContent: false },
           bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
         );
         this.#watchingActive = true;
