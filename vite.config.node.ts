@@ -50,7 +50,7 @@ export default defineConfig((config) => {
       remixVitePlugin({
         serverBuildFile: 'index.js',
         buildDirectory: 'build',
-        publicPath: '/build/',
+
         future: {
           v3_fetcherPersist: true,
           v3_relativeSplatPath: true,

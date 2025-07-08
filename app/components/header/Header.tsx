@@ -1,7 +1,14 @@
+import { lazy } from 'react';
+import React from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
-import { HeaderActionButtons } from './HeaderActionButtons.client';
-import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
+
+const HeaderActionButtons = lazy(() =>
+  import('./HeaderActionButtons.client').then((m) => ({ default: m.HeaderActionButtons })),
+);
+const ChatDescription = lazy(() =>
+  import('~/lib/persistence/ChatDescription.client').then((m) => ({ default: m.ChatDescription })),
+);
 import { chatStore } from '~/lib/stores/chat';
 import { classNames } from '~/utils/classNames';
 
@@ -26,12 +33,20 @@ export function Header() {
       {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
         <>
           <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
-            <ClientOnly>{() => <ChatDescription />}</ClientOnly>
+            <ClientOnly>
+              {() => (
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <ChatDescription />
+                </React.Suspense>
+              )}
+            </ClientOnly>
           </span>
           <ClientOnly>
             {() => (
               <div className="mr-1">
-                <HeaderActionButtons />
+                <React.Suspense fallback={<div>Loading...</div>}>
+                  <HeaderActionButtons />
+                </React.Suspense>
               </div>
             )}
           </ClientOnly>

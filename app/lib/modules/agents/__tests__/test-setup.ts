@@ -10,7 +10,7 @@ import {
 } from '~/lib/modules/agents/types';
 
 // Mock import.meta.env for tests
-global.globalThis.import = {
+(global.globalThis as any).import = {
   meta: {
     env: {
       VITE_LOG_LEVEL: 'debug',

@@ -36,6 +36,7 @@ export const links: LinksFunction = () => [
   {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+    crossOrigin: 'anonymous',
   },
 ];
 
@@ -209,7 +210,7 @@ export function ErrorBoundary() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
       <div className="text-center max-w-md">
-        <div className="text-6xl mb-4">⚡</div>
+        <div className="text-6xl mb-4" dangerouslySetInnerHTML={{ __html: '&#9889;' }}></div>
         <h1 className="text-2xl font-bold mb-2">{errorMessage}</h1>
         <p className="text-bolt-elements-textSecondary mb-6">{errorDetails}</p>
         <button

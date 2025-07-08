@@ -37,7 +37,7 @@ if (!import.meta.env.SSR) {
         }
 
         // Add additional environment checks
-        if (typeof window !== 'undefined' && !window.WebContainerSupported) {
+        if (typeof window !== 'undefined' && !(window as any).WebContainerSupported) {
           console.warn('WebContainer is not supported in this browser environment');
         }
 
@@ -135,7 +135,7 @@ if (!import.meta.env.SSR) {
          * In server environments like Railway, WebContainer might not be available
          * Log this as a warning rather than an error for these cases
          */
-        if (typeof window === 'undefined' || !window.WebContainerSupported) {
+        if (typeof window === 'undefined' || !(window as any).WebContainerSupported) {
           console.warn('WebContainer is not supported in this environment (likely server-side)');
           
           // Return a mock WebContainer-like object to prevent further errors

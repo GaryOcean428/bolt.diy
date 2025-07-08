@@ -344,4 +344,4 @@ const ChatImpl: React.FC<ChatProps> = memo(
   },
 );
 
-export default ChatImpl;
+// Removed default export to avoid import/export confusion - use named export 'Chat' instead

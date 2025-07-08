@@ -41,7 +41,7 @@ describe('Agent Event Handler Error Boundaries', () => {
         await Promise.race([potentiallyHangingOperation, timeoutPromise]);
         fail('Should have timed out');
       } catch (error) {
-        expect(error.message).toContain('timed out');
+        expect((error as Error).message).toContain('timed out');
       }
     });
 

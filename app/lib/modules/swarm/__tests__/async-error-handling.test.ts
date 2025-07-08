@@ -146,7 +146,7 @@ describe('Async Error Handling Integration', () => {
         await Promise.race([hangingOperation, timeoutPromise]);
         fail('Should have timed out');
       } catch (error) {
-        expect(error.message).toBe('Operation timed out');
+        expect((error as Error).message).toBe('Operation timed out');
       }
     });
 
