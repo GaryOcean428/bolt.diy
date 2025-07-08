@@ -70,6 +70,12 @@ export class FilesStore {
   // Method to manually start initialization (useful for client-side mounting)
   startWatching() {
     if (!import.meta.env.SSR) {
+      // Check if WebContainer is supported before starting
+      if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
+        console.warn('WebContainer requires Cross-Origin Isolation, file watching disabled');
+        return;
+      }
+      
       // Increased delay to ensure WebContainer is fully ready before starting file watching
       setTimeout(() => this.#init(), 2000);
     }
@@ -161,14 +167,22 @@ export class FilesStore {
       // Check if the work directory exists before setting up file watching
       try {
         // Use WorkspaceInitializer to ensure virtual workspace is ready
-        const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.');
+        const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.', webcontainer);
 
         if (workspaceReady) {
           // Check using relative path to avoid absolute path concatenation issues
           await webcontainer.fs.readdir('.');
           logger.debug('Work directory confirmed accessible for file watching');
         } else {
-          logger.warn('Virtual workspace initialization indicated issues');
+          logger.warn('Virtual workspace initialization indicated issues, attempting directory creation');
+          
+          // Attempt to create the directory if it doesn't exist
+          try {
+            await webcontainer.fs.mkdir('.', { recursive: true });
+            logger.info('Created work directory for file watching');
+          } catch (createError) {
+            logger.warn('Failed to create work directory:', createError);
+          }
         }
       } catch (dirError) {
         if (this.#initRetryCount >= this.#maxRetries) {

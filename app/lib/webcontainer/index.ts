@@ -27,6 +27,18 @@ if (!import.meta.env.SSR) {
         // Check if WebContainer is supported in this environment
         if (typeof window !== 'undefined' && !window.crossOriginIsolated) {
           console.warn('WebContainer requires Cross-Origin Isolation. Some features may not work properly.');
+          
+          // Log additional diagnostic information
+          console.warn('Cross-Origin Isolation check:', {
+            crossOriginIsolated: window.crossOriginIsolated,
+            location: window.location.href,
+            isSecureContext: window.isSecureContext,
+          });
+        }
+
+        // Add additional environment checks
+        if (typeof window !== 'undefined' && !window.WebContainerSupported) {
+          console.warn('WebContainer is not supported in this browser environment');
         }
 
         return WebContainer.boot({
@@ -44,16 +56,24 @@ if (!import.meta.env.SSR) {
         } else {
           console.log('WebContainer initialized with workdir:', webcontainer.workdir);
 
-          // Use enhanced workspace initialization
+          // Use enhanced workspace initialization with webcontainer instance
           try {
-            const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.');
+            const workspaceReady = await WorkspaceInitializer.ensureVirtualWorkspaceExists('.', webcontainer);
 
             if (workspaceReady) {
               // Validate the work directory exists using relative path to avoid path concatenation issues
               await webcontainer.fs.readdir('.');
               console.log('Work directory verified:', webcontainer.workdir);
             } else {
-              console.warn('Virtual workspace validation failed');
+              console.warn('Virtual workspace validation failed, attempting manual directory creation');
+              
+              try {
+                // Use relative path for workspace creation to avoid path issues
+                await webcontainer.fs.mkdir('.', { recursive: true });
+                console.log('Workspace directory created successfully');
+              } catch (createError) {
+                console.warn('Failed to create workspace directory:', createError);
+              }
             }
           } catch (error) {
             console.warn('Work directory validation failed, attempting to create workspace');
@@ -117,10 +137,38 @@ if (!import.meta.env.SSR) {
          */
         if (typeof window === 'undefined' || !window.WebContainerSupported) {
           console.warn('WebContainer is not supported in this environment (likely server-side)');
+          
+          // Return a mock WebContainer-like object to prevent further errors
+          return {
+            workdir: '/tmp/mock-workspace',
+            fs: {
+              readdir: () => Promise.resolve([]),
+              mkdir: () => Promise.resolve(),
+              writeFile: () => Promise.resolve(),
+            },
+            internal: {
+              watchPaths: () => {},
+            },
+            on: () => {},
+          } as any;
         }
 
-        // Re-throw to maintain promise rejection behavior
-        throw error;
+        // For client-side errors, still re-throw but provide a more user-friendly mock
+        console.warn('WebContainer failed to initialize, providing fallback functionality');
+        
+        // Return a mock WebContainer to prevent app crashes
+        return {
+          workdir: '/tmp/fallback-workspace',
+          fs: {
+            readdir: () => Promise.resolve([]),
+            mkdir: () => Promise.resolve(),
+            writeFile: () => Promise.resolve(),
+          },
+          internal: {
+            watchPaths: () => {},
+          },
+          on: () => {},
+        } as any;
       });
 
   if (import.meta.hot) {

@@ -64,15 +64,37 @@ export class WorkspaceInitializer {
    * Initialize workspace for WebContainer environments
    * This is a lighter version that works with virtual file systems
    */
-  static async ensureVirtualWorkspaceExists(workdir: string = '.'): Promise<boolean> {
+  static async ensureVirtualWorkspaceExists(workdir: string = '.', webcontainer?: any): Promise<boolean> {
     try {
       /*
-       * For virtual environments, we just need to verify the directory is accessible
-       * WebContainer manages the actual file system
+       * For virtual environments, we need to ensure the directory exists
+       * in the WebContainer file system before file watching can work
        */
       logger.debug(`Verifying virtual workspace: ${workdir}`);
 
-      // This will be handled by the WebContainer file system
+      // If webcontainer is provided, use it to ensure the directory exists
+      if (webcontainer && webcontainer.fs) {
+        try {
+          // Check if directory exists
+          await webcontainer.fs.readdir(workdir);
+          logger.debug(`Virtual workspace directory exists: ${workdir}`);
+        } catch (error) {
+          // Directory doesn't exist, try to create it
+          if (error instanceof Error && error.message.includes('ENOENT')) {
+            try {
+              await webcontainer.fs.mkdir(workdir, { recursive: true });
+              logger.info(`Created virtual workspace directory: ${workdir}`);
+            } catch (createError) {
+              logger.warn(`Failed to create virtual workspace directory: ${workdir}`, createError);
+              return false;
+            }
+          } else {
+            logger.warn(`Virtual workspace directory check failed: ${workdir}`, error);
+            return false;
+          }
+        }
+      }
+
       return true;
     } catch (error) {
       logger.error('Failed to verify virtual workspace:', error);
