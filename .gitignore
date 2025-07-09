@@ -44,3 +44,6 @@ site
 
 # commit file ignore
 app/commit.jsontsconfig.tsbuildinfo
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
