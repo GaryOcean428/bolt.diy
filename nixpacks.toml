@@ -1,16 +1,21 @@
 [variables]
-NIXPACKS_NODE_VERSION = "18"
+NIXPACKS_NODE_VERSION = "20"
 NIXPACKS_BUILD_CMD = "pnpm install --frozen-lockfile && pnpm build"
 PORT = "5173"
+NODE_ENV = "production"
 
 # Ensure Vite can access env vars during build
 VITE_OPENAI_API_KEY = "${OPENAI_API_KEY}"
 VITE_ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY}"
 VITE_GROQ_API_KEY = "${GROQ_API_KEY}"
 VITE_GOOGLE_GENERATIVE_AI_API_KEY = "${GOOGLE_GENERATIVE_AI_API_KEY}"
+VITE_PERPLEXITY_API_KEY = "${PERPLEXITY_API_KEY}"
+VITE_XAI_API_KEY = "${XAI_API_KEY}"
+VITE_GEMINI_API_KEY = "${GEMINI_API_KEY}"
+VITE_HUGGINGFACE_TOKEN = "${HUGGINGFACE_TOKEN}"
 
 [phases.setup]
-nixPkgs = ['nodejs-18_x', 'pnpm']
+nixPkgs = ['nodejs-20_x', 'pnpm']
 
 [phases.install]
 cmds = ['pnpm install --frozen-lockfile']
@@ -19,4 +24,4 @@ cmds = ['pnpm install --frozen-lockfile']
 cmds = ['pnpm build']
 
 [start]
-cmd = 'pnpm start'
+cmd = 'pnpm run server:railway'
